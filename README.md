@@ -10,3 +10,12 @@ Reach us by email:
 - Gwendolyn Liu (liug0226@stanford.edu)
 
 Or by Slack! (link tbd)
+
+# How to run the app
+If it's your first time running the app: ``npm install``
+
+Then, run: ``npm start``.
+Alternatives are:
+``npm run android``
+``npm run ios``
+``npm run web``
