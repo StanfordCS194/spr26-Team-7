@@ -15,3 +15,10 @@ python3 -m venv venv
 source venv/bin/activate      # macOS / Linux
 # venv\Scripts\activate       # Windows
 pip install -r requirements.txt
+```
+
+## To run locally
+
+``uvicorn main:app --reload``
+Go to the IP address:8000/docs
+And test it out
