@@ -9,9 +9,9 @@ Reach us by email:
 - Zion Asemota (zasemota@stanford.edu)
 - Gwendolyn Liu (liug0226@stanford.edu)
 
-# How to run the app
-The main mobile app is located at the folder `/mobile` within this repo.
+Or by Slack! (link tbd)
 
+# How to run the app
 If it's your first time running the app: ``npm install``
 
 Then, run: ``npm start``.

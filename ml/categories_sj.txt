@@ -1,0 +1,60 @@
+Vehicle Concerns
+* License Plate Number or: Vehicle Type, Color, Make, Model (optional)
+* Location (San Jose) with "tell us more"
+*  What vehicle concern are you reporting? *
+
+Choose one option that best describes the vehicle concern you are reporting.
+Lived-in vehicle
+Trash/sewage around a vehicle (not inside the vehicle or on the truck bed)
+Vehicle in a park, creek or trail
+Vehicle on private property
+Poor condition of a vehicle parked on a city street
+Issue with how, where or how long a vehicle is parked on a city street
+Suspected vehicle-related criminal activity (drugs or prostitution)
+
+
+ Vehicles will be investigated if they meet one of these qualifying conditions:
+
+Select one option that best describes the problem you are reporting.
+Burned out vehicle
+On jacks/ blocks
+Missing or shattered windows
+Vandalized/ Graffiti (non-commercial vehicle)
+With significantly flat tire(s)
+Missing tire or wheel
+Have deployed airbags/ Significant damage
+Unsecured/ Open doors or trunk
+Displaying salvage, accident, or auction markings on windshield
+Displaying multiple aged or weathered citations
+Attracting illegal dumping activities
+Inoperable vehicles (as defined by the California Vehicle Code: missing essential parts, such as, the windshield, steering wheel, driver's seat, engine, or two or more wheels)
+
+
+
+** Graffiti **
+
+Photo (optinal)
+
+Location*
+
+On:*
+1. Painted wall
+2. Unpainted wall
+3. Sidewalk
+4. Tree
+5. Wood Fence
+6. Chain Link Fence
+7. Utility Box
+8. Light Pole
+9. Park Restroom Building
+10. Other
+11. Park picnic table
+
+Is it on public property?
+
+Is it on a state highway?
+
+Tell us more* (4000 characters)
+
+Public to view report*
+
