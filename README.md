@@ -20,7 +20,7 @@ Alternatives are:
 ``npm run ios``
 ``npm run web``
 
-Git Test Assignment:
+Git Test Assignment:  
 Elijah Song  
 Lauren Yu  
 Zion Asemota  
