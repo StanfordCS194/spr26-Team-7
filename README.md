@@ -19,3 +19,7 @@ Alternatives are:
 ``npm run android``
 ``npm run ios``
 ``npm run web``
+
+Git Test Assignment:
+Elijah Song
+Lauren Yu
