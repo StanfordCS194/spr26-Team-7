@@ -21,6 +21,7 @@ Alternatives are:
 ``npm run web``
 
 Git Test Assignment:
-Elijah Song
-Lauren Yu
-Zion Asemota
+Elijah Song  
+Lauren Yu  
+Zion Asemota  
+Lianne Cha
