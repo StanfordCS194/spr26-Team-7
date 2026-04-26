@@ -12,13 +12,13 @@ export const ReportCameraScreen = ({ onCapture }: ReportCameraScreenProps) => {
       <View style={styles.cameraBody}>
         <Text style={styles.cameraIcon}>\u25A3</Text>
         <Text style={styles.cameraText}>Camera Viewfinder</Text>
-        <Text style={styles.gpsText}>(GPS capturing...)</Text>
+        <Text style={styles.gpsText}>(GPS capturing... please give the gps a moment to process.)</Text>
       </View>
       <View style={styles.captureBar}>
         <Pressable style={styles.smallButton} accessibilityRole="button">
           <Text style={styles.smallButtonText}>Gallery</Text>
         </Pressable>
-        <Pressable style={styles.captureButton} onPress={onCapture} accessibilityRole="button" />
+        <Pressable style={styles.captureButton} onPress={onCapture} accessibilityRole="button" accessibilityLabel="Capture photo" />
         <Pressable style={styles.smallButton} accessibilityRole="button">
           <Text style={styles.smallButtonText}>Layers</Text>
         </Pressable>
