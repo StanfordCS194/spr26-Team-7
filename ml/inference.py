@@ -1,23 +1,21 @@
 import io
 from PIL import Image
 import torch
-import torchvision.transforms as T
-from model import model
-from model import LABELS
+from model import processor, model
 
-transform = T.Compose([
-    T.Resize(256),
-    T.CenterCrop(224),
-    T.ToTensor(),
-])
+PROMPT = "a detailed description of"
 
-def predict(image_bytes: bytes):
+def predict(image_bytes: bytes) -> str:
     image = Image.open(io.BytesIO(image_bytes)).convert("RGB")
-    img = transform(image)
-    x = img.unsqueeze(0)
+    inputs = processor(image, text=PROMPT, return_tensors="pt")
 
     with torch.no_grad():
-        outputs = model(x)
-        pred = outputs.argmax(dim=1).item()
+        output = model.generate(
+            **inputs,
+            max_new_tokens=150,
+            num_beams=5,
+            length_penalty=1.5,
+            repetition_penalty=2.0,
+        )
 
-    return LABELS[pred]
+    return processor.decode(output[0], skip_special_tokens=True)
