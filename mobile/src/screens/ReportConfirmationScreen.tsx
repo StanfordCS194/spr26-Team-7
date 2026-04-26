@@ -1,70 +1,189 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native'
-import { WireframeHeader } from '../components/WireframeHeader'
+import { useEffect, useRef } from 'react';
+import { Animated, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { MockStreetPhoto } from '../components/MockStreetPhoto';
+import { Classification } from './ClassificationScreen';
+import { T } from '../theme';
 
 type ReportConfirmationScreenProps = {
-  caseNumber: string
-  neighborhood: string
-  totalInArea: number
-  onViewIssue: () => void
-  onReportAnother: () => void
-}
+  merged: boolean;
+  classification: Classification | null;
+  onDone: () => void;
+};
 
 export const ReportConfirmationScreen = ({
-  caseNumber,
-  neighborhood,
-  totalInArea,
-  onViewIssue,
-  onReportAnother,
+  merged,
+  classification,
+  onDone,
 }: ReportConfirmationScreenProps) => {
+  const scaleAnim = useRef(new Animated.Value(0)).current;
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(16)).current;
+
+  useEffect(() => {
+    const delay = setTimeout(() => {
+      Animated.parallel([
+        Animated.spring(scaleAnim, {
+          toValue: 1,
+          friction: 5,
+          tension: 40,
+          useNativeDriver: true,
+        }),
+        Animated.timing(fadeAnim, {
+          toValue: 1,
+          duration: 400,
+          delay: 200,
+          useNativeDriver: true,
+        }),
+        Animated.timing(slideAnim, {
+          toValue: 0,
+          duration: 320,
+          delay: 200,
+          useNativeDriver: true,
+        }),
+      ]).start();
+    }, 100);
+    return () => clearTimeout(delay);
+  }, []);
+
+  const tag = classification?.tag ?? 'Pothole';
+  const circleColor = merged ? T.blueLight : T.greenLight;
+  const checkColor = merged ? T.blue : T.green;
+
   return (
     <View style={styles.page}>
-      <WireframeHeader title="Confirmation" />
-      <View style={styles.body}>
-        <Text style={styles.check}>✓</Text>
-        <Text style={styles.title}>Report Submitted!</Text>
-        <Text style={styles.subtitle}>Thanks for helping improve {neighborhood}</Text>
-        <Text style={styles.meta}>{totalInArea} total issues reported in this area</Text>
+      <ScrollView contentContainerStyle={styles.scroll}>
+        {/* Check circle */}
+        <Animated.View style={[styles.checkCircle, { backgroundColor: circleColor, transform: [{ scale: scaleAnim }] }]}>
+          <Text style={[styles.checkMark, { color: checkColor }]}>✓</Text>
+        </Animated.View>
 
-        <View style={styles.caseCard}>
-          <Text style={styles.caseLabel}>Case Number</Text>
-          <Text style={styles.caseValue}>{caseNumber}</Text>
-        </View>
+        {/* Title */}
+        <Animated.Text style={[styles.title, { opacity: fadeAnim, transform: [{ translateY: slideAnim }] }]}>
+          {merged ? 'Report added!' : 'Report filed!'}
+        </Animated.Text>
 
-        <Pressable style={styles.primaryButton} onPress={onViewIssue} accessibilityRole="button">
-          <Text style={styles.primaryButtonText}>View Issue</Text>
-        </Pressable>
-        <Pressable style={styles.secondaryButton} onPress={onReportAnother} accessibilityRole="button">
-          <Text style={styles.secondaryButtonText}>Report Another</Text>
-        </Pressable>
-      </View>
+        {/* Subtitle */}
+        <Animated.Text style={[styles.subtitle, { opacity: fadeAnim, transform: [{ translateY: slideAnim }] }]}>
+          {merged
+            ? 'Your report joined 4 others. The city now has 5 confirmations for this pothole on Willow St.'
+            : 'Thanks for helping improve Willow Glen. Your report has been sent to San Jose Dept. of Transportation.'}
+        </Animated.Text>
+
+        {/* Summary card */}
+        <Animated.View style={[styles.summaryCard, { opacity: fadeAnim, transform: [{ translateY: slideAnim }] }]}>
+          <View style={styles.summaryPhoto}>
+            <MockStreetPhoto style={StyleSheet.absoluteFillObject} />
+            <View style={styles.summaryPhotoOverlay} />
+          </View>
+          <View style={styles.summaryBody}>
+            <View style={styles.summaryRow}>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.summaryTag}>{tag}</Text>
+                <Text style={styles.summaryAddr}>Willow St &amp; Lincoln Ave, San Jose</Text>
+              </View>
+              <View style={[styles.filedBadge, { backgroundColor: merged ? T.blueLight : T.greenLight }]}>
+                <Text style={[styles.filedBadgeText, { color: merged ? T.blue : T.green }]}>
+                  {merged ? '+1 · 5 total' : 'Filed'}
+                </Text>
+              </View>
+            </View>
+            <View style={styles.tagRow}>
+              <View style={styles.tag}>
+                <Text style={styles.tagText}>San Jose D.O.T.</Text>
+              </View>
+              <View style={styles.tag}>
+                <Text style={styles.tagText}>Est. 2–3 weeks</Text>
+              </View>
+              <View style={[styles.tag, { backgroundColor: '#fef3c7' }]}>
+                <Text style={[styles.tagText, { color: T.amber }]}>Pending</Text>
+              </View>
+            </View>
+          </View>
+        </Animated.View>
+
+        {/* Back to home */}
+        <Animated.View style={{ width: '100%', opacity: fadeAnim, transform: [{ translateY: slideAnim }] }}>
+          <Pressable onPress={onDone} style={styles.homeButton} accessibilityRole="button">
+            <Text style={styles.homeIcon}>🏠</Text>
+            <Text style={styles.homeText}>Back to home</Text>
+          </Pressable>
+        </Animated.View>
+      </ScrollView>
     </View>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
-  page: { flex: 1, backgroundColor: '#fff' },
-  body: {
-    flex: 1,
-    justifyContent: 'center',
-    paddingHorizontal: 24,
-    paddingBottom: 42,
-  },
-  check: { textAlign: 'center', color: '#00B643', fontSize: 84, marginBottom: 10, fontWeight: '800' },
-  title: { fontSize: 48 / 2, fontWeight: '900', textAlign: 'center' },
-  subtitle: { textAlign: 'center', marginTop: 8, color: '#3E4758', fontSize: 34 / 2, fontWeight: '500' },
-  meta: { textAlign: 'center', marginTop: 8, color: '#6D788B', fontSize: 28 / 2 },
-  caseCard: { marginTop: 24, backgroundColor: '#F5F7FB', borderRadius: 14, padding: 14, marginBottom: 18 },
-  caseLabel: { color: '#5F6B7E', marginBottom: 8, fontWeight: '600' },
-  caseValue: { fontSize: 50 / 2, fontWeight: '900', letterSpacing: 0.4 },
-  primaryButton: { backgroundColor: '#1565FF', borderRadius: 12, paddingVertical: 16, alignItems: 'center' },
-  primaryButtonText: { color: '#fff', fontWeight: '800', fontSize: 34 / 2 },
-  secondaryButton: {
-    marginTop: 10,
-    borderColor: '#D3DBE7',
-    borderWidth: 2,
-    borderRadius: 12,
-    paddingVertical: 16,
+  page: { flex: 1, backgroundColor: T.cream },
+  scroll: {
+    flexGrow: 1,
     alignItems: 'center',
+    paddingHorizontal: 24,
+    paddingTop: 32,
+    paddingBottom: 32,
+    gap: 16,
   },
-  secondaryButtonText: { color: '#111722', fontWeight: '800', fontSize: 34 / 2 },
-})
+
+  checkCircle: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 4,
+  },
+  checkMark: { fontSize: 42, fontWeight: '700', lineHeight: 50 },
+
+  title: {
+    fontSize: 22,
+    fontWeight: '800',
+    color: T.ink,
+    textAlign: 'center',
+  },
+  subtitle: {
+    fontSize: 15,
+    color: T.ink2,
+    textAlign: 'center',
+    lineHeight: 23,
+  },
+
+  summaryCard: {
+    width: '100%',
+    backgroundColor: T.white,
+    borderWidth: 1,
+    borderColor: T.border,
+    borderRadius: 16,
+    overflow: 'hidden',
+  },
+  summaryPhoto: {
+    height: 80,
+    backgroundColor: '#111',
+    overflow: 'hidden',
+    position: 'relative',
+  },
+  summaryPhotoOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0,0,0,0.18)',
+  },
+  summaryBody: { padding: 14, gap: 10 },
+  summaryRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 10 },
+  summaryTag: { fontSize: 15, fontWeight: '700', color: T.ink },
+  summaryAddr: { fontSize: 12, color: T.ink3, marginTop: 2 },
+  filedBadge: { borderRadius: 8, paddingHorizontal: 8, paddingVertical: 4 },
+  filedBadgeText: { fontSize: 11, fontWeight: '700' },
+  tagRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
+  tag: { backgroundColor: T.warm, borderRadius: 8, paddingHorizontal: 8, paddingVertical: 4 },
+  tagText: { fontSize: 11, color: T.ink3, fontWeight: '500' },
+
+  homeButton: {
+    backgroundColor: T.blue,
+    borderRadius: 14,
+    paddingVertical: 15,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+  },
+  homeIcon: { fontSize: 18 },
+  homeText: { color: 'white', fontSize: 15, fontWeight: '700' },
+});

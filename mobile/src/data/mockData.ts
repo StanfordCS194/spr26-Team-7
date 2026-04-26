@@ -8,13 +8,36 @@ export const issueCategories: IssueCategory[] = [
   'Transit Signage',
 ]
 
+const categoryGroupMap: Record<IssueCategory, string> = {
+  'Pothole': 'Roads & Infrastructure',
+  'Streetlight Outage': 'Utilities',
+  'Graffiti': 'Public Spaces',
+  'Illegal Dumping': 'Public Spaces',
+  'Transit Signage': 'Public Transit',
+}
+
+export const getCategoryGroup = (category: IssueCategory): string =>
+  categoryGroupMap[category] ?? 'Roads & Infrastructure'
+
+const departmentMap: Record<IssueCategory, { name: string; division: string }> = {
+  'Pothole': { name: 'Dept. of Transportation', division: 'Street Maintenance · 311' },
+  'Streetlight Outage': { name: 'Dept. of Public Works', division: 'Electrical Services · 311' },
+  'Graffiti': { name: 'Parks & Recreation Dept.', division: 'Beautification Division · 311' },
+  'Illegal Dumping': { name: 'Environmental Services', division: 'Code Enforcement · 311' },
+  'Transit Signage': { name: 'Transportation Authority', division: 'Transit Operations · 311' },
+}
+
+export const getDepartment = (category: IssueCategory): { name: string; division: string } =>
+  departmentMap[category] ?? { name: 'Dept. of Public Works', division: 'General Services · 311' }
+
 export const initialDraft: ReportDraft = {
   photoCount: 1,
   category: 'Pothole',
-  description: 'A medium-sized pothole approximately 8 inches in diameter located in the right lane of the street.',
+  description:
+    'Significant pothole on Willow St near Lincoln Ave causing road hazard. Approximately 2ft wide with visible asphalt damage.',
   notes: '',
-  address: '123 Main St, City, ST 12345',
-  neighborhood: 'Downtown',
+  address: 'Willow St & Lincoln Ave',
+  neighborhood: 'Willow Glen',
   duplicateNearby: true,
 }
 
@@ -22,14 +45,15 @@ export const demoReport: ReportRecord = {
   id: 'GC-2026-04821',
   category: 'Pothole',
   status: 'In Review',
-  description: 'A medium-sized pothole approximately 8 inches in diameter located in the right lane of the street.',
-  address: '123 Main St, City, ST 12345',
-  assignedTo: 'Department of Public Works',
+  description:
+    'Significant pothole on Willow St near Lincoln Ave causing road hazard. Approximately 2ft wide with visible asphalt damage.',
+  address: 'Willow St & Lincoln Ave, San Jose, CA 95125',
+  assignedTo: 'Dept. of Transportation',
   timeline: [
-    { label: 'Submitted', dateText: 'Apr 19, 2026 at 2:30 PM' },
-    { label: 'In Review', dateText: 'Apr 19, 2026 at 3:15 PM' },
+    { label: 'Submitted', dateText: 'Apr 26, 2026 at 2:30 PM' },
+    { label: 'In Review', dateText: 'Apr 26, 2026 at 3:15 PM' },
     { label: 'In Progress', dateText: 'Pending assignment' },
-    { label: 'Resolved', dateText: 'Estimated 4-7 days' },
+    { label: 'Resolved', dateText: 'Estimated 4–7 days' },
   ],
 }
 

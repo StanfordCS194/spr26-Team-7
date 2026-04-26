@@ -1,0 +1,18 @@
+export const T = {
+  blue:       '#2563eb',
+  blueDark:   '#1d4ed8',
+  blueLight:  '#eff6ff',
+  cream:      '#faf8f5',
+  warm:       '#f5f0e8',
+  amber:      '#d97706',
+  amberLight: '#fffbeb',
+  red:        '#dc2626',
+  green:      '#16a34a',
+  greenLight: '#f0fdf4',
+  ink:        '#1a1614',
+  ink2:       '#44403c',
+  ink3:       '#78716c',
+  ink4:       '#d6d3d1',
+  white:      '#ffffff',
+  border:     '#e7e5e0',
+} as const;
