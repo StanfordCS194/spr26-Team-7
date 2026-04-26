@@ -1,105 +1,103 @@
-import { StatusBar } from 'expo-status-bar'
-import { SafeAreaView, StyleSheet, View } from 'react-native'
-import { useMemo, useState } from 'react'
-import { BottomNav } from './src/components/BottomNav'
-import { demoReport, initialDraft } from './src/data/mockData'
-import { DashboardScreen } from './src/screens/DashboardScreen'
-import { IssueStatusScreen } from './src/screens/IssueStatusScreen'
-import { ProfileScreen } from './src/screens/ProfileScreen'
-import { ReportCameraScreen } from './src/screens/ReportCameraScreen'
-import { ReportConfirmationScreen } from './src/screens/ReportConfirmationScreen'
-import { ReportPreviewScreen } from './src/screens/ReportPreviewScreen'
-import { ReportReviewScreen } from './src/screens/ReportReviewScreen'
-import { ReportSubmittingScreen } from './src/screens/ReportSubmittingScreen'
-import { AppTab, ReportDraft } from './src/types'
+import { StatusBar } from 'expo-status-bar';
+import { SafeAreaView, StyleSheet, View } from 'react-native';
+import { useState } from 'react';
+import { BottomNav } from './src/components/BottomNav';
+import { DashboardScreen } from './src/screens/DashboardScreen';
+import { ProfileScreen } from './src/screens/ProfileScreen';
+import { ReportCameraScreen } from './src/screens/ReportCameraScreen';
+import { AnalyzingScreen } from './src/screens/AnalyzingScreen';
+import { ClassificationScreen, Classification } from './src/screens/ClassificationScreen';
+import { DuplicateScreen } from './src/screens/DuplicateScreen';
+import { ReportConfirmationScreen } from './src/screens/ReportConfirmationScreen';
+import { AppTab } from './src/types';
 
-type ReportFlowStep = 'camera' | 'preview' | 'review' | 'submitting' | 'confirmation' | 'status'
+type ReportStep = 'camera' | 'analyzing' | 'classify' | 'duplicate' | 'confirmation';
 
 export default function App() {
-  const [currentTab, setCurrentTab] = useState<AppTab>('report')
-  const [reportStep, setReportStep] = useState<ReportFlowStep>('camera')
-  const [draft, setDraft] = useState<ReportDraft>(initialDraft)
-  const [isSignedIn, setIsSignedIn] = useState(false)
-  const [lastSubmitWasPlusOne, setLastSubmitWasPlusOne] = useState(false)
-
-  const confirmationCount = useMemo(() => (lastSubmitWasPlusOne ? 39 : 38), [lastSubmitWasPlusOne])
+  const [currentTab, setCurrentTab] = useState<AppTab>('report');
+  const [reportStep, setReportStep] = useState<ReportStep>('camera');
+  const [classification, setClassification] = useState<Classification | null>(null);
+  const [merged, setMerged] = useState(false);
+  const [isSignedIn, setIsSignedIn] = useState(false);
 
   const handleResetFlow = () => {
-    setDraft(initialDraft)
-    setReportStep('camera')
-    setLastSubmitWasPlusOne(false)
-  }
+    setReportStep('camera');
+    setClassification(null);
+    setMerged(false);
+  };
 
   const renderReportFlow = () => {
     if (reportStep === 'camera') {
-      return <ReportCameraScreen onCapture={() => setReportStep('preview')} />
+      return <ReportCameraScreen onCapture={() => setReportStep('analyzing')} />;
     }
-
-    if (reportStep === 'preview') {
-      return <ReportPreviewScreen onBack={() => setReportStep('camera')} onContinue={() => setReportStep('review')} />
+    if (reportStep === 'analyzing') {
+      return <AnalyzingScreen onDone={() => setReportStep('classify')} />;
     }
-
-    if (reportStep === 'review') {
+    if (reportStep === 'classify') {
       return (
-        <ReportReviewScreen
-          draft={draft}
-          onBack={() => setReportStep('preview')}
-          onUpdateDraft={setDraft}
-          onSubmit={(isPlusOne) => {
-            setLastSubmitWasPlusOne(isPlusOne)
-            setReportStep('submitting')
+        <ClassificationScreen
+          onBack={() => setReportStep('camera')}
+          onConfirm={(c) => {
+            setClassification(c);
+            setReportStep('duplicate');
           }}
         />
-      )
+      );
     }
-
-    if (reportStep === 'submitting') {
-      return <ReportSubmittingScreen onDone={() => setReportStep('confirmation')} />
-    }
-
-    if (reportStep === 'confirmation') {
+    if (reportStep === 'duplicate') {
       return (
-        <ReportConfirmationScreen
-          caseNumber={demoReport.id}
-          neighborhood={draft.neighborhood}
-          totalInArea={confirmationCount}
-          onViewIssue={() => setReportStep('status')}
-          onReportAnother={handleResetFlow}
+        <DuplicateScreen
+          onMerge={() => { setMerged(true); setReportStep('confirmation'); }}
+          onNew={() => { setMerged(false); setReportStep('confirmation'); }}
+          onBack={() => setReportStep('classify')}
         />
-      )
+      );
     }
-
-    return <IssueStatusScreen report={demoReport} onBack={() => setReportStep('confirmation')} />
-  }
+    return (
+      <ReportConfirmationScreen
+        merged={merged}
+        classification={classification}
+        onDone={handleResetFlow}
+      />
+    );
+  };
 
   const renderCurrentTab = () => {
     if (currentTab === 'dashboard') {
-      return <DashboardScreen />
+      return <DashboardScreen />;
     }
     if (currentTab === 'profile') {
-      return <ProfileScreen isSignedIn={isSignedIn} onToggleAuth={() => setIsSignedIn((prev) => !prev)} />
+      return (
+        <ProfileScreen
+          isSignedIn={isSignedIn}
+          onToggleAuth={() => setIsSignedIn(prev => !prev)}
+        />
+      );
     }
-    return renderReportFlow()
-  }
+    return renderReportFlow();
+  };
+
+  // Only show bottom nav when not deep in the report flow
+  const showNav =
+    currentTab === 'dashboard' ||
+    currentTab === 'profile' ||
+    (currentTab === 'report' && reportStep === 'camera');
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar style="light" />
       <View style={styles.container}>{renderCurrentTab()}</View>
-      <BottomNav
-        currentTab={currentTab}
-        onChangeTab={(tab) => {
-          setCurrentTab(tab)
-          if (tab === 'report' && reportStep === 'status') {
-            setReportStep('confirmation')
-          }
-        }}
-      />
+      {showNav && (
+        <BottomNav
+          currentTab={currentTab}
+          onChangeTab={(tab) => setCurrentTab(tab)}
+        />
+      )}
     </SafeAreaView>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: '#fff' },
   container: { flex: 1, backgroundColor: '#fff' },
-})
+});
