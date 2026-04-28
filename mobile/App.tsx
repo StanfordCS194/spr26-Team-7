@@ -10,6 +10,7 @@ import { ClassificationScreen, Classification } from './src/screens/Classificati
 import { DuplicateScreen } from './src/screens/DuplicateScreen';
 import { ReportConfirmationScreen } from './src/screens/ReportConfirmationScreen';
 import { AppTab } from './src/types';
+import { AuthScreen } from './src/screens/AuthScreen';
 
 type ReportStep = 'camera' | 'analyzing' | 'classify' | 'duplicate' | 'confirmation';
 
@@ -19,6 +20,17 @@ export default function App() {
   const [classification, setClassification] = useState<Classification | null>(null);
   const [merged, setMerged] = useState(false);
   const [isSignedIn, setIsSignedIn] = useState(false);
+
+  const handleAuthenticate = () => {
+    setIsSignedIn(true);
+    setCurrentTab('dashboard');
+  };
+
+  const handleSignOut = () => {
+    setIsSignedIn(false);
+    setCurrentTab('report');
+    handleResetFlow();
+  };
 
   const handleResetFlow = () => {
     setReportStep('camera');
@@ -70,7 +82,7 @@ export default function App() {
       return (
         <ProfileScreen
           isSignedIn={isSignedIn}
-          onToggleAuth={() => setIsSignedIn(prev => !prev)}
+          onToggleAuth={handleSignOut}
         />
       );
     }
@@ -79,14 +91,23 @@ export default function App() {
 
   // Only show bottom nav when not deep in the report flow
   const showNav =
-    currentTab === 'dashboard' ||
-    currentTab === 'profile' ||
-    (currentTab === 'report' && reportStep === 'camera');
+    isSignedIn &&
+    (
+      currentTab === 'dashboard' ||
+      currentTab === 'profile' ||
+      (currentTab === 'report' && reportStep === 'camera')
+    );
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar style="light" />
-      <View style={styles.container}>{renderCurrentTab()}</View>
+      <View style={styles.container}>
+        {isSignedIn ? (
+          renderCurrentTab()
+        ) : (
+          <AuthScreen onAuthenticate={handleAuthenticate} />
+        )}
+      </View>
       {showNav && (
         <BottomNav
           currentTab={currentTab}
