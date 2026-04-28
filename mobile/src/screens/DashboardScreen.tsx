@@ -1,10 +1,14 @@
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
 import { topIssues } from '../data/mockData'
 import { WireframeHeader } from '../components/WireframeHeader'
 
 const filters = ['Roads', 'Utilities', 'Parks', 'Transit', 'Buildings']
 
-export const DashboardScreen = () => {
+type DashboardScreenProps = {
+  onIssueSelect?: () => void
+}
+
+export const DashboardScreen = ({ onIssueSelect }: DashboardScreenProps) => {
   return (
     <View style={styles.page}>
       <WireframeHeader title="Dashboard" />
@@ -12,7 +16,13 @@ export const DashboardScreen = () => {
         <Text style={styles.title}>Downtown Neighborhood</Text>
         <Text style={styles.subtitle}>Auto-detected · Zoom out to district/city</Text>
         <View style={styles.mapCard}>
-          <View style={[styles.pin, { top: 40, left: 80, backgroundColor: '#F08B00' }]} />
+          <Image source={require('../../assets/SJMap-hardcode.png')} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
+          <Pressable
+            style={[styles.pin, { top: '28%', left: '22%', backgroundColor: '#F08B00', borderWidth: 2, borderColor: '#fff' }]}
+            onPress={onIssueSelect}
+            accessibilityRole="button"
+            accessibilityLabel="Pothole at Willow St & Lincoln Ave"
+          />
           <View style={[styles.pin, { top: 110, left: 150, backgroundColor: '#0F9CFF' }]} />
           <View style={[styles.pin, { top: 70, left: 250, backgroundColor: '#28A745' }]} />
           <View style={[styles.pin, { top: 155, left: 220, backgroundColor: '#A35DFF' }]} />
@@ -49,7 +59,7 @@ const styles = StyleSheet.create({
   content: { padding: 14, gap: 14, paddingBottom: 24 },
   title: { fontSize: 22, fontWeight: '800' },
   subtitle: { color: '#69768A', fontWeight: '500' },
-  mapCard: { height: 220, borderRadius: 16, backgroundColor: '#EBF0F6', overflow: 'hidden' },
+  mapCard: { height: 290, borderRadius: 16, backgroundColor: '#EBF0F6', overflow: 'hidden' },
   pin: { position: 'absolute', width: 16, height: 16, borderRadius: 999 },
   filterRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   filterPill: {

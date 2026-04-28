@@ -1,5 +1,5 @@
 import { useMemo, useRef, useState } from 'react'
-import { Animated, PanResponder, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native'
+import { Animated, Image, PanResponder, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native'
 import { issueCategories } from '../data/mockData'
 import { IssueCategory, ReportDraft } from '../types'
 import { WireframeHeader } from '../components/WireframeHeader'
@@ -37,11 +37,14 @@ export const ReportReviewScreen = ({ draft, onBack, onUpdateDraft, onSubmit }: R
         <Text style={styles.pageTitle}>Review & Edit</Text>
         <View style={styles.card}>
           <Text style={styles.label}>Photos</Text>
-          <View style={styles.photoBox} />
+          <View style={styles.photoBox}>
+            <Image source={require('../../assets/pothole.jpg')} style={{ width: '100%', height: '100%' }} resizeMode="contain" />
+          </View>
         </View>
         <View style={styles.card}>
           <Text style={styles.label}>Location</Text>
           <View style={styles.mapArea}>
+            <Image source={require('../../assets/SJMap-hardcode.png')} style={{ width: '100%', height: '100%', position: 'absolute' }} resizeMode="cover" />
             <Text style={styles.dragLabel}>Drag pin to adjust</Text>
             <Animated.View style={[styles.pin, { transform: pin.getTranslateTransform() }]} {...panResponder.panHandlers}>
               <Text style={styles.pinText}>📍</Text>
@@ -117,8 +120,8 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   label: { fontSize: 28 / 2, fontWeight: '700', color: '#3E4857' },
-  photoBox: { width: 86, height: 86, backgroundColor: '#E4E8EF', borderRadius: 8 },
-  mapArea: { backgroundColor: '#EDF1F6', borderRadius: 10, height: 170, overflow: 'hidden' },
+  photoBox: { width: '100%', height: 240, backgroundColor: '#111', borderRadius: 8, overflow: 'hidden' },
+  mapArea: { backgroundColor: '#EDF1F6', borderRadius: 10, height: 190, overflow: 'hidden' },
   dragLabel: {
     position: 'absolute',
     left: 10,

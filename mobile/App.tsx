@@ -9,6 +9,8 @@ import { AnalyzingScreen } from './src/screens/AnalyzingScreen';
 import { ClassificationScreen, Classification } from './src/screens/ClassificationScreen';
 import { DuplicateScreen } from './src/screens/DuplicateScreen';
 import { ReportConfirmationScreen } from './src/screens/ReportConfirmationScreen';
+import { IssueStatusScreen } from './src/screens/IssueStatusScreen';
+import { demoReport } from './src/data/mockData';
 import { AppTab } from './src/types';
 
 type ReportStep = 'camera' | 'analyzing' | 'classify' | 'duplicate' | 'confirmation';
@@ -19,6 +21,7 @@ export default function App() {
   const [classification, setClassification] = useState<Classification | null>(null);
   const [merged, setMerged] = useState(false);
   const [isSignedIn, setIsSignedIn] = useState(false);
+  const [viewingIssue, setViewingIssue] = useState(false);
 
   const handleResetFlow = () => {
     setReportStep('camera');
@@ -64,7 +67,10 @@ export default function App() {
 
   const renderCurrentTab = () => {
     if (currentTab === 'dashboard') {
-      return <DashboardScreen />;
+      if (viewingIssue) {
+        return <IssueStatusScreen report={demoReport} onBack={() => setViewingIssue(false)} />;
+      }
+      return <DashboardScreen onIssueSelect={() => setViewingIssue(true)} />;
     }
     if (currentTab === 'profile') {
       return (
@@ -79,7 +85,7 @@ export default function App() {
 
   // Only show bottom nav when not deep in the report flow
   const showNav =
-    currentTab === 'dashboard' ||
+    (currentTab === 'dashboard' && !viewingIssue) ||
     currentTab === 'profile' ||
     (currentTab === 'report' && reportStep === 'camera');
 
@@ -90,7 +96,7 @@ export default function App() {
       {showNav && (
         <BottomNav
           currentTab={currentTab}
-          onChangeTab={(tab) => setCurrentTab(tab)}
+          onChangeTab={(tab) => { setCurrentTab(tab); setViewingIssue(false); }}
         />
       )}
     </SafeAreaView>

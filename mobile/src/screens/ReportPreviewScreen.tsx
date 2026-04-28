@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native'
+import { Image, Pressable, StyleSheet, Text, View } from 'react-native'
 import { WireframeHeader } from '../components/WireframeHeader'
 
 type ReportPreviewScreenProps = {
@@ -11,16 +11,16 @@ export const ReportPreviewScreen = ({ onBack, onContinue }: ReportPreviewScreenP
     <View style={styles.page}>
       <WireframeHeader title="Preview" showBack onBack={onBack} />
       <View style={styles.previewArea}>
+        <Image source={require('../../assets/pothole.jpg')} style={StyleSheet.absoluteFillObject} resizeMode="cover" />
         <View style={styles.analyzingBubble}>
           <Text style={styles.analyzingText}>Analyzing...</Text>
-        </View>
-        <View style={styles.photoPlaceholder}>
-          <Text style={styles.photoText}>Photo 1</Text>
         </View>
         <Text style={styles.caption}>Captured Image</Text>
       </View>
       <View style={styles.thumbnailStrip}>
-        <View style={[styles.thumbnail, styles.thumbnailActive]} />
+        <View style={[styles.thumbnail, styles.thumbnailActive]}>
+          <Image source={require('../../assets/pothole.jpg')} style={StyleSheet.absoluteFillObject} resizeMode="cover" />
+        </View>
         <Pressable style={styles.thumbnailAdd} accessibilityRole="button">
           <Text style={styles.thumbnailAddText}>+</Text>
         </Pressable>
@@ -47,6 +47,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#2E3D52',
     alignItems: 'center',
     justifyContent: 'center',
+    overflow: 'hidden',
   },
   analyzingBubble: {
     position: 'absolute',
@@ -58,16 +59,6 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   analyzingText: { color: '#fff', fontWeight: '700', fontSize: 16 },
-  photoPlaceholder: {
-    width: 160,
-    height: 160,
-    borderWidth: 4,
-    borderColor: '#768399',
-    borderStyle: 'dashed',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  photoText: { color: '#96A3B9', fontWeight: '600', fontSize: 30 / 2 },
   caption: { color: '#AEB8C8', fontWeight: '600', marginTop: 10 },
   thumbnailStrip: {
     flexDirection: 'row',
@@ -76,7 +67,7 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     paddingHorizontal: 12,
   },
-  thumbnail: { width: 66, height: 66, borderRadius: 8, backgroundColor: '#5E6D82' },
+  thumbnail: { width: 66, height: 66, borderRadius: 8, backgroundColor: '#5E6D82', overflow: 'hidden' },
   thumbnailActive: { borderColor: '#1F6DFF', borderWidth: 2 },
   thumbnailAdd: {
     width: 66,

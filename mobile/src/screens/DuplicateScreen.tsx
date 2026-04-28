@@ -1,5 +1,4 @@
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
-import { MockStreetPhoto } from "../components/MockStreetPhoto";
+import { Image, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { T } from "../theme";
 
 type DuplicateScreenProps = {
@@ -41,7 +40,7 @@ export const DuplicateScreen = ({
       {/* Existing report card */}
       <View style={styles.reportCard}>
         <View style={styles.reportPhoto}>
-          <MockStreetPhoto style={StyleSheet.absoluteFillObject} />
+          <Image source={require('../../assets/pothole.jpg')} style={{ width: '100%', height: '100%' }} resizeMode="contain" />
           <View style={styles.reportPhotoOverlay} />
           <View style={styles.reportBadges}>
             <View style={styles.typeBadge}>
@@ -133,7 +132,7 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   reportPhoto: {
-    height: 100,
+    height: 200,
     backgroundColor: "#111",
     overflow: "hidden",
     position: "relative",

@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 import {
   Animated,
+  Image,
   PanResponder,
   Pressable,
   ScrollView,
@@ -10,7 +11,6 @@ import {
   View,
 } from "react-native";
 import { MiniMapView } from "../components/MiniMapView";
-import { MockStreetPhoto } from "../components/MockStreetPhoto";
 import { T } from "../theme";
 
 const CATEGORIES = [
@@ -133,7 +133,7 @@ export const ClassificationScreen = ({
           <Text style={styles.backIcon}>‹</Text>
         </Pressable>
         <View style={styles.headerText}>
-          <Text style={styles.headerTitle}>Confirm &amp; submit</Text>
+          <Text style={styles.headerTitle}>Confirm & submit</Text>
           <Text style={styles.headerSubtitle}>Review details, then send</Text>
         </View>
       </View>
@@ -145,7 +145,7 @@ export const ClassificationScreen = ({
       >
         {/* Photo thumbnail */}
         <View style={styles.photoStrip}>
-          <MockStreetPhoto style={StyleSheet.absoluteFillObject} />
+          <Image source={require('../../assets/pothole.jpg')} style={{ width: '100%', height: '100%' }} resizeMode="contain" />
           <View style={styles.categoryChip}>
             <View style={styles.categoryDot} />
             <Text style={styles.categoryChipText}>{category}</Text>
@@ -245,7 +245,7 @@ export const ClassificationScreen = ({
             </View>
             <View style={{ flex: 1 }}>
               <Text style={styles.addressMain}>
-                Willow St &amp; Lincoln Ave
+                Willow St & Lincoln Ave
               </Text>
               <Text style={styles.addressSub}>San Jose, CA 95125</Text>
             </View>
@@ -271,7 +271,7 @@ export const ClassificationScreen = ({
           accessibilityRole="button"
         >
           <Text style={styles.submitCheck}>✓</Text>
-          <Text style={styles.submitText}>Confirm &amp; submit</Text>
+          <Text style={styles.submitText}>Confirm & submit</Text>
         </Pressable>
       </View>
     </View>
@@ -300,7 +300,7 @@ const styles = StyleSheet.create({
   scroll: { padding: 14, gap: 10, paddingBottom: 24 },
 
   photoStrip: {
-    height: 120,
+    height: 240,
     borderRadius: 0,
     overflow: "hidden",
     backgroundColor: "#111",

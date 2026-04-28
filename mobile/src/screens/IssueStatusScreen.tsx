@@ -1,4 +1,4 @@
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
 import { ReportRecord } from '../types'
 import { WireframeHeader } from '../components/WireframeHeader'
 
@@ -20,12 +20,21 @@ export const IssueStatusScreen = ({ report, onBack }: IssueStatusScreenProps) =>
           <Text style={styles.badgeText}>{report.status}</Text>
         </View>
         <View style={styles.photoArea}>
-          <Text style={styles.photoLabel}>Photo</Text>
+          <Image
+            source={require('../../assets/pothole.jpg')}
+            style={{ width: '100%', height: '100%' }}
+            resizeMode="contain"
+          />
         </View>
         <View style={styles.card}>
           <Text style={styles.label}>Location</Text>
           <View style={styles.mapArea}>
-            <Text style={styles.pin}>📍</Text>
+            <Image
+              source={require('../../assets/SJMap-hardcode.png')}
+              style={{ width: '100%', height: '100%' }}
+              resizeMode="cover"
+            />
+            <View style={styles.mapPin} />
           </View>
           <Text style={styles.value}>{report.address}</Text>
         </View>
@@ -72,24 +81,31 @@ const styles = StyleSheet.create({
   },
   badgeText: { color: '#6C5600', fontWeight: '700' },
   photoArea: {
-    height: 170,
+    height: 280,
     borderRadius: 14,
-    backgroundColor: '#E5EAF1',
-    justifyContent: 'center',
-    alignItems: 'center',
+    overflow: 'hidden',
+    backgroundColor: '#1a1a1a',
   },
-  photoLabel: { color: '#7C889B', fontWeight: '700', fontSize: 18 },
   card: { borderRadius: 14, borderWidth: 1, borderColor: '#E2E9F1', padding: 12, gap: 8 },
   label: { color: '#4E5A6E', fontWeight: '600', marginTop: 6, fontSize: 28 / 2 },
   value: { color: '#151B28', fontWeight: '700', fontSize: 36 / 2 },
   mapArea: {
-    height: 120,
+    height: 230,
     borderRadius: 10,
+    overflow: 'hidden',
     backgroundColor: '#EDF2F8',
-    justifyContent: 'center',
-    alignItems: 'center',
   },
-  pin: { fontSize: 30 },
+  mapPin: {
+    position: 'absolute',
+    width: 14,
+    height: 14,
+    borderRadius: 7,
+    backgroundColor: '#F08B00',
+    borderWidth: 2,
+    borderColor: '#fff',
+    top: '28%',
+    left: '22%',
+  },
   timelineTitle: { fontWeight: '800', fontSize: 36 / 2, marginBottom: 4 },
   timelineRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 12, marginBottom: 10 },
   dot: { width: 10, height: 10, borderRadius: 999, backgroundColor: '#1F6DFF', marginTop: 7 },
