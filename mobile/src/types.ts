@@ -1,6 +1,6 @@
 export type AppTab = 'dashboard' | 'report' | 'profile'
 
-export type ReportStatus = 'Submitted' | 'In Review' | 'In Progress' | 'Resolved'
+export type ReportStatus = 'Submitted' | 'Received' | 'In Progress' | 'Resolved'
 
 export type IssueCategory =
   | 'Pothole'
@@ -12,6 +12,7 @@ export type IssueCategory =
 export type TimelineEntry = {
   label: ReportStatus
   dateText: string
+  reached: boolean
 }
 
 export type ReportDraft = {
@@ -26,10 +27,23 @@ export type ReportDraft = {
 
 export type ReportRecord = {
   id: string
+  title: string
   category: IssueCategory
+  tag: string
+  district: string
   status: ReportStatus
   description: string
   address: string
   assignedTo: string
+  estimatedResolution: string
+  reportCount: number
+  isFollowing: boolean
+  isUserOwned: boolean
+  photoCount: number
+  pin: {
+    top: number
+    left: number
+    color: string
+  }
   timeline: TimelineEntry[]
 }

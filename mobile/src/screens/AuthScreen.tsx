@@ -57,12 +57,11 @@ export const AuthScreen = ({ onAuthenticate }: AuthScreenProps) => {
             {mode === 'signin' ? 'Enter App' : 'Create Account'}
           </Text>
         </Pressable>
-
-        <Text style={styles.footnote}>
-          {mode === 'signin'
-            ? 'Mock auth flow for the prototype.'
-            : 'By continuing, you agree to receive report status updates.'}
-        </Text>
+        {mode === 'signup' ? (
+          <Text style={styles.footnote}>
+            By continuing, you agree to receive report status updates.
+          </Text>
+        ) : null}
       </View>
     </ScrollView>
   );
