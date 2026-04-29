@@ -9,7 +9,10 @@ import { AnalyzingScreen } from './src/screens/AnalyzingScreen';
 import { ClassificationScreen, Classification } from './src/screens/ClassificationScreen';
 import { DuplicateScreen } from './src/screens/DuplicateScreen';
 import { ReportConfirmationScreen } from './src/screens/ReportConfirmationScreen';
-import { AppTab } from './src/types';
+import { AppTab, ReportRecord } from './src/types';
+import { AuthScreen } from './src/screens/AuthScreen';
+import { IssueStatusScreen } from './src/screens/IssueStatusScreen';
+import { dashboardIssues } from './src/data/mockData';
 
 type ReportStep = 'camera' | 'analyzing' | 'classify' | 'duplicate' | 'confirmation';
 
@@ -19,11 +22,63 @@ export default function App() {
   const [classification, setClassification] = useState<Classification | null>(null);
   const [merged, setMerged] = useState(false);
   const [isSignedIn, setIsSignedIn] = useState(false);
+  const [issues, setIssues] = useState<ReportRecord[]>(dashboardIssues);
+  const [selectedIssueId, setSelectedIssueId] = useState<string | null>(null);
+
+  const handleAuthenticate = () => {
+    setIsSignedIn(true);
+    setCurrentTab('dashboard');
+  };
+
+  const handleSignOut = () => {
+    setIsSignedIn(false);
+    setCurrentTab('report');
+    setSelectedIssueId(null);
+    handleResetFlow();
+  };
 
   const handleResetFlow = () => {
     setReportStep('camera');
     setClassification(null);
     setMerged(false);
+  };
+
+  const selectedIssue = selectedIssueId
+    ? issues.find((issue) => issue.id === selectedIssueId) ?? null
+    : null;
+
+  const handleOpenIssue = (issueId: string) => {
+    setSelectedIssueId(issueId);
+  };
+
+  const handleCloseIssue = () => {
+    setSelectedIssueId(null);
+  };
+
+  const handleToggleFollow = () => {
+    if (!selectedIssueId) {
+      return;
+    }
+    setIssues((prev) =>
+      prev.map((issue) =>
+        issue.id === selectedIssueId
+          ? { ...issue, isFollowing: !issue.isFollowing }
+          : issue
+      )
+    );
+  };
+
+  const handleAddIssuePhoto = () => {
+    if (!selectedIssueId) {
+      return;
+    }
+    setIssues((prev) =>
+      prev.map((issue) =>
+        issue.id === selectedIssueId
+          ? { ...issue, photoCount: issue.photoCount + 1 }
+          : issue
+      )
+    );
   };
 
   const renderReportFlow = () => {
@@ -64,13 +119,23 @@ export default function App() {
 
   const renderCurrentTab = () => {
     if (currentTab === 'dashboard') {
-      return <DashboardScreen />;
+      if (selectedIssue) {
+        return (
+          <IssueStatusScreen
+            report={selectedIssue}
+            onBack={handleCloseIssue}
+            onToggleFollow={handleToggleFollow}
+            onAddPhoto={handleAddIssuePhoto}
+          />
+        );
+      }
+      return <DashboardScreen issues={issues} onOpenIssue={handleOpenIssue} />;
     }
     if (currentTab === 'profile') {
       return (
         <ProfileScreen
           isSignedIn={isSignedIn}
-          onToggleAuth={() => setIsSignedIn(prev => !prev)}
+          onToggleAuth={handleSignOut}
         />
       );
     }
@@ -79,18 +144,31 @@ export default function App() {
 
   // Only show bottom nav when not deep in the report flow
   const showNav =
-    currentTab === 'dashboard' ||
-    currentTab === 'profile' ||
-    (currentTab === 'report' && reportStep === 'camera');
+    isSignedIn &&
+    !selectedIssue &&
+    (
+      currentTab === 'dashboard' ||
+      currentTab === 'profile' ||
+      (currentTab === 'report' && reportStep === 'camera')
+    );
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar style="light" />
-      <View style={styles.container}>{renderCurrentTab()}</View>
+      <View style={styles.container}>
+        {isSignedIn ? (
+          renderCurrentTab()
+        ) : (
+          <AuthScreen onAuthenticate={handleAuthenticate} />
+        )}
+      </View>
       {showNav && (
         <BottomNav
           currentTab={currentTab}
-          onChangeTab={(tab) => setCurrentTab(tab)}
+          onChangeTab={(tab) => {
+            setSelectedIssueId(null);
+            setCurrentTab(tab);
+          }}
         />
       )}
     </SafeAreaView>
