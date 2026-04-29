@@ -34,9 +34,9 @@ export const initialDraft: ReportDraft = {
   photoCount: 1,
   category: 'Pothole',
   description:
-    'Significant pothole on Willow St near Lincoln Ave causing road hazard. Approximately 2ft wide with visible asphalt damage.',
+    'Significant pothole on Glen Eyrie Ave near Carolyn Ave causing road hazard. Approximately 2ft wide with visible asphalt damage.',
   notes: '',
-  address: 'Willow St & Lincoln Ave',
+  address: 'Glen Eyrie Ave & Carolyn Ave, San Jose, CA 95125',
   neighborhood: 'Willow Glen',
   duplicateNearby: true,
 }
@@ -44,14 +44,14 @@ export const initialDraft: ReportDraft = {
 export const dashboardIssues: ReportRecord[] = [
   {
     id: 'GC-2026-04821',
-    title: 'Pothole at 4th and Santa Clara',
+    title: 'Pothole at Glen Eyrie and Carolyn',
     category: 'Pothole',
     tag: 'Road hazard',
-    district: 'Downtown District',
+    district: 'Willow Glen District',
     status: 'In Progress',
     description:
       'Large pothole in the right lane creating a sharp dip for cars and bikes turning through the intersection.',
-    address: '4th St & Santa Clara St, San Jose, CA 95113',
+    address: 'Glen Eyrie Ave & Carolyn Ave, San Jose, CA 95125',
     assignedTo: 'Dept. of Transportation',
     estimatedResolution: 'Estimated 5-7 days based on downtown pothole repairs',
     reportCount: 14,

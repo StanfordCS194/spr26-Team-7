@@ -1,6 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { Animated, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { MockStreetPhoto } from '../components/MockStreetPhoto';
+import { Animated, Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Classification } from './ClassificationScreen';
 import { T } from '../theme';
 
@@ -65,21 +64,21 @@ export const ReportConfirmationScreen = ({
         {/* Subtitle */}
         <Animated.Text style={[styles.subtitle, { opacity: fadeAnim, transform: [{ translateY: slideAnim }] }]}>
           {merged
-            ? 'Your report joined 4 others. The city now has 5 confirmations for this pothole on Willow St.'
-            : 'Thanks for helping improve Willow Glen. Your report has been sent to San Jose Dept. of Transportation.'}
+            ? 'Your report joined 4 others. The city now has 5 confirmations for this pothole on Glen Eyrie Ave.'
+            : 'Thanks for helping improve your neighborhood. Your report has been sent to San Jose Dept. of Transportation.'}
         </Animated.Text>
 
         {/* Summary card */}
         <Animated.View style={[styles.summaryCard, { opacity: fadeAnim, transform: [{ translateY: slideAnim }] }]}>
           <View style={styles.summaryPhoto}>
-            <MockStreetPhoto style={StyleSheet.absoluteFillObject} />
+            <Image source={require('../../assets/pothole.jpg')} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
             <View style={styles.summaryPhotoOverlay} />
           </View>
           <View style={styles.summaryBody}>
             <View style={styles.summaryRow}>
               <View style={{ flex: 1 }}>
                 <Text style={styles.summaryTag}>{tag}</Text>
-                <Text style={styles.summaryAddr}>Willow St &amp; Lincoln Ave, San Jose</Text>
+                <Text style={styles.summaryAddr}>Glen Eyrie Ave & Carolyn Ave, San Jose</Text>
               </View>
               <View style={[styles.filedBadge, { backgroundColor: merged ? T.blueLight : T.greenLight }]}>
                 <Text style={[styles.filedBadgeText, { color: merged ? T.blue : T.green }]}>
@@ -156,10 +155,10 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   summaryPhoto: {
-    height: 80,
+    width: '100%',
+    aspectRatio: 4 / 3,
     backgroundColor: '#111',
     overflow: 'hidden',
-    position: 'relative',
   },
   summaryPhotoOverlay: {
     ...StyleSheet.absoluteFillObject,

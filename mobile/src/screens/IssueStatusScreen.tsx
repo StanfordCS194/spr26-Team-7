@@ -1,5 +1,4 @@
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
-import { MiniMapView } from '../components/MiniMapView'
+import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
 import { MockStreetPhoto } from '../components/MockStreetPhoto'
 import { WireframeHeader } from '../components/WireframeHeader'
 import { T } from '../theme'
@@ -35,7 +34,7 @@ export const IssueStatusScreen = ({
         </View>
 
         <View style={styles.photoCard}>
-          <MockStreetPhoto style={StyleSheet.absoluteFillObject} />
+          <MockStreetPhoto style={{ width: '100%', height: '100%' }} />
           <View style={styles.photoOverlay}>
             <Text style={styles.photoOverlayText}>{report.photoCount} photo{report.photoCount === 1 ? '' : 's'}</Text>
           </View>
@@ -43,7 +42,10 @@ export const IssueStatusScreen = ({
 
         <View style={styles.card}>
           <Text style={styles.sectionTitle}>Location</Text>
-          <MiniMapView style={styles.mapArea} />
+          <View style={styles.mapArea}>
+            <Image source={require('../../assets/new-map.png')} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
+            <View style={styles.mapPin} />
+          </View>
           <Text style={styles.value}>{report.address}</Text>
           <View style={styles.tagRow}>
             <InfoPill label={report.category} />
@@ -157,8 +159,21 @@ const styles = StyleSheet.create({
   card: { borderRadius: 16, borderWidth: 1, borderColor: '#E2E9F1', padding: 14, gap: 10 },
   sectionTitle: { color: T.ink, fontWeight: '800', fontSize: 18 },
   mapArea: {
-    height: 130,
+    height: 200,
     borderRadius: 14,
+    overflow: 'hidden',
+    backgroundColor: '#EDF2F8',
+  },
+  mapPin: {
+    position: 'absolute',
+    width: 14,
+    height: 14,
+    borderRadius: 7,
+    backgroundColor: '#F08B00',
+    borderWidth: 2,
+    borderColor: '#fff',
+    top: '28%',
+    left: '22%',
   },
   value: { color: T.ink, fontWeight: '700', fontSize: 16, lineHeight: 22 },
   tagRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },

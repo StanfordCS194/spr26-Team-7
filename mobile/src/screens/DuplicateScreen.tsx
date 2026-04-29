@@ -1,5 +1,4 @@
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
-import { MockStreetPhoto } from "../components/MockStreetPhoto";
+import { Image, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { T } from "../theme";
 
 type DuplicateScreenProps = {
@@ -33,7 +32,7 @@ export const DuplicateScreen = ({
         <View style={styles.alertText}>
           <Text style={styles.alertTitle}>Similar report nearby</Text>
           <Text style={styles.alertBody}>
-            Someone reported a pothole on Willow St 0.1 mi away — 3 days ago.
+            Someone reported a pothole on Glen Eyrie Ave 0.1 mi away — 3 days ago.
           </Text>
         </View>
       </View>
@@ -41,7 +40,7 @@ export const DuplicateScreen = ({
       {/* Existing report card */}
       <View style={styles.reportCard}>
         <View style={styles.reportPhoto}>
-          <MockStreetPhoto style={StyleSheet.absoluteFillObject} />
+          <Image source={require('../../assets/pothole.jpg')} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
           <View style={styles.reportPhotoOverlay} />
           <View style={styles.reportBadges}>
             <View style={styles.typeBadge}>
@@ -53,9 +52,9 @@ export const DuplicateScreen = ({
           </View>
         </View>
         <View style={styles.reportBody}>
-          <Text style={styles.reportTitle}>Pothole — Willow St</Text>
+          <Text style={styles.reportTitle}>Pothole — Glen Eyrie Ave</Text>
           <Text style={styles.reportDesc}>
-            Large pothole near Lincoln Ave intersection. Reported 3 days ago.
+            Large pothole near Carolyn Ave intersection. Reported 3 days ago.
           </Text>
           <View style={styles.reportMeta}>
             <View style={styles.pendingBadge}>
@@ -133,10 +132,10 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   reportPhoto: {
-    height: 100,
+    width: '100%',
+    aspectRatio: 4 / 3,
     backgroundColor: "#111",
     overflow: "hidden",
-    position: "relative",
   },
   reportPhotoOverlay: {
     ...StyleSheet.absoluteFillObject,

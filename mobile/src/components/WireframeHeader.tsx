@@ -9,17 +9,12 @@ type WireframeHeaderProps = {
 export const WireframeHeader = ({ title, showBack, onBack }: WireframeHeaderProps) => {
   return (
     <View style={styles.header}>
-      <Text style={styles.title}>Wireframe: {title}</Text>
-      <View style={styles.rightControls}>
-        {showBack ? (
-          <Pressable onPress={onBack} accessibilityRole="button" style={styles.backButton}>
-            <Text style={styles.backButtonText}>{"\u2190 Back"}</Text>
-          </Pressable>
-        ) : null}
-        <Pressable style={styles.resetButton} accessibilityRole="button">
-          <Text style={styles.resetButtonText}>Reset</Text>
+      <Text style={styles.title}>{title}</Text>
+      {showBack ? (
+        <Pressable onPress={onBack} accessibilityRole="button" style={styles.backButton}>
+          <Text style={styles.backButtonText}>{"\u2190 Back"}</Text>
         </Pressable>
-      </View>
+      ) : null}
     </View>
   )
 }
@@ -38,22 +33,6 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: '600',
     fontSize: 20,
-  },
-  rightControls: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-  },
-  resetButton: {
-    backgroundColor: '#3A3F45',
-    borderRadius: 8,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-  },
-  resetButtonText: {
-    color: '#fff',
-    fontWeight: '700',
-    fontSize: 16,
   },
   backButton: {
     paddingVertical: 6,

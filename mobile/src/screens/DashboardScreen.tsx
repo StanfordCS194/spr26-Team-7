@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
 import { WireframeHeader } from '../components/WireframeHeader'
 import { ReportRecord } from '../types'
 import { T } from '../theme'
@@ -8,13 +8,11 @@ const filters = ['Roads', 'Utilities', 'Parks', 'Transit', 'Buildings']
 
 type DashboardScreenProps = {
   issues: ReportRecord[]
-  onOpenIssue: (issueId: string) => void
+  onOpenIssue: (id: string) => void
 }
 
-type DashboardView = 'overview' | 'all'
-
 export const DashboardScreen = ({ issues, onOpenIssue }: DashboardScreenProps) => {
-  const [currentView, setCurrentView] = useState<DashboardView>('overview')
+  const [currentView, setCurrentView] = useState<'overview' | 'all'>('overview')
   const featuredIssues = issues.slice(0, 3)
 
   return (
@@ -25,23 +23,15 @@ export const DashboardScreen = ({ issues, onOpenIssue }: DashboardScreenProps) =
         <Text style={styles.subtitle}>Tap a map pin or issue row to open the full issue page.</Text>
 
         <View style={styles.mapCard}>
-          <View style={styles.mapStreetHorizontal} />
-          <View style={styles.mapStreetVertical} />
-          <View style={[styles.mapBlock, { top: 18, left: 14, right: 208, bottom: 134 }]} />
-          <View style={[styles.mapBlock, { top: 18, left: 182, right: 82, bottom: 134 }]} />
-          <View style={[styles.mapBlock, { top: 144, left: 14, right: 208, bottom: 20 }]} />
-          <View style={[styles.mapBlock, { top: 144, left: 182, right: 82, bottom: 20 }]} />
-          {issues.map((issue) => (
-            <Pressable
-              key={issue.id}
-              style={[styles.pinButton, { top: issue.pin.top, left: issue.pin.left }]}
-              onPress={() => onOpenIssue(issue.id)}
-              accessibilityRole="button"
-            >
-              <View style={[styles.pinDot, { backgroundColor: issue.pin.color }]} />
-              <Text style={styles.pinCount}>{issue.reportCount}</Text>
-            </Pressable>
-          ))}
+          <Image source={require('../../assets/new-map.png')} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
+          <Pressable
+            style={[styles.pin, { top: '28%', left: '22%', backgroundColor: '#F08B00', borderWidth: 2, borderColor: '#fff' }]}
+            onPress={() => onOpenIssue(issues[0].id)}
+            accessibilityRole="button"
+          />
+          <View style={[styles.pin, { top: '50%', left: '42%', backgroundColor: '#0F9CFF' }]} />
+          <View style={[styles.pin, { top: '32%', left: '68%', backgroundColor: '#28A745' }]} />
+          <View style={[styles.pin, { top: '70%', left: '60%', backgroundColor: '#A35DFF' }]} />
         </View>
 
         <View style={styles.filterRow}>
@@ -126,56 +116,8 @@ const styles = StyleSheet.create({
   content: { padding: 14, gap: 14, paddingBottom: 24 },
   title: { fontSize: 22, fontWeight: '800', color: T.ink },
   subtitle: { color: '#69768A', fontWeight: '500' },
-  mapCard: {
-    height: 220,
-    borderRadius: 16,
-    backgroundColor: '#EBF0F6',
-    overflow: 'hidden',
-    position: 'relative',
-  },
-  mapStreetHorizontal: {
-    position: 'absolute',
-    top: 100,
-    left: 0,
-    right: 0,
-    height: 18,
-    backgroundColor: '#F7FAFD',
-  },
-  mapStreetVertical: {
-    position: 'absolute',
-    top: 0,
-    bottom: 0,
-    left: 130,
-    width: 18,
-    backgroundColor: '#F7FAFD',
-  },
-  mapBlock: {
-    position: 'absolute',
-    backgroundColor: '#D8E2EF',
-    borderRadius: 12,
-  },
-  pinButton: {
-    position: 'absolute',
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    backgroundColor: 'rgba(255,255,255,0.95)',
-    borderRadius: 999,
-    paddingHorizontal: 8,
-    paddingVertical: 5,
-    borderWidth: 1,
-    borderColor: '#D7E1EE',
-  },
-  pinDot: {
-    width: 14,
-    height: 14,
-    borderRadius: 999,
-  },
-  pinCount: {
-    color: T.ink,
-    fontWeight: '800',
-    fontSize: 12,
-  },
+  mapCard: { height: 220, borderRadius: 16, backgroundColor: '#EBF0F6', overflow: 'hidden' },
+  pin: { position: 'absolute', width: 16, height: 16, borderRadius: 999 },
   filterRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   filterPill: {
     borderColor: '#9EC0F7',

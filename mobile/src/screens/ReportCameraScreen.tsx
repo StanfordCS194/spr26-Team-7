@@ -33,7 +33,7 @@ export const ReportCameraScreen = ({ onCapture }: ReportCameraScreenProps) => {
     <View style={styles.page}>
       {/* Viewfinder */}
       <View style={styles.viewfinder}>
-        <MockStreetPhoto style={StyleSheet.absoluteFillObject} />
+        <MockStreetPhoto style={{ width: '100%', height: '100%' }} />
 
         {/* Corner guides */}
         <View style={[styles.corner, styles.cornerTL]} />

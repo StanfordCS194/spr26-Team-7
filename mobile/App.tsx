@@ -142,7 +142,6 @@ export default function App() {
     return renderReportFlow();
   };
 
-  // Only show bottom nav when not deep in the report flow
   const showNav =
     isSignedIn &&
     !selectedIssue &&

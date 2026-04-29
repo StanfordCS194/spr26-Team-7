@@ -72,7 +72,7 @@ export const AnalyzingScreen = ({ onDone }: AnalyzingScreenProps) => {
   return (
     <View style={styles.page}>
       {/* Dimmed photo background */}
-      <MockStreetPhoto style={StyleSheet.absoluteFillObject} />
+      <MockStreetPhoto style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }} />
       <View style={styles.overlay} />
 
       {/* Content */}
