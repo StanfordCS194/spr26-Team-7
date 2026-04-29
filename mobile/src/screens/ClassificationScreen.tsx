@@ -91,7 +91,7 @@ export const ClassificationScreen = ({
   const [category, setCategory] = useState("Roads & Infrastructure");
   const [tag, setTag] = useState("Pothole");
   const [desc, setDesc] = useState(
-    "Significant pothole on Willow St near Lincoln Ave causing road hazard. Approximately 2ft wide with visible asphalt damage.",
+    "Significant pothole on Glen Eyrie Ave near Carolyn Ave causing road hazard. Approximately 2ft wide with visible asphalt damage.",
   );
   const [showTagMenu, setShowTagMenu] = useState(false);
 
@@ -245,7 +245,7 @@ export const ClassificationScreen = ({
             </View>
             <View style={{ flex: 1 }}>
               <Text style={styles.addressMain}>
-                Willow St & Lincoln Ave
+                Glen Eyrie Ave & Carolyn Ave
               </Text>
               <Text style={styles.addressSub}>San Jose, CA 95125</Text>
             </View>

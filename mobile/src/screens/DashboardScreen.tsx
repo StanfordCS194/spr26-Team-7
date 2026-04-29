@@ -23,15 +23,15 @@ export const DashboardScreen = ({ issues, onOpenIssue }: DashboardScreenProps) =
         <Text style={styles.subtitle}>Tap a map pin or issue row to open the full issue page.</Text>
 
         <View style={styles.mapCard}>
-          <Image source={require('../../assets/SJMap-hardcode.png')} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
+          <Image source={require('../../assets/new-map.png')} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
           <Pressable
             style={[styles.pin, { top: '28%', left: '22%', backgroundColor: '#F08B00', borderWidth: 2, borderColor: '#fff' }]}
             onPress={() => onOpenIssue(issues[0].id)}
             accessibilityRole="button"
           />
-          <View style={[styles.pin, { top: 110, left: 150, backgroundColor: '#0F9CFF' }]} />
-          <View style={[styles.pin, { top: 70, left: 250, backgroundColor: '#28A745' }]} />
-          <View style={[styles.pin, { top: 155, left: 220, backgroundColor: '#A35DFF' }]} />
+          <View style={[styles.pin, { top: '50%', left: '42%', backgroundColor: '#0F9CFF' }]} />
+          <View style={[styles.pin, { top: '32%', left: '68%', backgroundColor: '#28A745' }]} />
+          <View style={[styles.pin, { top: '70%', left: '60%', backgroundColor: '#A35DFF' }]} />
         </View>
 
         <View style={styles.filterRow}>

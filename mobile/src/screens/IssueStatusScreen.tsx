@@ -43,7 +43,7 @@ export const IssueStatusScreen = ({
         <View style={styles.card}>
           <Text style={styles.sectionTitle}>Location</Text>
           <View style={styles.mapArea}>
-            <Image source={require('../../assets/SJMap-hardcode.png')} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
+            <Image source={require('../../assets/new-map.png')} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
             <View style={styles.mapPin} />
           </View>
           <Text style={styles.value}>{report.address}</Text>

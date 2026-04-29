@@ -32,7 +32,7 @@ export const DuplicateScreen = ({
         <View style={styles.alertText}>
           <Text style={styles.alertTitle}>Similar report nearby</Text>
           <Text style={styles.alertBody}>
-            Someone reported a pothole on Willow St 0.1 mi away — 3 days ago.
+            Someone reported a pothole on Glen Eyrie Ave 0.1 mi away — 3 days ago.
           </Text>
         </View>
       </View>
@@ -52,9 +52,9 @@ export const DuplicateScreen = ({
           </View>
         </View>
         <View style={styles.reportBody}>
-          <Text style={styles.reportTitle}>Pothole — Willow St</Text>
+          <Text style={styles.reportTitle}>Pothole — Glen Eyrie Ave</Text>
           <Text style={styles.reportDesc}>
-            Large pothole near Lincoln Ave intersection. Reported 3 days ago.
+            Large pothole near Carolyn Ave intersection. Reported 3 days ago.
           </Text>
           <View style={styles.reportMeta}>
             <View style={styles.pendingBadge}>

@@ -64,8 +64,8 @@ export const ReportConfirmationScreen = ({
         {/* Subtitle */}
         <Animated.Text style={[styles.subtitle, { opacity: fadeAnim, transform: [{ translateY: slideAnim }] }]}>
           {merged
-            ? 'Your report joined 4 others. The city now has 5 confirmations for this pothole on Willow St.'
-            : 'Thanks for helping improve Willow Glen. Your report has been sent to San Jose Dept. of Transportation.'}
+            ? 'Your report joined 4 others. The city now has 5 confirmations for this pothole on Glen Eyrie Ave.'
+            : 'Thanks for helping improve your neighborhood. Your report has been sent to San Jose Dept. of Transportation.'}
         </Animated.Text>
 
         {/* Summary card */}
@@ -78,7 +78,7 @@ export const ReportConfirmationScreen = ({
             <View style={styles.summaryRow}>
               <View style={{ flex: 1 }}>
                 <Text style={styles.summaryTag}>{tag}</Text>
-                <Text style={styles.summaryAddr}>Willow St & Lincoln Ave, San Jose</Text>
+                <Text style={styles.summaryAddr}>Glen Eyrie Ave & Carolyn Ave, San Jose</Text>
               </View>
               <View style={[styles.filedBadge, { backgroundColor: merged ? T.blueLight : T.greenLight }]}>
                 <Text style={[styles.filedBadgeText, { color: merged ? T.blue : T.green }]}>
