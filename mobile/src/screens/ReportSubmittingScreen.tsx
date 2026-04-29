@@ -14,7 +14,7 @@ export const ReportSubmittingScreen = ({ onDone }: ReportSubmittingScreenProps) 
 
   return (
     <View style={styles.page}>
-      <Image source={require('../../assets/pothole.jpg')} style={StyleSheet.absoluteFillObject} resizeMode="cover" />
+      <Image source={require('../../assets/pothole.jpg')} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }} resizeMode="cover" />
       <View style={styles.overlay} />
       <WireframeHeader title="Submitting" />
       <View style={styles.body}>

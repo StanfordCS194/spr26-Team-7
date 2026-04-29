@@ -145,7 +145,7 @@ export const ClassificationScreen = ({
       >
         {/* Photo thumbnail */}
         <View style={styles.photoStrip}>
-          <Image source={require('../../assets/pothole.jpg')} style={{ width: '100%', height: '100%' }} resizeMode="contain" />
+          <Image source={require('../../assets/pothole.jpg')} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
           <View style={styles.categoryChip}>
             <View style={styles.categoryDot} />
             <Text style={styles.categoryChipText}>{category}</Text>
@@ -300,8 +300,8 @@ const styles = StyleSheet.create({
   scroll: { padding: 14, gap: 10, paddingBottom: 24 },
 
   photoStrip: {
-    height: 240,
-    borderRadius: 0,
+    width: '100%',
+    aspectRatio: 4 / 3,
     overflow: "hidden",
     backgroundColor: "#111",
   },

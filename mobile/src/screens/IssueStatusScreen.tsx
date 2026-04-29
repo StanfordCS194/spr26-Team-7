@@ -23,7 +23,7 @@ export const IssueStatusScreen = ({ report, onBack }: IssueStatusScreenProps) =>
           <Image
             source={require('../../assets/pothole.jpg')}
             style={{ width: '100%', height: '100%' }}
-            resizeMode="contain"
+            resizeMode="cover"
           />
         </View>
         <View style={styles.card}>
@@ -81,7 +81,8 @@ const styles = StyleSheet.create({
   },
   badgeText: { color: '#6C5600', fontWeight: '700' },
   photoArea: {
-    height: 280,
+    width: '100%',
+    aspectRatio: 4 / 3,
     borderRadius: 14,
     overflow: 'hidden',
     backgroundColor: '#1a1a1a',

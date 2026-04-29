@@ -11,7 +11,7 @@ export const ReportPreviewScreen = ({ onBack, onContinue }: ReportPreviewScreenP
     <View style={styles.page}>
       <WireframeHeader title="Preview" showBack onBack={onBack} />
       <View style={styles.previewArea}>
-        <Image source={require('../../assets/pothole.jpg')} style={StyleSheet.absoluteFillObject} resizeMode="cover" />
+        <Image source={require('../../assets/pothole.jpg')} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }} resizeMode="cover" />
         <View style={styles.analyzingBubble}>
           <Text style={styles.analyzingText}>Analyzing...</Text>
         </View>
@@ -19,7 +19,7 @@ export const ReportPreviewScreen = ({ onBack, onContinue }: ReportPreviewScreenP
       </View>
       <View style={styles.thumbnailStrip}>
         <View style={[styles.thumbnail, styles.thumbnailActive]}>
-          <Image source={require('../../assets/pothole.jpg')} style={StyleSheet.absoluteFillObject} resizeMode="cover" />
+          <Image source={require('../../assets/pothole.jpg')} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
         </View>
         <Pressable style={styles.thumbnailAdd} accessibilityRole="button">
           <Text style={styles.thumbnailAddText}>+</Text>

@@ -71,7 +71,7 @@ export const ReportConfirmationScreen = ({
         {/* Summary card */}
         <Animated.View style={[styles.summaryCard, { opacity: fadeAnim, transform: [{ translateY: slideAnim }] }]}>
           <View style={styles.summaryPhoto}>
-            <Image source={require('../../assets/pothole.jpg')} style={{ width: '100%', height: '100%' }} resizeMode="contain" />
+            <Image source={require('../../assets/pothole.jpg')} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
             <View style={styles.summaryPhotoOverlay} />
           </View>
           <View style={styles.summaryBody}>
@@ -155,10 +155,10 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   summaryPhoto: {
-    height: 200,
+    width: '100%',
+    aspectRatio: 4 / 3,
     backgroundColor: '#111',
     overflow: 'hidden',
-    position: 'relative',
   },
   summaryPhotoOverlay: {
     ...StyleSheet.absoluteFillObject,

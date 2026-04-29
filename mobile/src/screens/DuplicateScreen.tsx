@@ -40,7 +40,7 @@ export const DuplicateScreen = ({
       {/* Existing report card */}
       <View style={styles.reportCard}>
         <View style={styles.reportPhoto}>
-          <Image source={require('../../assets/pothole.jpg')} style={{ width: '100%', height: '100%' }} resizeMode="contain" />
+          <Image source={require('../../assets/pothole.jpg')} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
           <View style={styles.reportPhotoOverlay} />
           <View style={styles.reportBadges}>
             <View style={styles.typeBadge}>
@@ -132,10 +132,10 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   reportPhoto: {
-    height: 200,
+    width: '100%',
+    aspectRatio: 4 / 3,
     backgroundColor: "#111",
     overflow: "hidden",
-    position: "relative",
   },
   reportPhotoOverlay: {
     ...StyleSheet.absoluteFillObject,
