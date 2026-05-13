@@ -16,6 +16,25 @@ import { dashboardIssues } from './src/data/mockData';
 
 type ReportStep = 'camera' | 'analyzing' | 'classify' | 'duplicate' | 'confirmation';
 
+const REPORT_API_BASE = (
+  process.env.EXPO_PUBLIC_REPORT_API_URL ?? 'http://127.0.0.1:3001'
+).replace(/\/$/, '');
+
+const postDifferentIssueReport = (c: Classification) => {
+  const url = `${REPORT_API_BASE}/api/report-different-issue`;
+  void fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      category: c.category,
+      tag: c.tag,
+      desc: c.desc,
+      locationMain: c.locationMain,
+      locationSub: c.locationSub,
+    }),
+  }).catch(() => {});
+};
+
 export default function App() {
   const [currentTab, setCurrentTab] = useState<AppTab>('report');
   const [reportStep, setReportStep] = useState<ReportStep>('camera');
@@ -103,7 +122,13 @@ export default function App() {
       return (
         <DuplicateScreen
           onMerge={() => { setMerged(true); setReportStep('confirmation'); }}
-          onNew={() => { setMerged(false); setReportStep('confirmation'); }}
+          onNew={() => {
+            if (classification) {
+              postDifferentIssueReport(classification);
+            }
+            setMerged(false);
+            setReportStep('confirmation');
+          }}
           onBack={() => setReportStep('classify')}
         />
       );

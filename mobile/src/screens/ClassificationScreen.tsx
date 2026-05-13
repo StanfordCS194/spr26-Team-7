@@ -50,6 +50,10 @@ const TAGS_BY_CATEGORY: Record<string, string[]> = {
   ],
 };
 
+/** Shown on the location card and included in classification (email / downstream). */
+const LOCATION_MAIN_LINE = "Glen Eyrie Ave & Carolyn Ave";
+const LOCATION_SUB_LINE = "San Jose, CA 95125";
+
 const DEPT_BY_CATEGORY: Record<string, { name: string; division: string }> = {
   "Roads & Infrastructure": {
     name: "San Jose Dept. of Transportation",
@@ -77,6 +81,8 @@ export type Classification = {
   category: string;
   tag: string;
   desc: string;
+  locationMain: string;
+  locationSub: string;
 };
 
 type ClassificationScreenProps = {
@@ -244,10 +250,8 @@ export const ClassificationScreen = ({
               <Text>📍</Text>
             </View>
             <View style={{ flex: 1 }}>
-              <Text style={styles.addressMain}>
-                Glen Eyrie Ave & Carolyn Ave
-              </Text>
-              <Text style={styles.addressSub}>San Jose, CA 95125</Text>
+              <Text style={styles.addressMain}>{LOCATION_MAIN_LINE}</Text>
+              <Text style={styles.addressSub}>{LOCATION_SUB_LINE}</Text>
             </View>
             <Pressable accessibilityRole="button">
               <Text style={styles.editLink}>Edit</Text>
@@ -266,7 +270,15 @@ export const ClassificationScreen = ({
       {/* CTA */}
       <View style={styles.ctaBar}>
         <Pressable
-          onPress={() => onConfirm({ category, tag, desc })}
+          onPress={() =>
+            onConfirm({
+              category,
+              tag,
+              desc,
+              locationMain: LOCATION_MAIN_LINE,
+              locationSub: LOCATION_SUB_LINE,
+            })
+          }
           style={styles.submitButton}
           accessibilityRole="button"
         >
