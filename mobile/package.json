@@ -3,6 +3,8 @@
   "version": "1.0.0",
   "main": "index.ts",
   "scripts": {
+    "setup": "bash ../scripts/setup-local-env.sh",
+    "postinstall": "bash ../scripts/setup-local-env.sh",
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
