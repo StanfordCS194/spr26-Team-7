@@ -1,105 +1,50 @@
 import { Pressable, ScrollView, StyleSheet, Switch, Text, View } from 'react-native'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { WireframeHeader } from '../components/WireframeHeader'
-import { fetchProfileSummary, ProfileSummary } from '../lib/profiles'
-import { formatMemberSince, formatReportDate } from '../lib/reportMapper'
-import { useAuth } from '../providers/AuthProvider'
 
-export const ProfileScreen = () => {
-  const { user, signOut } = useAuth()
-  const [summary, setSummary] = useState<ProfileSummary | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
+type ProfileScreenProps = {
+  isSignedIn: boolean
+  onToggleAuth: () => void
+}
 
-  useEffect(() => {
-    if (!user) {
-      setSummary(null)
-      setIsLoading(false)
-      return
-    }
-
-    let isMounted = true
-    setIsLoading(true)
-
-    void fetchProfileSummary(user)
-      .then((nextSummary) => {
-        if (!isMounted) {
-          return
-        }
-        setSummary(nextSummary)
-      })
-      .catch(() => {
-        if (!isMounted) {
-          return
-        }
-        setSummary(null)
-      })
-      .finally(() => {
-        if (!isMounted) {
-          return
-        }
-        setIsLoading(false)
-      })
-
-    return () => {
-      isMounted = false
-    }
-  }, [user])
-
-  const displayName = summary?.fullName ?? user?.email ?? 'Signed in'
-
-  const handleSignOut = async () => {
-    await signOut()
-  }
-
+export const ProfileScreen = ({ isSignedIn, onToggleAuth }: ProfileScreenProps) => {
   return (
     <View style={styles.page}>
       <WireframeHeader title="Profile" />
       <ScrollView contentContainerStyle={styles.content}>
         <Text style={styles.title}>My Profile</Text>
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Account</Text>
-          <Text style={styles.bodyText}>{displayName}</Text>
-          {summary?.email ? <Text style={styles.bodyText}>{summary.email}</Text> : null}
-          {summary?.zipCode ? <Text style={styles.bodyText}>ZIP {summary.zipCode}</Text> : null}
-        </View>
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Notification Preferences</Text>
-          <PreferenceRow label="Status changes on my reports" />
-          <PreferenceRow label="Updates on followed reports" />
-          <PreferenceRow label="Resolved issue notifications" />
-        </View>
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Personal Impact</Text>
-          {isLoading ? (
-            <Text style={styles.bodyText}>Loading your activity...</Text>
-          ) : (
-            <>
-              <Text style={styles.bodyText}>Total submitted: {summary?.totalSubmitted ?? 0}</Text>
-              <Text style={styles.bodyText}>Resolved: {summary?.resolvedCount ?? 0}</Text>
-              <Text style={styles.bodyText}>
-                Using app for:{' '}
-                {summary?.memberSince ? formatMemberSince(summary.memberSince) : 'Just joined'}
-              </Text>
-            </>
-          )}
-        </View>
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>My Reports</Text>
-          {isLoading ? (
-            <Text style={styles.bodyText}>Loading your reports...</Text>
-          ) : summary?.reports.length ? (
-            summary.reports.map((report) => (
-              <Text key={report.id} style={styles.bodyText}>
-                • {report.title} · {report.status} · {formatReportDate(report.createdAt)}
-              </Text>
-            ))
-          ) : (
-            <Text style={styles.bodyText}>No reports submitted yet.</Text>
-          )}
-        </View>
-        <Pressable style={styles.secondaryButton} onPress={handleSignOut} accessibilityRole="button">
-          <Text style={styles.secondaryButtonText}>Log Out</Text>
-        </Pressable>
+        {!isSignedIn ? (
+          <View style={styles.card}>
+            <Text style={styles.promptTitle}>Use app without login, or sign in for history and follows.</Text>
+            <Pressable style={styles.primaryButton} onPress={onToggleAuth} accessibilityRole="button">
+              <Text style={styles.primaryButtonText}>Log In</Text>
+            </Pressable>
+          </View>
+        ) : (
+          <>
+            <View style={styles.card}>
+              <Text style={styles.cardTitle}>Notification Preferences</Text>
+              <PreferenceRow label="Status changes on my reports" />
+              <PreferenceRow label="Updates on followed reports" />
+              <PreferenceRow label="Resolved issue notifications" />
+            </View>
+            <View style={styles.card}>
+              <Text style={styles.cardTitle}>Personal Impact</Text>
+              <Text style={styles.bodyText}>Total submitted: 18</Text>
+              <Text style={styles.bodyText}>Resolved: 11</Text>
+              <Text style={styles.bodyText}>Using app for: 7 months</Text>
+            </View>
+            <View style={styles.card}>
+              <Text style={styles.cardTitle}>My Reports</Text>
+              <Text style={styles.bodyText}>• Pothole · In Review · Apr 19, 2026</Text>
+              <Text style={styles.bodyText}>• Streetlight Outage · Submitted · Apr 16, 2026</Text>
+              <Text style={styles.bodyText}>• Graffiti · Resolved · Apr 10, 2026</Text>
+            </View>
+            <Pressable style={styles.secondaryButton} onPress={onToggleAuth} accessibilityRole="button">
+              <Text style={styles.secondaryButtonText}>Log Out</Text>
+            </Pressable>
+          </>
+        )}
       </ScrollView>
     </View>
   )
@@ -120,7 +65,10 @@ const styles = StyleSheet.create({
   content: { padding: 14, gap: 14, paddingBottom: 24 },
   title: { fontSize: 22, fontWeight: '800' },
   card: { borderColor: '#E2EAF2', borderWidth: 1, borderRadius: 14, padding: 12, gap: 10 },
+  promptTitle: { color: '#324159', lineHeight: 22, fontSize: 16, fontWeight: '500' },
   cardTitle: { fontWeight: '800', fontSize: 17 },
+  primaryButton: { marginTop: 4, backgroundColor: '#1565FF', borderRadius: 10, paddingVertical: 12, alignItems: 'center' },
+  primaryButtonText: { color: '#fff', fontWeight: '700', fontSize: 16 },
   secondaryButton: { borderColor: '#D5DEE9', borderWidth: 2, borderRadius: 10, paddingVertical: 12, alignItems: 'center' },
   secondaryButtonText: { fontWeight: '700', fontSize: 16 },
   preferenceRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },

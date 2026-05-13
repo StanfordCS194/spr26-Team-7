@@ -8,11 +8,10 @@ const filters = ['Roads', 'Utilities', 'Parks', 'Transit', 'Buildings']
 
 type DashboardScreenProps = {
   issues: ReportRecord[]
-  isLoading?: boolean
   onOpenIssue: (id: string) => void
 }
 
-export const DashboardScreen = ({ issues, isLoading = false, onOpenIssue }: DashboardScreenProps) => {
+export const DashboardScreen = ({ issues, onOpenIssue }: DashboardScreenProps) => {
   const [currentView, setCurrentView] = useState<'overview' | 'all'>('overview')
   const featuredIssues = issues.slice(0, 3)
 
@@ -27,11 +26,7 @@ export const DashboardScreen = ({ issues, isLoading = false, onOpenIssue }: Dash
           <Image source={require('../../assets/new-map.png')} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
           <Pressable
             style={[styles.pin, { top: '28%', left: '22%', backgroundColor: '#F08B00', borderWidth: 2, borderColor: '#fff' }]}
-            onPress={() => {
-              if (issues[0]) {
-                onOpenIssue(issues[0].id)
-              }
-            }}
+            onPress={() => onOpenIssue(issues[0].id)}
             accessibilityRole="button"
           />
           <View style={[styles.pin, { top: '50%', left: '42%', backgroundColor: '#0F9CFF' }]} />
@@ -67,12 +62,6 @@ export const DashboardScreen = ({ issues, isLoading = false, onOpenIssue }: Dash
             </Text>
           </Pressable>
         </View>
-
-        {isLoading ? (
-          <View style={styles.loadingCard}>
-            <Text style={styles.loadingText}>Loading reports...</Text>
-          </View>
-        ) : null}
 
         {currentView === 'overview' ? (
           <>
@@ -127,14 +116,6 @@ const styles = StyleSheet.create({
   content: { padding: 14, gap: 14, paddingBottom: 24 },
   title: { fontSize: 22, fontWeight: '800', color: T.ink },
   subtitle: { color: '#69768A', fontWeight: '500' },
-  loadingCard: {
-    borderColor: '#E2EAF2',
-    borderWidth: 1,
-    borderRadius: 14,
-    padding: 12,
-    backgroundColor: '#F8FAFC',
-  },
-  loadingText: { color: '#69768A', fontWeight: '600' },
   mapCard: { height: 220, borderRadius: 16, backgroundColor: '#EBF0F6', overflow: 'hidden' },
   pin: { position: 'absolute', width: 16, height: 16, borderRadius: 999 },
   filterRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },

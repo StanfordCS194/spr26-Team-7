@@ -1,125 +1,15 @@
 import { useState } from 'react';
-import {
-  ActivityIndicator,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from 'react-native';
-import { signInWithEmail, getAuthRedirectUri, signInWithGoogle, signUpWithEmail } from '../lib/auth';
+import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { T } from '../theme';
 
 type AuthMode = 'signin' | 'signup';
 
-type LabeledInputProps = {
-  label: string;
-  placeholder: string;
-  value: string;
-  onChangeText: (value: string) => void;
-  secureTextEntry?: boolean;
-  keyboardType?: 'default' | 'email-address' | 'number-pad';
-  autoCapitalize?: 'none' | 'words';
+type AuthScreenProps = {
+  onAuthenticate: () => void;
 };
 
-const LabeledInput = ({
-  label,
-  value,
-  onChangeText,
-  autoCapitalize = 'none',
-  ...props
-}: LabeledInputProps) => {
-  return (
-    <View style={styles.inputGroup}>
-      <Text style={styles.inputLabel}>{label}</Text>
-      <TextInput
-        {...props}
-        value={value}
-        onChangeText={onChangeText}
-        autoCapitalize={autoCapitalize}
-        placeholderTextColor={T.ink3}
-        style={styles.input}
-      />
-    </View>
-  );
-};
-
-export const AuthScreen = () => {
+export const AuthScreen = ({ onAuthenticate }: AuthScreenProps) => {
   const [mode, setMode] = useState<AuthMode>('signin');
-  const [fullName, setFullName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [zipCode, setZipCode] = useState('');
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [infoMessage, setInfoMessage] = useState<string | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isGoogleSubmitting, setIsGoogleSubmitting] = useState(false);
-
-  const resetMessages = () => {
-    setErrorMessage(null);
-    setInfoMessage(null);
-  };
-
-  const handleModeChange = (nextMode: AuthMode) => {
-    setMode(nextMode);
-    resetMessages();
-  };
-
-  const handleSubmit = async () => {
-    resetMessages();
-
-    const normalizedEmail = email.trim().toLowerCase();
-    if (!normalizedEmail || !password) {
-      setErrorMessage('Enter your email and password.');
-      return;
-    }
-
-    if (mode === 'signup' && (!fullName.trim() || !zipCode.trim())) {
-      setErrorMessage('Enter your full name and ZIP code to create an account.');
-      return;
-    }
-
-    setIsSubmitting(true);
-    try {
-      if (mode === 'signin') {
-        await signInWithEmail(normalizedEmail, password);
-        return;
-      }
-
-      const session = await signUpWithEmail(normalizedEmail, password, {
-        fullName,
-        zipCode,
-      });
-
-      if (!session) {
-        setInfoMessage('Check your email to confirm your account, then sign in.');
-      }
-    } catch (error) {
-      const message = error instanceof Error ? error.message : 'Unable to sign in right now.';
-      setErrorMessage(message);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const handleGoogleSignIn = async () => {
-    resetMessages();
-    setIsGoogleSubmitting(true);
-    try {
-      await signInWithGoogle();
-    } catch (error) {
-      let message = error instanceof Error ? error.message : 'Google sign-in failed.';
-      if (__DEV__) {
-        message = `${message} Add this redirect URL in Supabase: ${getAuthRedirectUri()}`;
-      }
-      setErrorMessage(message);
-    } finally {
-      setIsGoogleSubmitting(false);
-    }
-  };
-
-  const isBusy = isSubmitting || isGoogleSubmitting;
 
   return (
     <ScrollView contentContainerStyle={styles.content} style={styles.page}>
@@ -135,7 +25,7 @@ export const AuthScreen = () => {
         <View style={styles.tabRow}>
           <Pressable
             accessibilityRole="button"
-            onPress={() => handleModeChange('signin')}
+            onPress={() => setMode('signin')}
             style={[styles.modeTab, mode === 'signin' ? styles.modeTabActive : null]}
           >
             <Text style={[styles.modeTabText, mode === 'signin' ? styles.modeTabTextActive : null]}>
@@ -144,7 +34,7 @@ export const AuthScreen = () => {
           </Pressable>
           <Pressable
             accessibilityRole="button"
-            onPress={() => handleModeChange('signup')}
+            onPress={() => setMode('signup')}
             style={[styles.modeTab, mode === 'signup' ? styles.modeTabActive : null]}
           >
             <Text style={[styles.modeTabText, mode === 'signup' ? styles.modeTabTextActive : null]}>
@@ -154,75 +44,19 @@ export const AuthScreen = () => {
         </View>
 
         {mode === 'signup' ? (
-          <LabeledInput
-            label="Full Name"
-            placeholder="Jordan Lee"
-            value={fullName}
-            onChangeText={setFullName}
-            autoCapitalize="words"
-          />
+          <LabeledInput label="Full Name" placeholder="Jordan Lee" />
         ) : null}
-        <LabeledInput
-          label="Email"
-          placeholder="name@example.com"
-          value={email}
-          onChangeText={setEmail}
-          keyboardType="email-address"
-        />
-        <LabeledInput
-          label="Password"
-          placeholder="Enter password"
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-        />
+        <LabeledInput label="Email" placeholder="name@example.com" />
+        <LabeledInput label="Password" placeholder="Enter password" secureTextEntry />
         {mode === 'signup' ? (
-          <LabeledInput
-            label="ZIP Code"
-            placeholder="94103"
-            value={zipCode}
-            onChangeText={setZipCode}
-            keyboardType="number-pad"
-          />
+          <LabeledInput label="ZIP Code" placeholder="94103" keyboardType="number-pad" />
         ) : null}
 
-        {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
-        {infoMessage ? <Text style={styles.infoText}>{infoMessage}</Text> : null}
-
-        <Pressable
-          style={[styles.primaryButton, isBusy ? styles.buttonDisabled : null]}
-          onPress={handleSubmit}
-          disabled={isBusy}
-          accessibilityRole="button"
-        >
-          {isSubmitting ? (
-            <ActivityIndicator color={T.white} />
-          ) : (
-            <Text style={styles.primaryButtonText}>
-              {mode === 'signin' ? 'Enter App' : 'Create Account'}
-            </Text>
-          )}
+        <Pressable style={styles.primaryButton} onPress={onAuthenticate} accessibilityRole="button">
+          <Text style={styles.primaryButtonText}>
+            {mode === 'signin' ? 'Enter App' : 'Create Account'}
+          </Text>
         </Pressable>
-
-        <View style={styles.dividerRow}>
-          <View style={styles.dividerLine} />
-          <Text style={styles.dividerText}>or</Text>
-          <View style={styles.dividerLine} />
-        </View>
-
-        <Pressable
-          style={[styles.googleButton, isBusy ? styles.buttonDisabled : null]}
-          onPress={handleGoogleSignIn}
-          disabled={isBusy}
-          accessibilityRole="button"
-        >
-          {isGoogleSubmitting ? (
-            <ActivityIndicator color={T.ink} />
-          ) : (
-            <Text style={styles.googleButtonText}>Continue with Google</Text>
-          )}
-        </Pressable>
-
         {mode === 'signup' ? (
           <Text style={styles.footnote}>
             By continuing, you agree to receive report status updates.
@@ -230,6 +64,28 @@ export const AuthScreen = () => {
         ) : null}
       </View>
     </ScrollView>
+  );
+};
+
+const LabeledInput = ({
+  label,
+  ...props
+}: {
+  label: string;
+  placeholder: string;
+  secureTextEntry?: boolean;
+  keyboardType?: 'default' | 'email-address' | 'number-pad';
+}) => {
+  return (
+    <View style={styles.inputGroup}>
+      <Text style={styles.inputLabel}>{label}</Text>
+      <TextInput
+        {...props}
+        placeholderTextColor={T.ink3}
+        style={styles.input}
+        autoCapitalize="none"
+      />
+    </View>
   );
 };
 
@@ -331,48 +187,6 @@ const styles = StyleSheet.create({
     color: T.white,
     fontSize: 16,
     fontWeight: '800',
-  },
-  googleButton: {
-    borderWidth: 1,
-    borderColor: T.border,
-    borderRadius: 14,
-    paddingVertical: 15,
-    alignItems: 'center',
-    backgroundColor: T.white,
-  },
-  googleButtonText: {
-    color: T.ink,
-    fontSize: 16,
-    fontWeight: '700',
-  },
-  buttonDisabled: {
-    opacity: 0.7,
-  },
-  dividerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  dividerLine: {
-    flex: 1,
-    height: 1,
-    backgroundColor: T.border,
-  },
-  dividerText: {
-    color: T.ink3,
-    fontSize: 13,
-    fontWeight: '600',
-    textTransform: 'uppercase',
-  },
-  errorText: {
-    color: T.red,
-    fontSize: 14,
-    lineHeight: 20,
-  },
-  infoText: {
-    color: T.green,
-    fontSize: 14,
-    lineHeight: 20,
   },
   footnote: {
     color: T.ink3,

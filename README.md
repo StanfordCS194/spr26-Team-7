@@ -14,15 +14,13 @@ Reach us by email:
 
 The main mobile app is located at the folder `/mobile` within this repo.
 
-```bash
-cd mobile
-npm install
-npm start
-```
+If it's your first time running the app: `npm install`
 
-`npm install` creates `mobile/.env` from `mobile/.env.shared` if you do not already have one. Restart with `npx expo start --clear` after changing env values.
-
-Alternatives: `npm run android`, `npm run ios`, `npm run web`
+Then, run: `npm start`.
+Alternatives are:
+`npm run android`
+`npm run ios`
+`npm run web`
 
 Git Test Assignment:  
 Elijah Song  
