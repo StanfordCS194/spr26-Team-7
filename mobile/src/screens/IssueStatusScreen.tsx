@@ -1,14 +1,17 @@
 import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
 import { MockStreetPhoto } from '../components/MockStreetPhoto'
+import { SampleIssueImage } from '../components/SampleIssueImage'
 import { WireframeHeader } from '../components/WireframeHeader'
 import { T } from '../theme'
-import { ReportRecord } from '../types'
+import { ReportRecord, SampleIssueRecord } from '../types'
 
 type IssueStatusScreenProps = {
-  report: ReportRecord
+  report: ReportRecord | SampleIssueRecord
   onBack: () => void
   onToggleFollow: () => void
   onAddPhoto: () => void
+  primaryActionLabel?: string
+  onPrimaryAction?: () => void
 }
 
 export const IssueStatusScreen = ({
@@ -16,7 +19,14 @@ export const IssueStatusScreen = ({
   onBack,
   onToggleFollow,
   onAddPhoto,
+  primaryActionLabel,
+  onPrimaryAction,
 }: IssueStatusScreenProps) => {
+  const isSampleIssue = 'image' in report
+  const coordinatesText = isSampleIssue
+    ? `${report.latitude.toFixed(6)}, ${report.longitude.toFixed(6)}`
+    : null
+
   return (
     <View style={styles.page}>
       <WireframeHeader title="Issue" showBack onBack={onBack} />
@@ -34,7 +44,11 @@ export const IssueStatusScreen = ({
         </View>
 
         <View style={styles.photoCard}>
-          <MockStreetPhoto style={{ width: '100%', height: '100%' }} />
+          {isSampleIssue ? (
+            <SampleIssueImage image={report.image} style={{ width: '100%', height: '100%' }} />
+          ) : (
+            <MockStreetPhoto style={{ width: '100%', height: '100%' }} />
+          )}
           <View style={styles.photoOverlay}>
             <Text style={styles.photoOverlayText}>{report.photoCount} photo{report.photoCount === 1 ? '' : 's'}</Text>
           </View>
@@ -44,14 +58,30 @@ export const IssueStatusScreen = ({
           <Text style={styles.sectionTitle}>Location</Text>
           <View style={styles.mapArea}>
             <Image source={require('../../assets/new-map.png')} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
-            <View style={styles.mapPin} />
+            <View
+              style={[
+                styles.mapPin,
+                {
+                  top: `${report.pin.top}%`,
+                  left: `${report.pin.left}%`,
+                  backgroundColor: report.pin.color,
+                },
+              ]}
+            />
           </View>
-          <Text style={styles.value}>{report.address}</Text>
+          <Text style={styles.value}>{isSampleIssue ? report.locationName : report.address}</Text>
+          <Text style={styles.secondaryValue}>{report.address}</Text>
+          {coordinatesText ? <Text style={styles.metaValue}>Coordinates: {coordinatesText}</Text> : null}
           <View style={styles.tagRow}>
-            <InfoPill label={report.category} />
+            <InfoPill label={isSampleIssue ? report.type : report.category} />
             <InfoPill label={report.tag} />
             <InfoPill label={report.district} />
           </View>
+        </View>
+
+        <View style={styles.card}>
+          <Text style={styles.sectionTitle}>Description</Text>
+          <Text style={styles.bodyText}>{report.description}</Text>
         </View>
 
         <View style={styles.card}>
@@ -75,22 +105,38 @@ export const IssueStatusScreen = ({
             value={`${report.reportCount} people reported or confirmed this issue`}
           />
           <InsightRow label="Assigned team" value={report.assignedTo} />
+          {isSampleIssue ? (
+            <InsightRow
+              label="Integration payload"
+              value={`source=${report.integration.source} · feature=${report.integration.mapFeatureType} · marker=${report.integration.markerColor}`}
+            />
+          ) : null}
         </View>
 
         <View style={styles.actionRow}>
-          <Pressable
-            style={[styles.followButton, report.isFollowing ? styles.followButtonActive : null]}
-            onPress={onToggleFollow}
-            accessibilityRole="button"
-          >
-            <Text style={[styles.followButtonText, report.isFollowing ? styles.followButtonTextActive : null]}>
-              {report.isFollowing ? 'Following for updates' : 'Follow this issue'}
-            </Text>
-          </Pressable>
+          {primaryActionLabel && onPrimaryAction ? (
+            <Pressable
+              style={styles.followButton}
+              onPress={onPrimaryAction}
+              accessibilityRole="button"
+            >
+              <Text style={styles.followButtonText}>{primaryActionLabel}</Text>
+            </Pressable>
+          ) : (
+            <Pressable
+              style={[styles.followButton, report.isFollowing ? styles.followButtonActive : null]}
+              onPress={onToggleFollow}
+              accessibilityRole="button"
+            >
+              <Text style={[styles.followButtonText, report.isFollowing ? styles.followButtonTextActive : null]}>
+                {report.isFollowing ? 'Following for updates' : 'Follow this issue'}
+              </Text>
+            </Pressable>
+          )}
 
           {report.isUserOwned ? (
             <Pressable style={styles.secondaryButton} onPress={onAddPhoto} accessibilityRole="button">
-              <Text style={styles.secondaryButtonText}>Add photo or update</Text>
+              <Text style={styles.secondaryButtonText}>{primaryActionLabel ? 'Back to library' : 'Add photo or update'}</Text>
             </Pressable>
           ) : null}
         </View>
@@ -169,13 +215,12 @@ const styles = StyleSheet.create({
     width: 14,
     height: 14,
     borderRadius: 7,
-    backgroundColor: '#F08B00',
     borderWidth: 2,
     borderColor: '#fff',
-    top: '28%',
-    left: '22%',
   },
   value: { color: T.ink, fontWeight: '700', fontSize: 16, lineHeight: 22 },
+  secondaryValue: { color: T.ink2, fontWeight: '500', lineHeight: 21 },
+  metaValue: { color: T.ink3, fontWeight: '600', fontSize: 12 },
   tagRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   infoPill: {
     backgroundColor: T.warm,
@@ -191,6 +236,7 @@ const styles = StyleSheet.create({
   dotPending: { backgroundColor: T.ink4 },
   timelineLabel: { fontSize: 16, fontWeight: '700', color: T.ink },
   timelineDate: { color: '#667287', fontWeight: '500', lineHeight: 20 },
+  bodyText: { color: T.ink2, lineHeight: 22, fontWeight: '500' },
   insightRow: { gap: 4 },
   insightLabel: { color: T.ink3, fontWeight: '700', fontSize: 13, textTransform: 'uppercase' },
   insightValue: { color: T.ink, fontWeight: '600', lineHeight: 22 },
