@@ -9,14 +9,58 @@ import { AnalyzingScreen } from './src/screens/AnalyzingScreen';
 import { ClassificationScreen, Classification } from './src/screens/ClassificationScreen';
 import { DuplicateScreen } from './src/screens/DuplicateScreen';
 import { ReportConfirmationScreen } from './src/screens/ReportConfirmationScreen';
-import { AppTab, ReportRecord, SampleIssueRecord } from './src/types';
-import { AuthScreen } from './src/screens/AuthScreen';
 import { IssueStatusScreen } from './src/screens/IssueStatusScreen';
-import { dashboardIssues } from './src/data/mockData';
+import { RecurringIssueDetailScreen } from './src/screens/RecurringIssueDetailScreen';
+import { AuthScreen } from './src/screens/AuthScreen';
 import { SampleIssuePickerScreen } from './src/screens/SampleIssuePickerScreen';
+import { AppTab, IssueCategory, ReportRecord, ReportStatus, SampleIssueRecord } from './src/types';
+import { MapReport, MapReportCategoryId } from './src/data/mockMapReports';
+import { ChronicSpot } from './src/data/dashboard311';
 import { sampleIssues } from './src/data/sampleIssues';
 
-type ReportStep = 'picker' | 'camera' | 'analyzing' | 'classify' | 'duplicate' | 'confirmation' | 'issue';
+const CATEGORY_LABEL: Record<MapReportCategoryId, IssueCategory> = {
+  pothole:     'Pothole',
+  streetlight: 'Streetlight Outage',
+  graffiti:    'Graffiti',
+  dumping:     'Illegal Dumping',
+  vehicle:     'Vehicle Concerns',
+  container:   'Illegal Dumping',
+  encampment:  'Encampment',
+  junk:        'Junk Pickup',
+};
+
+const STATUS_MAP: Record<string, ReportStatus> = {
+  'Submitted':   'Submitted',
+  'Open':        'Received',
+  'In Progress': 'In Progress',
+  'Closed':      'Resolved',
+};
+
+function mapReportToRecord(r: MapReport): ReportRecord {
+  const category = CATEGORY_LABEL[r.categoryId];
+  return {
+    id:                  r.id,
+    title:               r.title,
+    category,
+    tag:                 category,
+    district:            `San Jose District ${r.district}`,
+    status:              STATUS_MAP[r.status] ?? 'Submitted',
+    description:         r.description,
+    address:             r.address,
+    assignedTo:          r.assignedTo,
+    estimatedResolution: '2–3 weeks',
+    reportCount:         1,
+    isFollowing:         false,
+    isUserOwned:         false,
+    photoCount:          0,
+    pin:                 { top: 0, left: 0, color: '#5B9BF8' },
+    timeline:            r.timeline.map((t, i) => ({
+      label:    (STATUS_MAP[t.label] ?? t.label) as ReportStatus,
+      dateText: t.dateText,
+      reached:  i === 0,
+    })),
+  };
+}
 
 const REPORT_API_BASE = (
   process.env.EXPO_PUBLIC_REPORT_API_URL ?? 'http://127.0.0.1:3001'
@@ -37,14 +81,16 @@ const postDifferentIssueReport = (c: Classification) => {
   }).catch(() => {});
 };
 
+type ReportStep = 'picker' | 'issue' | 'camera' | 'analyzing' | 'classify' | 'duplicate' | 'confirmation';
+
 export default function App() {
-  const [currentTab, setCurrentTab] = useState<AppTab>('report');
-  const [reportStep, setReportStep] = useState<ReportStep>('picker');
-  const [classification, setClassification] = useState<Classification | null>(null);
-  const [merged, setMerged] = useState(false);
-  const [isSignedIn, setIsSignedIn] = useState(false);
-  const [issues, setIssues] = useState<ReportRecord[]>(dashboardIssues);
-  const [selectedIssueId, setSelectedIssueId] = useState<string | null>(null);
+  const [currentTab, setCurrentTab]                   = useState<AppTab>('report');
+  const [reportStep, setReportStep]                   = useState<ReportStep>('picker');
+  const [classification, setClassification]           = useState<Classification | null>(null);
+  const [merged, setMerged]                           = useState(false);
+  const [isSignedIn, setIsSignedIn]                   = useState(false);
+  const [mapReport, setMapReport]                     = useState<MapReport | null>(null);
+  const [chronicSpot, setChronicSpot]                 = useState<ChronicSpot | null>(null);
   const [selectedSampleIssue, setSelectedSampleIssue] = useState<SampleIssueRecord | null>(null);
 
   const handleAuthenticate = () => {
@@ -55,7 +101,6 @@ export default function App() {
   const handleSignOut = () => {
     setIsSignedIn(false);
     setCurrentTab('report');
-    setSelectedIssueId(null);
     handleResetFlow();
   };
 
@@ -64,48 +109,6 @@ export default function App() {
     setClassification(null);
     setMerged(false);
     setSelectedSampleIssue(null);
-  };
-
-  const selectedIssue = selectedIssueId
-    ? issues.find((issue) => issue.id === selectedIssueId) ?? null
-    : null;
-
-  const handleOpenIssue = (issueId: string) => {
-    setSelectedIssueId(issueId);
-  };
-
-  const handleCloseIssue = () => {
-    setSelectedIssueId(null);
-  };
-
-  const handleToggleFollow = () => {
-    if (!selectedIssueId) {
-      return;
-    }
-    setIssues((prev) =>
-      prev.map((issue) =>
-        issue.id === selectedIssueId
-          ? { ...issue, isFollowing: !issue.isFollowing }
-          : issue
-      )
-    );
-  };
-
-  const handleAddIssuePhoto = () => {
-    if (selectedSampleIssue) {
-      handleResetFlow();
-      return;
-    }
-    if (!selectedIssueId) {
-      return;
-    }
-    setIssues((prev) =>
-      prev.map((issue) =>
-        issue.id === selectedIssueId
-          ? { ...issue, photoCount: issue.photoCount + 1 }
-          : issue
-      )
-    );
   };
 
   const renderReportFlow = () => {
@@ -182,17 +185,30 @@ export default function App() {
 
   const renderCurrentTab = () => {
     if (currentTab === 'dashboard') {
-      if (selectedIssue) {
+      if (chronicSpot) {
         return (
-          <IssueStatusScreen
-            report={selectedIssue}
-            onBack={handleCloseIssue}
-            onToggleFollow={handleToggleFollow}
-            onAddPhoto={handleAddIssuePhoto}
+          <RecurringIssueDetailScreen
+            spot={chronicSpot}
+            onBack={() => setChronicSpot(null)}
           />
         );
       }
-      return <DashboardScreen issues={issues} onOpenIssue={handleOpenIssue} />;
+      if (mapReport) {
+        return (
+          <IssueStatusScreen
+            report={mapReportToRecord(mapReport)}
+            onBack={() => setMapReport(null)}
+            onToggleFollow={() => {}}
+            onAddPhoto={() => {}}
+          />
+        );
+      }
+      return (
+        <DashboardScreen
+          onViewReport={(r) => setMapReport(r)}
+          onViewChronicSpot={(spot) => setChronicSpot(spot)}
+        />
+      );
     }
     if (currentTab === 'profile') {
       return (
@@ -207,12 +223,11 @@ export default function App() {
 
   const showNav =
     isSignedIn &&
-    !selectedIssue &&
-    (
-      currentTab === 'dashboard' ||
+    !chronicSpot &&
+    !mapReport &&
+    (currentTab === 'dashboard' ||
       currentTab === 'profile' ||
-      (currentTab === 'report' && reportStep === 'picker')
-    );
+      (currentTab === 'report' && reportStep === 'picker'));
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -227,10 +242,7 @@ export default function App() {
       {showNav && (
         <BottomNav
           currentTab={currentTab}
-          onChangeTab={(tab) => {
-            setSelectedIssueId(null);
-            setCurrentTab(tab);
-          }}
+          onChangeTab={(tab) => setCurrentTab(tab)}
         />
       )}
     </SafeAreaView>
