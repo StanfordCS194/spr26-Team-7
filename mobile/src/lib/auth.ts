@@ -1,4 +1,3 @@
-import * as QueryParams from 'expo-auth-session/build/QueryParams'
 import { makeRedirectUri } from 'expo-auth-session'
 import * as WebBrowser from 'expo-web-browser'
 import Constants, { ExecutionEnvironment } from 'expo-constants'
@@ -26,6 +25,21 @@ export const getAuthRedirectUri = () => {
     scheme: 'govchat',
     path: 'auth/callback',
   })
+}
+
+const getQueryParams = (input: string) => {
+  const url = new URL(input, 'https://phony.example')
+  const errorCode = url.searchParams.get('errorCode')
+  url.searchParams.delete('errorCode')
+
+  const params = Object.fromEntries(url.searchParams)
+  if (url.hash) {
+    new URLSearchParams(url.hash.replace(/^#/, '')).forEach((value, key) => {
+      params[key] = value
+    })
+  }
+
+  return { errorCode, params }
 }
 
 const resolveProviderSignInUrl = async (authorizeUrl: string) => {
@@ -56,7 +70,7 @@ const resolveProviderSignInUrl = async (authorizeUrl: string) => {
 }
 
 const createSessionFromUrl = async (url: string) => {
-  const { params, errorCode } = QueryParams.getQueryParams(url)
+  const { params, errorCode } = getQueryParams(url)
 
   if (errorCode) {
     throw new Error(errorCode)

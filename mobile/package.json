@@ -5,6 +5,11 @@
   "scripts": {
     "setup": "bash ../scripts/setup-local-env.sh",
     "postinstall": "bash ../scripts/setup-local-env.sh",
+    "prestart": "npm run setup",
+    "prestart:tunnel": "npm run setup",
+    "preandroid": "npm run setup",
+    "preios": "npm run setup",
+    "preweb": "npm run setup",
     "start": "expo start",
     "start:tunnel": "expo start --tunnel",
     "android": "expo start --android",

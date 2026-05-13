@@ -28,9 +28,25 @@ copy_if_missing() {
   echo "Created $(basename "$target") from $(basename "$source")"
 }
 
-copy_if_missing "$MOBILE_ENV" "$MOBILE_SHARED"
-if [[ ! -f "$MOBILE_ENV" ]]; then
-  copy_if_missing "$MOBILE_ENV" "$MOBILE_EXAMPLE"
+mobile_env_has_supabase_values() {
+  if [[ ! -f "$MOBILE_ENV" ]]; then
+    return 1
+  fi
+
+  local url key
+  url="$(grep -E '^EXPO_PUBLIC_SUPABASE_URL=' "$MOBILE_ENV" 2>/dev/null | tail -n1 | cut -d= -f2- || true)"
+  key="$(grep -E '^EXPO_PUBLIC_SUPABASE_ANON_KEY=' "$MOBILE_ENV" 2>/dev/null | tail -n1 | cut -d= -f2- || true)"
+
+  [[ -n "$url" && -n "$key" && "$url" != *your-project-ref* && "$key" != "your-supabase-anon-key" ]]
+}
+
+if ! mobile_env_has_supabase_values; then
+  if [[ -f "$MOBILE_SHARED" ]]; then
+    cp "$MOBILE_SHARED" "$MOBILE_ENV"
+    echo "Created mobile/.env from .env.shared"
+  elif [[ ! -f "$MOBILE_ENV" ]]; then
+    copy_if_missing "$MOBILE_ENV" "$MOBILE_EXAMPLE"
+  fi
 fi
 
 copy_if_missing "$SERVER_ENV" "$SERVER_EXAMPLE"
