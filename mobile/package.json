@@ -6,6 +6,7 @@
     "setup": "bash ../scripts/setup-local-env.sh",
     "postinstall": "bash ../scripts/setup-local-env.sh",
     "start": "expo start",
+    "start:tunnel": "expo start --tunnel",
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web"
