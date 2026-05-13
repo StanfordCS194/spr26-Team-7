@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
-import { ActivityIndicator, SafeAreaView, StyleSheet, View } from 'react-native';
-import { useCallback, useEffect, useState } from 'react';
+import { SafeAreaView, StyleSheet, View } from 'react-native';
+import { useState } from 'react';
 import { BottomNav } from './src/components/BottomNav';
 import { DashboardScreen } from './src/screens/DashboardScreen';
 import { ProfileScreen } from './src/screens/ProfileScreen';
@@ -12,13 +12,6 @@ import { ReportConfirmationScreen } from './src/screens/ReportConfirmationScreen
 import { AppTab, ReportRecord, SampleIssueRecord } from './src/types';
 import { AuthScreen } from './src/screens/AuthScreen';
 import { IssueStatusScreen } from './src/screens/IssueStatusScreen';
-import { useAuth } from './src/providers/AuthProvider';
-import {
-  createReportFromClassification,
-  fetchDashboardReports,
-  incrementReportPhotoCount,
-  setReportFollow,
-} from './src/lib/reports';
 import { dashboardIssues } from './src/data/mockData';
 import { SampleIssuePickerScreen } from './src/screens/SampleIssuePickerScreen';
 import { sampleIssues } from './src/data/sampleIssues';
@@ -45,49 +38,26 @@ const postDifferentIssueReport = (c: Classification) => {
 };
 
 export default function App() {
-  const { session, isLoading } = useAuth();
   const [currentTab, setCurrentTab] = useState<AppTab>('report');
   const [reportStep, setReportStep] = useState<ReportStep>('picker');
   const [classification, setClassification] = useState<Classification | null>(null);
   const [merged, setMerged] = useState(false);
-  const [issues, setIssues] = useState<ReportRecord[]>([]);
-  const [issuesLoading, setIssuesLoading] = useState(false);
+  const [isSignedIn, setIsSignedIn] = useState(false);
+  const [issues, setIssues] = useState<ReportRecord[]>(dashboardIssues);
   const [selectedIssueId, setSelectedIssueId] = useState<string | null>(null);
-  const isSignedIn = Boolean(session);
   const [selectedSampleIssue, setSelectedSampleIssue] = useState<SampleIssueRecord | null>(null);
 
-  const loadIssues = useCallback(async () => {
-    if (!session?.user) {
-      setIssues([]);
-      return;
-    }
+  const handleAuthenticate = () => {
+    setIsSignedIn(true);
+    setCurrentTab('dashboard');
+  };
 
-    setIssuesLoading(true);
-    try {
-      const nextIssues = await fetchDashboardReports(session.user.id);
-      setIssues(nextIssues);
-    } catch {
-      setIssues([]);
-    } finally {
-      setIssuesLoading(false);
-    }
-  }, [session?.user]);
-
-  useEffect(() => {
-    void loadIssues();
-  }, [loadIssues]);
-
-  useEffect(() => {
-    if (session) {
-      return;
-    }
-
+  const handleSignOut = () => {
+    setIsSignedIn(false);
     setCurrentTab('report');
     setSelectedIssueId(null);
-    setReportStep('camera');
-    setClassification(null);
-    setMerged(false);
-  }, [session]);
+    handleResetFlow();
+  };
 
   const handleResetFlow = () => {
     setReportStep('picker');
@@ -109,33 +79,16 @@ export default function App() {
   };
 
   const handleToggleFollow = () => {
-    if (!selectedIssueId || !session?.user) {
+    if (!selectedIssueId) {
       return;
     }
-
-    const selectedIssue = issues.find((issue) => issue.id === selectedIssueId);
-    if (!selectedIssue) {
-      return;
-    }
-
-    const nextFollowing = !selectedIssue.isFollowing;
     setIssues((prev) =>
       prev.map((issue) =>
         issue.id === selectedIssueId
-          ? { ...issue, isFollowing: nextFollowing }
+          ? { ...issue, isFollowing: !issue.isFollowing }
           : issue
       )
     );
-
-    void setReportFollow(session.user.id, selectedIssueId, nextFollowing).catch(() => {
-      setIssues((prev) =>
-        prev.map((issue) =>
-          issue.id === selectedIssueId
-            ? { ...issue, isFollowing: selectedIssue.isFollowing }
-            : issue
-        )
-      );
-    });
   };
 
   const handleAddIssuePhoto = () => {
@@ -146,7 +99,6 @@ export default function App() {
     if (!selectedIssueId) {
       return;
     }
-
     setIssues((prev) =>
       prev.map((issue) =>
         issue.id === selectedIssueId
@@ -154,24 +106,6 @@ export default function App() {
           : issue
       )
     );
-
-    void incrementReportPhotoCount(selectedIssueId).catch(() => {});
-  };
-
-  const handleCompleteReport = async (nextMerged: boolean) => {
-    if (classification && session?.user) {
-      try {
-        await createReportFromClassification(session.user.id, classification, {
-          merged: nextMerged,
-        });
-        await loadIssues();
-      } catch {
-        // Keep the confirmation screen even if persistence fails.
-      }
-    }
-
-    setMerged(nextMerged);
-    setReportStep('confirmation');
   };
 
   const renderReportFlow = () => {
@@ -223,14 +157,13 @@ export default function App() {
     if (reportStep === 'duplicate') {
       return (
         <DuplicateScreen
-          onMerge={() => {
-            void handleCompleteReport(true);
-          }}
+          onMerge={() => { setMerged(true); setReportStep('confirmation'); }}
           onNew={() => {
             if (classification) {
               postDifferentIssueReport(classification);
             }
-            void handleCompleteReport(false);
+            setMerged(false);
+            setReportStep('confirmation');
           }}
           onBack={() => setReportStep('classify')}
           selectedSampleIssue={selectedSampleIssue}
@@ -259,10 +192,15 @@ export default function App() {
           />
         );
       }
-      return <DashboardScreen issues={issues} isLoading={issuesLoading} onOpenIssue={handleOpenIssue} />;
+      return <DashboardScreen issues={issues} onOpenIssue={handleOpenIssue} />;
     }
     if (currentTab === 'profile') {
-      return <ProfileScreen />;
+      return (
+        <ProfileScreen
+          isSignedIn={isSignedIn}
+          onToggleAuth={handleSignOut}
+        />
+      );
     }
     return renderReportFlow();
   };
@@ -276,17 +214,6 @@ export default function App() {
       (currentTab === 'report' && reportStep === 'picker')
     );
 
-  if (isLoading) {
-    return (
-      <SafeAreaView style={styles.safeArea}>
-        <StatusBar style="light" />
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#2563eb" />
-        </View>
-      </SafeAreaView>
-    );
-  }
-
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar style="light" />
@@ -294,7 +221,7 @@ export default function App() {
         {isSignedIn ? (
           renderCurrentTab()
         ) : (
-          <AuthScreen />
+          <AuthScreen onAuthenticate={handleAuthenticate} />
         )}
       </View>
       {showNav && (
@@ -313,5 +240,4 @@ export default function App() {
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: '#fff' },
   container: { flex: 1, backgroundColor: '#fff' },
-  loadingContainer: { flex: 1, alignItems: 'center', justifyContent: 'center' },
 });
