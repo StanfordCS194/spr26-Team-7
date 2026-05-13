@@ -1,15 +1,32 @@
 import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
-import { MockStreetPhoto } from '../components/MockStreetPhoto'
+import { MaterialCommunityIcons } from '@expo/vector-icons'
 import { SampleIssueImage } from '../components/SampleIssueImage'
-import { WireframeHeader } from '../components/WireframeHeader'
-import { T } from '../theme'
+
+import { dashboard311 } from '../data/dashboard311'
 import { ReportRecord, SampleIssueRecord } from '../types'
+
+const CATEGORY_ICON: Record<string, string> = {
+  'Pothole':             'road-variant',
+  'Streetlight Outage':  'lightbulb-on-outline',
+  'Graffiti':            'format-paint',
+  'Illegal Dumping':     'trash-can-outline',
+  'Vehicle Concerns':    'car',
+  'Encampment Concerns': 'tent',
+}
+
+const CATEGORY_COLOR: Record<string, string> = {
+  'Pothole':             '#E8514A',
+  'Streetlight Outage':  '#5B9BF8',
+  'Graffiti':            '#3ECF82',
+  'Illegal Dumping':     '#F0A030',
+  'Vehicle Concerns':    '#E8514A',
+  'Encampment Concerns': '#A78BFA',
+}
 
 type IssueStatusScreenProps = {
   report: ReportRecord | SampleIssueRecord
   onBack: () => void
   onToggleFollow: () => void
-  onAddPhoto: () => void
   primaryActionLabel?: string
   onPrimaryAction?: () => void
 }
@@ -18,7 +35,6 @@ export const IssueStatusScreen = ({
   report,
   onBack,
   onToggleFollow,
-  onAddPhoto,
   primaryActionLabel,
   onPrimaryAction,
 }: IssueStatusScreenProps) => {
@@ -27,27 +43,36 @@ export const IssueStatusScreen = ({
     ? `${report.latitude.toFixed(6)}, ${report.longitude.toFixed(6)}`
     : null
 
+  const d3IssueTypes = dashboard311.districts['3']?.issueTypes ?? []
+  const issueMetrics = d3IssueTypes.find(t => t.name === report.category)
+
   return (
     <View style={styles.page}>
-      <WireframeHeader title="Issue" showBack onBack={onBack} />
+      <View style={styles.header}>
+        <Pressable style={styles.closeButton} onPress={onBack} accessibilityRole="button" accessibilityLabel="Close">
+          <Text style={styles.closeIcon}>✕</Text>
+        </Pressable>
+      </View>
       <ScrollView contentContainerStyle={styles.content}>
         <View style={styles.headingRow}>
           <View style={styles.headingCopy}>
             <Text style={styles.issueId}>{report.id}</Text>
             <Text style={styles.issueTitle}>{report.title}</Text>
           </View>
-          <View style={[styles.badge, report.status === 'Resolved' ? styles.badgeResolved : null]}>
-            <Text style={[styles.badgeText, report.status === 'Resolved' ? styles.badgeTextResolved : null]}>
-              {report.status}
-            </Text>
-          </View>
         </View>
 
         <View style={styles.photoCard}>
-          {isSampleIssue ? (
+          {'image' in report ? (
             <SampleIssueImage image={report.image} style={{ width: '100%', height: '100%' }} />
           ) : (
-            <MockStreetPhoto style={{ width: '100%', height: '100%' }} />
+            <View style={styles.photoPlaceholder}>
+              <MaterialCommunityIcons
+                name={(CATEGORY_ICON[report.category] ?? 'alert-circle-outline') as any}
+                size={44}
+                color={CATEGORY_COLOR[report.category] ?? '#8D939E'}
+              />
+              <Text style={styles.photoPlaceholderLabel}>{report.category}</Text>
+            </View>
           )}
           <View style={styles.photoOverlay}>
             <Text style={styles.photoOverlayText}>{report.photoCount} photo{report.photoCount === 1 ? '' : 's'}</Text>
@@ -73,8 +98,6 @@ export const IssueStatusScreen = ({
           <Text style={styles.secondaryValue}>{report.address}</Text>
           {coordinatesText ? <Text style={styles.metaValue}>Coordinates: {coordinatesText}</Text> : null}
           <View style={styles.tagRow}>
-            <InfoPill label={isSampleIssue ? report.type : report.category} />
-            <InfoPill label={report.tag} />
             <InfoPill label={report.district} />
           </View>
         </View>
@@ -99,18 +122,17 @@ export const IssueStatusScreen = ({
 
         <View style={styles.card}>
           <Text style={styles.sectionTitle}>Insights</Text>
-          <InsightRow label="Estimated resolution time" value={report.estimatedResolution} />
           <InsightRow
-            label="Reports and confirmations"
-            value={`${report.reportCount} people reported or confirmed this issue`}
+            label="Avg. resolution time"
+            value={issueMetrics ? issueMetrics.all.avgTimeLabel : report.estimatedResolution}
+          />
+          <InsightRow
+            label="Resolution rate"
+            value={issueMetrics
+              ? `${issueMetrics.all.resolvedPct}% of District 3 cases resolved`
+              : `${report.reportCount} ${report.reportCount === 1 ? 'person' : 'people'} reported or confirmed this issue`}
           />
           <InsightRow label="Assigned team" value={report.assignedTo} />
-          {isSampleIssue ? (
-            <InsightRow
-              label="Integration payload"
-              value={`source=${report.integration.source} · feature=${report.integration.mapFeatureType} · marker=${report.integration.markerColor}`}
-            />
-          ) : null}
         </View>
 
         <View style={styles.actionRow}>
@@ -133,12 +155,6 @@ export const IssueStatusScreen = ({
               </Text>
             </Pressable>
           )}
-
-          {report.isUserOwned ? (
-            <Pressable style={styles.secondaryButton} onPress={onAddPhoto} accessibilityRole="button">
-              <Text style={styles.secondaryButtonText}>{primaryActionLabel ? 'Back to library' : 'Add photo or update'}</Text>
-            </Pressable>
-          ) : null}
         </View>
       </ScrollView>
     </View>
@@ -163,30 +179,30 @@ const InfoPill = ({ label }: { label: string }) => {
 }
 
 const styles = StyleSheet.create({
-  page: { flex: 1, backgroundColor: T.white },
+  page: { flex: 1, backgroundColor: '#18191C' },
   content: { padding: 14, gap: 14, paddingBottom: 32 },
   headingRow: { gap: 10 },
   headingCopy: { gap: 6 },
-  issueId: { fontSize: 13, fontWeight: '700', color: T.ink3, letterSpacing: 0.4 },
-  issueTitle: { fontSize: 24, fontWeight: '900', color: T.ink, lineHeight: 30 },
+  issueId: { fontSize: 13, fontWeight: '700', color: '#8D939E', letterSpacing: 0.4 },
+  issueTitle: { fontSize: 24, fontWeight: '900', color: '#F2F3F5', lineHeight: 30 },
   badge: {
-    backgroundColor: '#FFF2BF',
+    backgroundColor: '#F0A03028',
     alignSelf: 'flex-start',
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 20,
   },
   badgeResolved: {
-    backgroundColor: T.greenLight,
+    backgroundColor: '#4F8EF728',
   },
-  badgeText: { color: '#6C5600', fontWeight: '700' },
-  badgeTextResolved: { color: T.green },
+  badgeText: { color: '#F0A030', fontWeight: '700' },
+  badgeTextResolved: { color: '#4F8EF7' },
   photoCard: {
     height: 190,
     borderRadius: 18,
     overflow: 'hidden',
     position: 'relative',
-    backgroundColor: '#D7DEE9',
+    backgroundColor: '#2C2D32',
   },
   photoOverlay: {
     position: 'absolute',
@@ -198,17 +214,17 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
   },
   photoOverlayText: {
-    color: T.white,
+    color: '#F2F3F5',
     fontWeight: '700',
     fontSize: 12,
   },
-  card: { borderRadius: 16, borderWidth: 1, borderColor: '#E2E9F1', padding: 14, gap: 10 },
-  sectionTitle: { color: T.ink, fontWeight: '800', fontSize: 18 },
+  card: { borderRadius: 16, backgroundColor: '#222428', padding: 14, gap: 10 },
+  sectionTitle: { color: '#F2F3F5', fontWeight: '800', fontSize: 18 },
   mapArea: {
     height: 200,
     borderRadius: 14,
     overflow: 'hidden',
-    backgroundColor: '#EDF2F8',
+    backgroundColor: '#2C2D32',
   },
   mapPin: {
     position: 'absolute',
@@ -218,52 +234,67 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: '#fff',
   },
-  value: { color: T.ink, fontWeight: '700', fontSize: 16, lineHeight: 22 },
-  secondaryValue: { color: T.ink2, fontWeight: '500', lineHeight: 21 },
-  metaValue: { color: T.ink3, fontWeight: '600', fontSize: 12 },
+  value: { color: '#F2F3F5', fontWeight: '700', fontSize: 16, lineHeight: 22 },
+  secondaryValue: { color: '#8D939E', fontWeight: '500', lineHeight: 21 },
+  metaValue: { color: '#8D939E', fontWeight: '600', fontSize: 12 },
   tagRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   infoPill: {
-    backgroundColor: T.warm,
+    backgroundColor: '#2C2D32',
     borderRadius: 999,
     paddingHorizontal: 10,
     paddingVertical: 6,
   },
-  infoPillText: { color: T.ink2, fontWeight: '700', fontSize: 12 },
+  infoPillText: { color: '#8D939E', fontWeight: '700', fontSize: 12 },
   timelineRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 12 },
   timelineTextWrap: { flex: 1, gap: 2 },
   dot: { width: 12, height: 12, borderRadius: 999, marginTop: 6 },
-  dotReached: { backgroundColor: T.blue },
-  dotPending: { backgroundColor: T.ink4 },
-  timelineLabel: { fontSize: 16, fontWeight: '700', color: T.ink },
-  timelineDate: { color: '#667287', fontWeight: '500', lineHeight: 20 },
-  bodyText: { color: T.ink2, lineHeight: 22, fontWeight: '500' },
+  dotReached: { backgroundColor: '#4F8EF7' },
+  dotPending: { backgroundColor: '#35373D' },
+  timelineLabel: { fontSize: 16, fontWeight: '700', color: '#F2F3F5' },
+  timelineDate: { color: '#8D939E', fontWeight: '500', lineHeight: 20 },
+  bodyText: { color: '#8D939E', lineHeight: 22, fontWeight: '500' },
   insightRow: { gap: 4 },
-  insightLabel: { color: T.ink3, fontWeight: '700', fontSize: 13, textTransform: 'uppercase' },
-  insightValue: { color: T.ink, fontWeight: '600', lineHeight: 22 },
+  insightLabel: { color: '#8D939E', fontWeight: '700', fontSize: 13, textTransform: 'uppercase' },
+  insightValue: { color: '#F2F3F5', fontWeight: '600', lineHeight: 22 },
   actionRow: { gap: 10 },
   followButton: {
     borderRadius: 14,
-    backgroundColor: T.blue,
+    backgroundColor: '#4F8EF7',
     paddingVertical: 16,
     alignItems: 'center',
   },
   followButtonActive: {
-    backgroundColor: T.blueLight,
+    backgroundColor: '#2C2D32',
     borderWidth: 1,
-    borderColor: '#C7DBFF',
+    borderColor: '#35373D',
   },
-  followButtonText: { color: T.white, fontWeight: '800', fontSize: 16 },
-  followButtonTextActive: { color: T.blueDark },
-  secondaryButton: {
-    borderRadius: 14,
-    borderWidth: 1,
-    borderColor: T.border,
-    paddingVertical: 16,
+  followButtonText: { color: '#fff', fontWeight: '800', fontSize: 16 },
+  followButtonTextActive: { color: '#F2F3F5' },
+  header: {
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#35373D',
+  },
+  closeButton: {
+    backgroundColor: '#2C2D32',
+    width: 32,
+    height: 32,
+    borderRadius: 16,
     alignItems: 'center',
+    justifyContent: 'center',
   },
-  secondaryButtonText: {
-    color: T.ink,
-    fontWeight: '800',
-    fontSize: 16,
+  closeIcon: { color: '#8D939E', fontSize: 14, fontWeight: '600' },
+  photoPlaceholder: {
+    flex: 1,
+    backgroundColor: '#2C2D32',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
+  },
+  photoPlaceholderLabel: {
+    color: '#8D939E',
+    fontSize: 13,
+    fontWeight: '600',
   },
 })

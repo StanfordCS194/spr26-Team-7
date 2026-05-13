@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
-import { T } from '../theme';
 
 type AuthMode = 'signin' | 'signup';
 
@@ -81,7 +80,7 @@ const LabeledInput = ({
       <Text style={styles.inputLabel}>{label}</Text>
       <TextInput
         {...props}
-        placeholderTextColor={T.ink3}
+        placeholderTextColor="#55595F"
         style={styles.input}
         autoCapitalize="none"
       />
@@ -92,7 +91,7 @@ const LabeledInput = ({
 const styles = StyleSheet.create({
   page: {
     flex: 1,
-    backgroundColor: T.cream,
+    backgroundColor: '#18191C',
   },
   content: {
     flexGrow: 1,
@@ -105,39 +104,32 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   eyebrow: {
-    color: T.blue,
+    color: '#4F8EF7',
     fontSize: 14,
     fontWeight: '800',
     letterSpacing: 1,
     textTransform: 'uppercase',
   },
   title: {
-    color: T.ink,
+    color: '#F2F3F5',
     fontSize: 34,
     lineHeight: 40,
     fontWeight: '900',
   },
   subtitle: {
-    color: T.ink2,
+    color: '#8D939E',
     fontSize: 16,
     lineHeight: 24,
   },
   card: {
-    backgroundColor: T.white,
+    backgroundColor: '#222428',
     borderRadius: 24,
-    borderWidth: 1,
-    borderColor: T.border,
     padding: 18,
     gap: 14,
-    shadowColor: '#000',
-    shadowOpacity: 0.05,
-    shadowRadius: 16,
-    shadowOffset: { width: 0, height: 8 },
-    elevation: 3,
   },
   tabRow: {
     flexDirection: 'row',
-    backgroundColor: T.blueLight,
+    backgroundColor: '#2C2D32',
     borderRadius: 16,
     padding: 4,
   },
@@ -148,48 +140,48 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   modeTabActive: {
-    backgroundColor: T.white,
+    backgroundColor: '#35373D',
   },
   modeTabText: {
-    color: T.ink2,
+    color: '#8D939E',
     fontWeight: '700',
     fontSize: 15,
   },
   modeTabTextActive: {
-    color: T.blueDark,
+    color: '#F2F3F5',
   },
   inputGroup: {
     gap: 6,
   },
   inputLabel: {
-    color: T.ink2,
+    color: '#8D939E',
     fontWeight: '700',
     fontSize: 14,
   },
   input: {
     borderWidth: 1,
-    borderColor: T.border,
+    borderColor: '#35373D',
     borderRadius: 14,
     paddingHorizontal: 14,
     paddingVertical: 14,
     fontSize: 16,
-    color: T.ink,
-    backgroundColor: T.white,
+    color: '#F2F3F5',
+    backgroundColor: '#2C2D32',
   },
   primaryButton: {
     marginTop: 4,
-    backgroundColor: T.blue,
+    backgroundColor: '#4F8EF7',
     borderRadius: 14,
     paddingVertical: 15,
     alignItems: 'center',
   },
   primaryButtonText: {
-    color: T.white,
+    color: '#fff',
     fontSize: 16,
     fontWeight: '800',
   },
   footnote: {
-    color: T.ink3,
+    color: '#55595F',
     fontSize: 13,
     lineHeight: 18,
     textAlign: 'center',

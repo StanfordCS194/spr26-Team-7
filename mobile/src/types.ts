@@ -12,15 +12,11 @@ export type ReportStatus =
 
 export type IssueCategory =
   | 'Pothole'
-  | 'Cracked Road'
-  | 'Damaged Sidewalk'
   | 'Streetlight Outage'
   | 'Graffiti'
   | 'Illegal Dumping'
-  | 'Transit Signage'
   | 'Vehicle Concerns'
-  | 'Encampment'
-  | 'Junk Pickup'
+  | 'Encampment Concerns'
 
 export type TimelineEntry = {
   label: ReportStatus

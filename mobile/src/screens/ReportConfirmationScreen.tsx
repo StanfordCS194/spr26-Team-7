@@ -1,8 +1,8 @@
 import { useEffect, useRef } from 'react';
 import { Animated, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SampleIssueImage } from '../components/SampleIssueImage';
+import { dashboard311 } from '../data/dashboard311';
 import { Classification } from './ClassificationScreen';
-import { T } from '../theme';
 import { SampleIssueRecord } from '../types';
 
 type ReportConfirmationScreenProps = {
@@ -10,6 +10,7 @@ type ReportConfirmationScreenProps = {
   classification: Classification | null;
   onDone: () => void;
   selectedSampleIssue?: SampleIssueRecord | null;
+  onViewIssue?: () => void;
 };
 
 export const ReportConfirmationScreen = ({
@@ -17,6 +18,7 @@ export const ReportConfirmationScreen = ({
   classification,
   onDone,
   selectedSampleIssue,
+  onViewIssue,
 }: ReportConfirmationScreenProps) => {
   const scaleAnim = useRef(new Animated.Value(0)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -49,11 +51,15 @@ export const ReportConfirmationScreen = ({
   }, [fadeAnim, scaleAnim, slideAnim]);
 
   const tag = classification?.tag ?? 'Pothole';
+  const category = classification?.category ?? selectedSampleIssue?.category ?? 'Pothole';
+  const d3IssueTypes = dashboard311.districts['3']?.issueTypes ?? [];
+  const issueMetrics = d3IssueTypes.find(t => t.name === category);
+  const estimatedTime = issueMetrics?.all.avgTimeLabel ?? selectedSampleIssue?.estimatedResolution ?? '2–3 weeks';
   const address = classification?.locationMain
     ? `${classification.locationMain}, ${classification.locationSub}`
     : 'Glen Eyrie Ave & Carolyn Ave, San Jose';
-  const circleColor = merged ? T.blueLight : T.greenLight;
-  const checkColor = merged ? T.blue : T.green;
+  const circleColor = merged ? '#F0A03028' : '#4F8EF728';
+  const checkColor = merged ? '#F0A030' : '#4F8EF7';
 
   return (
     <View style={styles.page}>
@@ -63,59 +69,62 @@ export const ReportConfirmationScreen = ({
         </Animated.View>
 
         <Animated.Text style={[styles.title, { opacity: fadeAnim, transform: [{ translateY: slideAnim }] }]}>
-          {merged ? 'Report added!' : 'Report filed!'}
+          {merged ? 'Report Added' : 'Report Filed'}
         </Animated.Text>
 
         <Animated.Text style={[styles.subtitle, { opacity: fadeAnim, transform: [{ translateY: slideAnim }] }]}>
-          {merged
-            ? `Your report joined nearby reports for ${tag.toLowerCase()}.`
-            : `Thanks for helping improve your neighborhood. Your ${tag.toLowerCase()} report is ready for the city workflow.`}
+          {`Thank you for contributing to your neighborhood!`}
         </Animated.Text>
 
         <Animated.View style={[styles.summaryCard, { opacity: fadeAnim, transform: [{ translateY: slideAnim }] }]}>
-          <View style={styles.summaryPhoto}>
-            <SampleIssueImage
-              image={
-                selectedSampleIssue?.image ?? {
-                  kind: 'asset',
-                  source: require('../../assets/pothole.jpg'),
-                  alt: 'Submitted report preview',
+          <Pressable onPress={onViewIssue} disabled={!onViewIssue} accessibilityRole="button">
+            <View style={styles.summaryPhoto}>
+              <SampleIssueImage
+                image={
+                  selectedSampleIssue?.image ?? {
+                    kind: 'asset',
+                    source: require('../../assets/pothole.jpg'),
+                    alt: 'Submitted report preview',
+                  }
                 }
-              }
-              style={{ width: '100%', height: '100%' }}
-            />
-            <View style={styles.summaryPhotoOverlay} />
-          </View>
-          <View style={styles.summaryBody}>
-            <View style={styles.summaryRow}>
-              <View style={{ flex: 1 }}>
-                <Text style={styles.summaryTag}>{tag}</Text>
-                <Text style={styles.summaryAddr}>{address}</Text>
+                style={{ width: '100%', height: '100%' }}
+              />
+              <View style={styles.summaryPhotoOverlay} />
+            </View>
+            <View style={styles.summaryBody}>
+              <View style={styles.summaryRow}>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.summaryTag}>{tag}</Text>
+                  <Text style={styles.summaryAddr}>{address}</Text>
+                </View>
+                <View style={[styles.filedBadge, { backgroundColor: '#F0A03028' }]}>
+                  <Text style={[styles.filedBadgeText, { color: '#F0A030' }]}>
+                    Submitted
+                  </Text>
+                </View>
               </View>
-              <View style={[styles.filedBadge, { backgroundColor: merged ? T.blueLight : T.greenLight }]}>
-                <Text style={[styles.filedBadgeText, { color: merged ? T.blue : T.green }]}>
-                  {merged ? '+1 · 5 total' : 'Filed'}
-                </Text>
+              <View style={styles.tagRow}>
+                <View style={styles.tag}>
+                  <Text style={styles.tagText}>{selectedSampleIssue?.district ?? 'San Jose District 3'}</Text>
+                </View>
+                <View style={[styles.tag, { backgroundColor: '#4F8EF728' }]}>
+                  <Text style={[styles.tagText, { color: '#4F8EF7' }]}>Est. {estimatedTime}</Text>
+                </View>
               </View>
             </View>
-            <View style={styles.tagRow}>
-              <View style={styles.tag}>
-                <Text style={styles.tagText}>{selectedSampleIssue?.assignedTo ?? 'San Jose D.O.T.'}</Text>
+            {onViewIssue && (
+              <View style={styles.viewReportRow}>
+                <Text style={styles.viewReportText}>View Report</Text>
+                <Text style={styles.viewReportChevron}>›</Text>
               </View>
-              <View style={styles.tag}>
-                <Text style={styles.tagText}>{selectedSampleIssue?.district ?? 'San Jose District 3'}</Text>
-              </View>
-              <View style={[styles.tag, { backgroundColor: '#fef3c7' }]}>
-                <Text style={[styles.tagText, { color: T.amber }]}>Pending</Text>
-              </View>
-            </View>
-          </View>
+            )}
+          </Pressable>
         </Animated.View>
 
         <Animated.View style={{ width: '100%', opacity: fadeAnim, transform: [{ translateY: slideAnim }] }}>
           <Pressable onPress={onDone} style={styles.homeButton} accessibilityRole="button">
             <Text style={styles.homeIcon}>🏠</Text>
-            <Text style={styles.homeText}>Back to home</Text>
+            <Text style={styles.homeText}>Back to Reporting</Text>
           </Pressable>
         </Animated.View>
       </ScrollView>
@@ -124,7 +133,7 @@ export const ReportConfirmationScreen = ({
 };
 
 const styles = StyleSheet.create({
-  page: { flex: 1, backgroundColor: T.cream },
+  page: { flex: 1, backgroundColor: '#18191C' },
   scroll: {
     flexGrow: 1,
     alignItems: 'center',
@@ -147,21 +156,19 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 22,
     fontWeight: '800',
-    color: T.ink,
+    color: '#F2F3F5',
     textAlign: 'center',
   },
   subtitle: {
     fontSize: 15,
-    color: T.ink2,
+    color: '#8D939E',
     textAlign: 'center',
     lineHeight: 23,
   },
 
   summaryCard: {
     width: '100%',
-    backgroundColor: T.white,
-    borderWidth: 1,
-    borderColor: T.border,
+    backgroundColor: '#222428',
     borderRadius: 16,
     overflow: 'hidden',
   },
@@ -177,16 +184,28 @@ const styles = StyleSheet.create({
   },
   summaryBody: { padding: 14, gap: 10 },
   summaryRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 10 },
-  summaryTag: { fontSize: 15, fontWeight: '700', color: T.ink },
-  summaryAddr: { fontSize: 12, color: T.ink3, marginTop: 2 },
+  summaryTag: { fontSize: 15, fontWeight: '700', color: '#F2F3F5' },
+  summaryAddr: { fontSize: 12, color: '#55595F', marginTop: 2 },
   filedBadge: { borderRadius: 8, paddingHorizontal: 8, paddingVertical: 4 },
   filedBadgeText: { fontSize: 11, fontWeight: '700' },
   tagRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
-  tag: { backgroundColor: T.warm, borderRadius: 8, paddingHorizontal: 8, paddingVertical: 4 },
-  tagText: { fontSize: 11, color: T.ink3, fontWeight: '500' },
+  tag: { backgroundColor: '#2C2D32', borderRadius: 8, paddingHorizontal: 8, paddingVertical: 4 },
+  tagText: { fontSize: 11, color: '#8D939E', fontWeight: '500' },
+
+  viewReportRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 14,
+    paddingVertical: 11,
+    borderTopWidth: 1,
+    borderTopColor: '#35373D',
+  },
+  viewReportText: { fontSize: 14, fontWeight: '600', color: '#F2F3F5' },
+  viewReportChevron: { fontSize: 20, color: '#55595F', lineHeight: 22 },
 
   homeButton: {
-    backgroundColor: T.blue,
+    backgroundColor: '#4F8EF7',
     borderRadius: 14,
     paddingVertical: 15,
     flexDirection: 'row',
@@ -195,5 +214,5 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   homeIcon: { fontSize: 18 },
-  homeText: { color: 'white', fontSize: 15, fontWeight: '700' },
+  homeText: { color: '#fff', fontSize: 15, fontWeight: '700' },
 });
