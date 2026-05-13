@@ -2,6 +2,8 @@ import { IssueCategory, ReportDraft, ReportRecord } from '../types'
 
 export const issueCategories: IssueCategory[] = [
   'Pothole',
+  'Cracked Road',
+  'Damaged Sidewalk',
   'Streetlight Outage',
   'Graffiti',
   'Illegal Dumping',
@@ -10,6 +12,8 @@ export const issueCategories: IssueCategory[] = [
 
 const categoryGroupMap: Record<IssueCategory, string> = {
   'Pothole': 'Roads & Infrastructure',
+  'Cracked Road': 'Roads & Infrastructure',
+  'Damaged Sidewalk': 'Roads & Infrastructure',
   'Streetlight Outage': 'Utilities',
   'Graffiti': 'Public Spaces',
   'Illegal Dumping': 'Public Spaces',
@@ -21,6 +25,8 @@ export const getCategoryGroup = (category: IssueCategory): string =>
 
 const departmentMap: Record<IssueCategory, { name: string; division: string }> = {
   'Pothole': { name: 'Dept. of Transportation', division: 'Street Maintenance · 311' },
+  'Cracked Road': { name: 'Dept. of Transportation', division: 'Street Maintenance · 311' },
+  'Damaged Sidewalk': { name: 'Dept. of Transportation', division: 'Sidewalk & Curb Repair · 311' },
   'Streetlight Outage': { name: 'Dept. of Public Works', division: 'Electrical Services · 311' },
   'Graffiti': { name: 'Parks & Recreation Dept.', division: 'Beautification Division · 311' },
   'Illegal Dumping': { name: 'Environmental Services', division: 'Code Enforcement · 311' },
