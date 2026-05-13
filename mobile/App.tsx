@@ -7,14 +7,13 @@ import { ProfileScreen } from './src/screens/ProfileScreen';
 import { ReportCameraScreen } from './src/screens/ReportCameraScreen';
 import { AnalyzingScreen } from './src/screens/AnalyzingScreen';
 import { ClassificationScreen, Classification } from './src/screens/ClassificationScreen';
-import { DuplicateScreen } from './src/screens/DuplicateScreen';
 import { ReportConfirmationScreen } from './src/screens/ReportConfirmationScreen';
 import { IssueStatusScreen } from './src/screens/IssueStatusScreen';
 import { RecurringIssueDetailScreen } from './src/screens/RecurringIssueDetailScreen';
 import { AuthScreen } from './src/screens/AuthScreen';
 import { SampleIssuePickerScreen } from './src/screens/SampleIssuePickerScreen';
 import { AppTab, IssueCategory, ReportRecord, ReportStatus, SampleIssueRecord } from './src/types';
-import { MapReport, MapReportCategoryId } from './src/data/mockMapReports';
+import { DISTRICT_CENTERS, MapReport, MapReportCategoryId } from './src/data/mockMapReports';
 import { ChronicSpot } from './src/data/dashboard311';
 import { sampleIssues } from './src/data/sampleIssues';
 
@@ -25,9 +24,42 @@ const CATEGORY_LABEL: Record<MapReportCategoryId, IssueCategory> = {
   dumping:     'Illegal Dumping',
   vehicle:     'Vehicle Concerns',
   container:   'Illegal Dumping',
-  encampment:  'Encampment',
-  junk:        'Junk Pickup',
+  encampment:  'Encampment Concerns',
+  junk:        'Illegal Dumping',
 };
+
+const CATEGORY_TO_ID: Record<string, MapReportCategoryId> = {
+  'Pothole':             'pothole',
+  'Streetlight Outage':  'streetlight',
+  'Graffiti':            'graffiti',
+  'Illegal Dumping':     'dumping',
+  'Vehicle Concerns':    'vehicle',
+  'Encampment Concerns': 'encampment',
+};
+
+function buildUserMapReport(
+  c: Classification,
+  sampleIssue: SampleIssueRecord | null,
+): MapReport {
+  const categoryId = CATEGORY_TO_ID[c.category] ?? 'pothole';
+  const districtMatch = (sampleIssue?.district ?? '').match(/\d+/);
+  const district = districtMatch ? parseInt(districtMatch[0], 10) : 3;
+  const center = DISTRICT_CENTERS[district] ?? DISTRICT_CENTERS[3];
+  return {
+    id:          `user-${Date.now()}`,
+    categoryId,
+    title:       c.tag,
+    address:     `${c.locationMain}, ${c.locationSub}`,
+    district,
+    lat:         sampleIssue?.latitude  ?? center.latitude,
+    lon:         sampleIssue?.longitude ?? center.longitude,
+    status:      'Submitted',
+    createdAt:   new Date(),
+    description: c.desc,
+    assignedTo:  sampleIssue?.assignedTo ?? 'San Jose 311',
+    timeline:    [{ label: 'Submitted', dateText: 'Just now' }],
+  };
+}
 
 const STATUS_MAP: Record<string, ReportStatus> = {
   'Submitted':   'Submitted',
@@ -62,52 +94,39 @@ function mapReportToRecord(r: MapReport): ReportRecord {
   };
 }
 
-const REPORT_API_BASE = (
-  process.env.EXPO_PUBLIC_REPORT_API_URL ?? 'http://127.0.0.1:3001'
-).replace(/\/$/, '');
 
-const postDifferentIssueReport = (c: Classification) => {
-  const url = `${REPORT_API_BASE}/api/report-different-issue`;
-  void fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      category: c.category,
-      tag: c.tag,
-      desc: c.desc,
-      locationMain: c.locationMain,
-      locationSub: c.locationSub,
-    }),
-  }).catch(() => {});
-};
 
-type ReportStep = 'picker' | 'issue' | 'camera' | 'analyzing' | 'classify' | 'duplicate' | 'confirmation';
+type ReportStep = 'picker' | 'camera' | 'analyzing' | 'classify' | 'confirmation' | 'submitted-view';
 
 export default function App() {
   const [currentTab, setCurrentTab]                   = useState<AppTab>('report');
-  const [reportStep, setReportStep]                   = useState<ReportStep>('picker');
+  const [reportStep, setReportStep]                   = useState<ReportStep>('camera');
   const [classification, setClassification]           = useState<Classification | null>(null);
-  const [merged, setMerged]                           = useState(false);
   const [isSignedIn, setIsSignedIn]                   = useState(false);
   const [mapReport, setMapReport]                     = useState<MapReport | null>(null);
   const [chronicSpot, setChronicSpot]                 = useState<ChronicSpot | null>(null);
   const [selectedSampleIssue, setSelectedSampleIssue] = useState<SampleIssueRecord | null>(null);
+  const [userSubmissions, setUserSubmissions]         = useState<{ mapReport: MapReport; sampleIssue: SampleIssueRecord | null }[]>([]);
+  const [focusReport, setFocusReport]                 = useState<MapReport | null>(null);
 
   const handleAuthenticate = () => {
     setIsSignedIn(true);
-    setCurrentTab('dashboard');
+    setCurrentTab('report');
   };
 
   const handleSignOut = () => {
     setIsSignedIn(false);
     setCurrentTab('report');
+    setUserSubmissions([]);
+    setFocusReport(null);
+    setMapReport(null);
+    setChronicSpot(null);
     handleResetFlow();
   };
 
   const handleResetFlow = () => {
-    setReportStep('picker');
+    setReportStep('camera');
     setClassification(null);
-    setMerged(false);
     setSelectedSampleIssue(null);
   };
 
@@ -118,7 +137,7 @@ export default function App() {
           onSelectIssue={(issueId) => {
             const nextIssue = sampleIssues.find((issue) => issue.id === issueId) ?? null;
             setSelectedSampleIssue(nextIssue);
-            setReportStep('issue');
+            setReportStep('classify');
           }}
           onOpenCamera={() => {
             setSelectedSampleIssue(null);
@@ -127,20 +146,13 @@ export default function App() {
         />
       );
     }
-    if (reportStep === 'issue' && selectedSampleIssue) {
+    if (reportStep === 'camera') {
       return (
-        <IssueStatusScreen
-          report={selectedSampleIssue}
-          onBack={handleResetFlow}
-          onToggleFollow={() => {}}
-          onAddPhoto={handleResetFlow}
-          primaryActionLabel="Continue demo report"
-          onPrimaryAction={() => setReportStep('classify')}
+        <ReportCameraScreen
+          onCapture={() => setReportStep('analyzing')}
+          onOpenLibrary={() => setReportStep('picker')}
         />
       );
-    }
-    if (reportStep === 'camera') {
-      return <ReportCameraScreen onCapture={() => setReportStep('analyzing')} />;
     }
     if (reportStep === 'analyzing') {
       return <AnalyzingScreen onDone={() => setReportStep('classify')} />;
@@ -148,37 +160,43 @@ export default function App() {
     if (reportStep === 'classify') {
       return (
         <ClassificationScreen
-          onBack={() => setReportStep(selectedSampleIssue ? 'issue' : 'camera')}
+          onBack={() => setReportStep(selectedSampleIssue ? 'picker' : 'camera')}
           onConfirm={(c) => {
             setClassification(c);
-            setReportStep('duplicate');
+            const newMapReport = buildUserMapReport(c, selectedSampleIssue);
+            setUserSubmissions(prev => [...prev, { mapReport: newMapReport, sampleIssue: selectedSampleIssue }]);
+            setFocusReport(newMapReport);
+            setReportStep('confirmation');
           }}
           selectedSampleIssue={selectedSampleIssue}
         />
       );
     }
-    if (reportStep === 'duplicate') {
+    if (reportStep === 'submitted-view' && selectedSampleIssue) {
+      const submittedRecord: SampleIssueRecord = {
+        ...selectedSampleIssue,
+        status: 'Submitted',
+        timeline: selectedSampleIssue.timeline.map((entry, i) => ({
+          ...entry,
+          reached: i === 0,
+          dateText: i === 0 ? 'Just submitted' : entry.dateText,
+        })),
+      };
       return (
-        <DuplicateScreen
-          onMerge={() => { setMerged(true); setReportStep('confirmation'); }}
-          onNew={() => {
-            if (classification) {
-              postDifferentIssueReport(classification);
-            }
-            setMerged(false);
-            setReportStep('confirmation');
-          }}
-          onBack={() => setReportStep('classify')}
-          selectedSampleIssue={selectedSampleIssue}
+        <IssueStatusScreen
+          report={submittedRecord}
+          onBack={() => setReportStep('confirmation')}
+          onToggleFollow={() => {}}
         />
       );
     }
     return (
       <ReportConfirmationScreen
-        merged={merged}
+        merged={false}
         classification={classification}
         onDone={handleResetFlow}
         selectedSampleIssue={selectedSampleIssue}
+        onViewIssue={selectedSampleIssue ? () => setReportStep('submitted-view') : undefined}
       />
     );
   };
@@ -194,12 +212,30 @@ export default function App() {
         );
       }
       if (mapReport) {
+        const userSub = userSubmissions.find(s => s.mapReport.id === mapReport.id);
+        if (userSub?.sampleIssue) {
+          const submittedRecord: SampleIssueRecord = {
+            ...userSub.sampleIssue,
+            status: 'Submitted',
+            timeline: userSub.sampleIssue.timeline.map((entry, i) => ({
+              ...entry,
+              reached: i === 0,
+              dateText: i === 0 ? 'Just submitted' : entry.dateText,
+            })),
+          };
+          return (
+            <IssueStatusScreen
+              report={submittedRecord}
+              onBack={() => setMapReport(null)}
+              onToggleFollow={() => {}}
+            />
+          );
+        }
         return (
           <IssueStatusScreen
             report={mapReportToRecord(mapReport)}
             onBack={() => setMapReport(null)}
             onToggleFollow={() => {}}
-            onAddPhoto={() => {}}
           />
         );
       }
@@ -207,6 +243,14 @@ export default function App() {
         <DashboardScreen
           onViewReport={(r) => setMapReport(r)}
           onViewChronicSpot={(spot) => setChronicSpot(spot)}
+          extraReports={userSubmissions.map(s => s.mapReport)}
+          focusReport={focusReport}
+          onFocusConsumed={() => setFocusReport(null)}
+          reportImages={Object.fromEntries(
+            userSubmissions
+              .filter(s => s.sampleIssue?.image)
+              .map(s => [s.mapReport.id, s.sampleIssue!.image])
+          )}
         />
       );
     }
@@ -227,7 +271,7 @@ export default function App() {
     !mapReport &&
     (currentTab === 'dashboard' ||
       currentTab === 'profile' ||
-      (currentTab === 'report' && reportStep === 'picker'));
+      (currentTab === 'report' && reportStep === 'camera'));
 
   return (
     <SafeAreaView style={styles.safeArea}>

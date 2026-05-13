@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 import {
   Animated,
+  Dimensions,
   PanResponder,
   Pressable,
   ScrollView,
@@ -9,39 +10,50 @@ import {
   TextInput,
   View,
 } from "react-native";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { SampleIssueImage } from "../components/SampleIssueImage";
 import { MiniMapView } from "../components/MiniMapView";
 import { SampleIssueRecord } from "../types";
-import { T } from "../theme";
+
+const SCREEN_HEIGHT = Dimensions.get('window').height;
 
 const TAGS_BY_CATEGORY: Record<string, string[]> = {
-  "Roads & Infrastructure": [
+  Pothole: [
     "Pothole",
-    "Cracked Road",
-    "Damaged sidewalk",
-    "Missing Sign",
+    "Cracked Pavement",
+    "Damaged Sidewalk",
     "Broken Curb",
-    "Flooding",
+    "Uneven Surface",
   ],
-  "Public Transit": [
-    "Bus Stop Damage",
-    "Missing Shelter",
-    "Broken Bench",
-    "Graffiti",
-  ],
-  "Buildings & Facilities": [
-    "Graffiti",
-    "Broken Door",
-    "Lighting Out",
-    "Vandalism",
-  ],
-  "Parks & Recreation": ["Broken Equipment", "Graffiti", "Dead Tree", "Litter"],
-  Utilities: [
-    "Broken streetlight",
+  "Streetlight Outage": [
     "Light Out",
-    "Downed Wire",
-    "Water Main Break",
-    "Leaking Hydrant",
+    "Broken Fixture",
+    "Flickering Light",
+    "Downed Pole",
+  ],
+  Graffiti: [
+    "Public Property",
+    "Private Property",
+    "Park Facility",
+    "Underpass / Bridge",
+  ],
+  "Illegal Dumping": [
+    "Bulk Waste",
+    "Construction Debris",
+    "Household Items",
+    "Hazardous Material",
+  ],
+  "Vehicle Concerns": [
+    "Abandoned Vehicle",
+    "Illegally Parked",
+    "Stolen Vehicle",
+    "Vehicle Parts",
+  ],
+  "Encampment Concerns": [
+    "Public Property",
+    "Roadway / Sidewalk",
+    "Park",
+    "Underpass / Bridge",
   ],
 };
 
@@ -49,25 +61,29 @@ const LOCATION_MAIN_LINE = "Glen Eyrie Ave & Carolyn Ave";
 const LOCATION_SUB_LINE = "San Jose, CA 95125";
 
 const DEPT_BY_CATEGORY: Record<string, { name: string; division: string }> = {
-  "Roads & Infrastructure": {
+  Pothole: {
     name: "San Jose Dept. of Transportation",
     division: "Street Maintenance Division · 311",
   },
-  "Public Transit": {
-    name: "Transportation Authority",
-    division: "Transit Operations · 311",
+  "Streetlight Outage": {
+    name: "Dept. of Public Works",
+    division: "Electrical Services · 311",
   },
-  "Buildings & Facilities": {
+  Graffiti: {
     name: "Parks & Recreation Dept.",
     division: "Beautification Division · 311",
   },
-  "Parks & Recreation": {
-    name: "Parks & Recreation Dept.",
-    division: "Maintenance Division · 311",
+  "Illegal Dumping": {
+    name: "Environmental Services",
+    division: "Solid Waste Division · 311",
   },
-  Utilities: {
-    name: "Dept. of Public Works",
-    division: "Electrical Services · 311",
+  "Vehicle Concerns": {
+    name: "San Jose Police Dept.",
+    division: "Traffic Division · 311",
+  },
+  "Encampment Concerns": {
+    name: "Dept. of Housing",
+    division: "Homelessness Response Team · 311",
   },
 };
 
@@ -85,17 +101,26 @@ type ClassificationScreenProps = {
   selectedSampleIssue?: SampleIssueRecord | null;
 };
 
-const getInitialCategory = (selectedSampleIssue?: SampleIssueRecord | null) => {
-  if (!selectedSampleIssue) {
-    return "Roads & Infrastructure";
-  }
-  if (selectedSampleIssue.category === "Streetlight Outage") {
-    return "Utilities";
-  }
-  if (selectedSampleIssue.category === "Graffiti") {
-    return "Buildings & Facilities";
-  }
-  return "Roads & Infrastructure";
+const CATEGORY_COLOR: Record<string, string> = {
+  'Pothole':             '#E8514A',
+  'Streetlight Outage':  '#5B9BF8',
+  'Graffiti':            '#3ECF82',
+  'Illegal Dumping':     '#F0A030',
+  'Vehicle Concerns':    '#E8514A',
+  'Encampment Concerns': '#A78BFA',
+};
+
+const CATEGORY_ICON: Record<string, string> = {
+  'Pothole':             'road-variant',
+  'Streetlight Outage':  'lightbulb-on-outline',
+  'Graffiti':            'format-paint',
+  'Illegal Dumping':     'trash-can-outline',
+  'Vehicle Concerns':    'car',
+  'Encampment Concerns': 'tent',
+};
+
+const getInitialCategory = (selectedSampleIssue?: SampleIssueRecord | null): string => {
+  return selectedSampleIssue?.category ?? "Pothole";
 };
 
 export const ClassificationScreen = ({
@@ -109,7 +134,7 @@ export const ClassificationScreen = ({
     selectedSampleIssue?.address ?? LOCATION_SUB_LINE;
 
   const [category, setCategory] = useState(getInitialCategory(selectedSampleIssue));
-  const [tag, setTag] = useState(selectedSampleIssue?.type ?? "Pothole");
+  const [tag, setTag] = useState(selectedSampleIssue?.tag ?? "Pothole");
   const [desc, setDesc] = useState(
     selectedSampleIssue?.description ??
       "Significant pothole on Glen Eyrie Ave near Carolyn Ave causing road hazard. Approximately 2ft wide with visible asphalt damage.",
@@ -144,19 +169,10 @@ export const ClassificationScreen = ({
   return (
     <View style={styles.page}>
       <View style={styles.header}>
-        <Pressable
-          onPress={onBack}
-          style={styles.backButton}
-          accessibilityRole="button"
-        >
-          <Text style={styles.backIcon}>‹</Text>
+        <Pressable style={styles.closeButton} onPress={onBack} accessibilityRole="button" accessibilityLabel="Close">
+          <Text style={styles.closeIcon}>✕</Text>
         </Pressable>
-        <View style={styles.headerText}>
-          <Text style={styles.headerTitle}>Confirm & submit</Text>
-          <Text style={styles.headerSubtitle}>Review details, then send</Text>
-        </View>
       </View>
-
       <ScrollView
         style={{ flex: 1 }}
         contentContainerStyle={styles.scroll}
@@ -174,17 +190,16 @@ export const ClassificationScreen = ({
             style={{ width: "100%", height: "100%" }}
           />
           <View style={styles.categoryChip}>
-            <View style={styles.categoryDot} />
+            <MaterialCommunityIcons
+              name={(CATEGORY_ICON[category] ?? 'alert-circle-outline') as any}
+              size={13}
+              color={CATEGORY_COLOR[category] ?? '#8D939E'}
+            />
             <Text style={styles.categoryChipText}>{category}</Text>
           </View>
         </View>
 
         <View style={styles.card}>
-          <View style={[styles.row, styles.rowBorder]}>
-            <Text style={styles.rowLabel}>CATEGORY</Text>
-            <Text style={styles.rowValue}>{category}</Text>
-          </View>
-
           <View style={[styles.row, styles.rowBorder]}>
             <Text style={styles.rowLabel}>ISSUE TYPE</Text>
             <Pressable
@@ -229,6 +244,7 @@ export const ClassificationScreen = ({
               onChangeText={setDesc}
               style={styles.descInput}
               textAlignVertical="top"
+              placeholderTextColor="#55595F"
             />
           </View>
         </View>
@@ -237,8 +253,7 @@ export const ClassificationScreen = ({
           <View style={[styles.locationHeader, styles.rowBorder]}>
             <Text style={styles.rowLabel}>LOCATION</Text>
             <View style={styles.gpsBadge}>
-              <Text style={styles.gpsPin}>📍</Text>
-              <Text style={styles.gpsBadgeText}>GPS auto-detected</Text>
+              <Text style={styles.gpsBadgeText}>📍 GPS</Text>
             </View>
           </View>
 
@@ -294,7 +309,7 @@ export const ClassificationScreen = ({
           accessibilityRole="button"
         >
           <Text style={styles.submitCheck}>✓</Text>
-          <Text style={styles.submitText}>Confirm & submit</Text>
+          <Text style={styles.submitText}>Confirm</Text>
         </Pressable>
       </View>
     </View>
@@ -302,31 +317,17 @@ export const ClassificationScreen = ({
 };
 
 const styles = StyleSheet.create({
-  page: { flex: 1, backgroundColor: T.cream },
+  page: { flex: 1, backgroundColor: '#18191C' },
 
-  header: {
-    backgroundColor: T.white,
-    borderBottomWidth: 1,
-    borderBottomColor: T.border,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
-  },
-  backButton: { padding: 4, marginLeft: -4 },
-  backIcon: { fontSize: 28, color: T.ink2, lineHeight: 30, fontWeight: "300" },
-  headerText: { flex: 1 },
-  headerTitle: { fontSize: 16, fontWeight: "700", color: T.ink },
-  headerSubtitle: { fontSize: 12, color: T.ink3, marginTop: 1 },
 
-  scroll: { padding: 14, gap: 10, paddingBottom: 24 },
+  scroll: { padding: 12, gap: 8, paddingBottom: 20 },
 
   photoStrip: {
     width: "100%",
-    aspectRatio: 4 / 3,
+    height: Math.round(SCREEN_HEIGHT * 0.30),
     overflow: "hidden",
     backgroundColor: "#111",
+    borderRadius: 14,
   },
   categoryChip: {
     position: "absolute",
@@ -349,27 +350,24 @@ const styles = StyleSheet.create({
   categoryChipText: { color: "white", fontSize: 11, fontWeight: "600" },
 
   card: {
-    backgroundColor: T.white,
+    backgroundColor: '#222428',
     borderRadius: 14,
-    borderWidth: 1,
-    borderColor: T.border,
     overflow: "visible",
   },
 
-  row: { paddingHorizontal: 14, paddingVertical: 13, gap: 5 },
-  rowBorder: { borderBottomWidth: 1, borderBottomColor: T.border },
+  row: { paddingHorizontal: 14, paddingVertical: 11, gap: 5 },
+  rowBorder: { borderBottomWidth: 1, borderBottomColor: '#35373D' },
   rowLabel: {
     fontSize: 10,
-    fontWeight: "600",
-    color: T.ink3,
+    fontWeight: "700",
+    color: '#8D939E',
     letterSpacing: 0.5,
   },
-  rowValue: { fontSize: 15, fontWeight: "600", color: T.ink },
 
   selector: {
-    backgroundColor: T.warm,
-    borderWidth: 1.5,
-    borderColor: T.border,
+    backgroundColor: '#2C2D32',
+    borderWidth: 1,
+    borderColor: '#35373D',
     borderRadius: 9,
     paddingHorizontal: 12,
     paddingVertical: 10,
@@ -378,36 +376,36 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: 2,
   },
-  selectorText: { fontSize: 14, fontWeight: "600", color: T.ink },
-  selectorChevron: { fontSize: 14, color: T.ink3 },
+  selectorText: { fontSize: 14, fontWeight: "600", color: '#F2F3F5' },
+  selectorChevron: { fontSize: 14, color: '#8D939E' },
 
   dropdown: {
     marginTop: 4,
     borderWidth: 1,
-    borderColor: T.border,
+    borderColor: '#35373D',
     borderRadius: 11,
     overflow: "hidden",
-    backgroundColor: T.white,
+    backgroundColor: '#222428',
   },
   dropdownItem: {
     paddingHorizontal: 14,
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: T.border,
+    borderBottomColor: '#35373D',
   },
-  dropdownItemActive: { backgroundColor: T.blueLight },
-  dropdownItemText: { fontSize: 14, color: T.ink },
-  dropdownItemTextActive: { color: T.blue, fontWeight: "600" },
+  dropdownItemActive: { backgroundColor: '#4F8EF728' },
+  dropdownItemText: { fontSize: 14, color: '#F2F3F5' },
+  dropdownItemTextActive: { color: '#4F8EF7', fontWeight: "600" },
 
   descInput: {
-    backgroundColor: T.warm,
-    borderWidth: 1.5,
-    borderColor: T.border,
+    backgroundColor: '#2C2D32',
+    borderWidth: 1,
+    borderColor: '#35373D',
     borderRadius: 9,
     paddingHorizontal: 12,
     paddingVertical: 10,
     fontSize: 14,
-    color: T.ink,
+    color: '#F2F3F5',
     minHeight: 80,
     fontFamily: undefined,
     lineHeight: 22,
@@ -416,29 +414,24 @@ const styles = StyleSheet.create({
 
   locationHeader: {
     paddingHorizontal: 14,
-    paddingVertical: 13,
+    paddingVertical: 11,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
   },
   gpsBadge: {
-    backgroundColor: T.greenLight,
-    borderRadius: 7,
-    paddingHorizontal: 7,
-    paddingVertical: 3,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 4,
-    borderWidth: 1,
-    borderColor: "rgba(22,163,74,0.2)",
+    backgroundColor: '#4F8EF728',
+    borderRadius: 6,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
   },
-  gpsPin: { fontSize: 11 },
-  gpsBadgeText: { color: T.green, fontSize: 11, fontWeight: "700" },
+  gpsBadgeText: { color: '#4F8EF7', fontSize: 10, fontWeight: "600" },
 
   mapArea: {
-    height: 140,
+    height: 130,
     overflow: "hidden",
     position: "relative",
+    backgroundColor: '#1a1d22',
   },
   draggablePin: {
     position: "absolute",
@@ -454,61 +447,59 @@ const styles = StyleSheet.create({
     position: "absolute",
     bottom: 8,
     alignSelf: "center",
-    backgroundColor: "rgba(0,0,0,0.5)",
+    backgroundColor: "rgba(0,0,0,0.55)",
     borderRadius: 20,
     paddingHorizontal: 10,
     paddingVertical: 3,
   },
-  mapHintText: { color: "white", fontSize: 10, fontWeight: "500" },
+  mapHintText: { color: '#8D939E', fontSize: 10, fontWeight: "500" },
 
   addressRow: {
     flexDirection: "row",
     alignItems: "center",
     gap: 10,
     paddingHorizontal: 14,
-    paddingVertical: 12,
+    paddingVertical: 11,
     borderTopWidth: 1,
-    borderTopColor: T.border,
+    borderTopColor: '#35373D',
   },
   addressIcon: {
     width: 34,
     height: 34,
     borderRadius: 9,
-    backgroundColor: T.blueLight,
+    backgroundColor: '#2C2D32',
     alignItems: "center",
     justifyContent: "center",
   },
-  addressMain: { fontSize: 14, fontWeight: "700", color: T.ink },
-  addressSub: { fontSize: 12, color: T.ink3, marginTop: 1 },
-  editLink: { color: T.blue, fontSize: 12, fontWeight: "600" },
+  addressMain: { fontSize: 14, fontWeight: "700", color: '#F2F3F5' },
+  addressSub: { fontSize: 12, color: '#8D939E', marginTop: 1 },
+  editLink: { color: '#8D939E', fontSize: 12, fontWeight: "600" },
 
   routingCard: {
-    backgroundColor: T.blueLight,
-    borderWidth: 1,
-    borderColor: "rgba(37,99,235,0.15)",
+    backgroundColor: '#222428',
     borderRadius: 12,
-    padding: 14,
+    padding: 12,
     gap: 3,
   },
   routingLabel: {
     fontSize: 10,
-    fontWeight: "600",
-    color: T.blue,
+    fontWeight: "700",
+    color: '#8D939E',
     letterSpacing: 0.5,
     marginBottom: 2,
   },
-  routingName: { fontSize: 14, fontWeight: "700", color: T.ink },
-  routingDiv: { fontSize: 12, color: T.ink3 },
+  routingName: { fontSize: 14, fontWeight: "700", color: '#F2F3F5' },
+  routingDiv: { fontSize: 12, color: '#8D939E' },
 
   ctaBar: {
     padding: 14,
     paddingBottom: 10,
-    backgroundColor: T.white,
+    backgroundColor: '#18191C',
     borderTopWidth: 1,
-    borderTopColor: T.border,
+    borderTopColor: '#35373D',
   },
   submitButton: {
-    backgroundColor: T.blue,
+    backgroundColor: '#4F8EF7',
     borderRadius: 14,
     paddingVertical: 15,
     flexDirection: "row",
@@ -516,6 +507,21 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     gap: 8,
   },
-  submitCheck: { color: "white", fontSize: 16, fontWeight: "800" },
-  submitText: { color: "white", fontSize: 16, fontWeight: "700" },
+  submitCheck: { color: '#fff', fontSize: 16, fontWeight: "800" },
+  submitText: { color: '#fff', fontSize: 16, fontWeight: "700" },
+  header: {
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#35373D',
+  },
+  closeButton: {
+    backgroundColor: '#2C2D32',
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  closeIcon: { color: '#8D939E', fontSize: 14, fontWeight: '600' },
 });

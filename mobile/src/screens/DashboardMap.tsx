@@ -9,7 +9,6 @@ import {
 } from "react-native";
 import MapView, { Marker, Region } from "react-native-maps";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { MockStreetPhoto } from "../components/MockStreetPhoto";
 import {
   ALL_CATEGORY_IDS,
   CATEGORY_CONFIG,
@@ -18,6 +17,8 @@ import {
   MapReport,
   MapReportCategoryId,
 } from "../data/mockMapReports";
+import { SampleIssueImage as SampleIssueImageData } from "../types";
+import { SampleIssueImage } from "../components/SampleIssueImage";
 
 // ── Palette (matches DashboardScreen) ──────────────────────────────────────
 const D = {
@@ -134,6 +135,14 @@ function clusterReports(
   return result;
 }
 
+// ── Glow ring (rendered as a Marker so it tracks lat/lon natively) ────────────
+const GlowRing = ({ color }: { color: string }) => (
+  <View style={{ width: 52, height: 52, alignItems: 'center', justifyContent: 'center' }}>
+    <View style={{ position: 'absolute', width: 52, height: 52, borderRadius: 26, backgroundColor: color + '25' }} />
+    <View style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: color + '35', borderWidth: 1.5, borderColor: color + 'AA' }} />
+  </View>
+);
+
 // ── Individual report marker ─────────────────────────────────────────────────
 const ReportMarker = ({
   report,
@@ -175,9 +184,11 @@ const ClusterMarkerView = ({ count }: { count: number }) => (
 const PreviewCard = ({
   report,
   onTap,
+  image,
 }: {
   report: MapReport;
   onTap: () => void;
+  image?: SampleIssueImageData;
 }) => {
   const slideY = useRef(new Animated.Value(160)).current;
   const statusColor =
@@ -205,10 +216,17 @@ const PreviewCard = ({
   return (
     <Animated.View style={[pc.card, { transform: [{ translateY: slideY }] }]}>
       <Pressable style={pc.inner} onPress={onTap} accessibilityRole="button">
-        <View style={pc.photo}>
-          <MockStreetPhoto style={StyleSheet.absoluteFillObject} />
-          <View style={pc.photoOverlay} />
-        </View>
+        {image ? (
+          <SampleIssueImage image={image} style={pc.photo} />
+        ) : (
+          <View style={[pc.photo, pc.photoPlaceholder]}>
+            <MaterialCommunityIcons
+              name={CATEGORY_CONFIG[report.categoryId].icon as any}
+              size={30}
+              color={CATEGORY_CONFIG[report.categoryId].color}
+            />
+          </View>
+        )}
         <View style={pc.body}>
           <Text style={pc.title} numberOfLines={1}>
             {report.title}
@@ -297,6 +315,10 @@ const FilterBar = ({
 type Props = {
   district: number;
   onViewReport: (report: MapReport) => void;
+  extraReports?: MapReport[];
+  focusReport?: MapReport | null;
+  onFocusConsumed?: () => void;
+  reportImages?: Record<string, SampleIssueImageData>;
 };
 
 // Card dimensions for pin-adjacent positioning
@@ -304,25 +326,53 @@ const CARD_W = 252;
 const CARD_H = 92; // estimated rendered height (photo 68 + padding 24)
 const PIN_H = 50; // approx px from anchor point (tail tip) to top of circle
 
-export const DashboardMap = ({ district, onViewReport }: Props) => {
+export const DashboardMap = ({ district, onViewReport, extraReports, focusReport, onFocusConsumed, reportImages }: Props) => {
   const [activeFilter, setActiveFilter] = useState<MapReportCategoryId | "all">(
     "all",
   );
   const [hovered, setHovered] = useState<MapReport | null>(null);
+  const [showCard, setShowCard] = useState(false);
   const [cardPos, setCardPos] = useState<{ x: number; y: number } | null>(null);
   const [latDelta, setLatDelta] = useState(0.04);
   const containerSize = useRef({ width: 390, height: 700 });
+  const mapRef = useRef<MapView>(null);
+  const showCardTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    if (!focusReport) return;
+
+    mapRef.current?.animateToRegion({
+      latitude: focusReport.lat,
+      longitude: focusReport.lon,
+      latitudeDelta: 0.003,
+      longitudeDelta: 0.003,
+    }, 800);
+
+    onFocusConsumed?.();
+  }, [focusReport]);
 
   const center = DISTRICT_CENTERS[district] ?? DISTRICT_CENTERS[3];
 
+  useEffect(() => {
+    if (showCardTimer.current) clearTimeout(showCardTimer.current);
+    setHovered(null);
+    setShowCard(false);
+    setCardPos(null);
+  }, [activeFilter]);
+
+  const allReports = useMemo(
+    () => [...MOCK_MAP_REPORTS, ...(extraReports ?? [])],
+    [extraReports],
+  );
+
   const filtered = useMemo(
     () =>
-      MOCK_MAP_REPORTS.filter(
+      allReports.filter(
         (r) =>
           r.district === district &&
           (activeFilter === "all" || r.categoryId === activeFilter),
       ),
-    [district, activeFilter],
+    [allReports, district, activeFilter],
   );
 
   const clustered = useMemo(
@@ -340,6 +390,13 @@ export const DashboardMap = ({ district, onViewReport }: Props) => {
     const newDelta = region.latitudeDelta;
     setLatDelta(newDelta);
 
+    const clearHover = () => {
+      if (showCardTimer.current) clearTimeout(showCardTimer.current);
+      setHovered(null);
+      setShowCard(false);
+      setCardPos(null);
+    };
+
     if (newDelta < 0.018) {
       const threshold = newDelta * 0.35;
       let nearest: MapReport | null = null;
@@ -351,22 +408,19 @@ export const DashboardMap = ({ district, onViewReport }: Props) => {
           nearest = r;
         }
       }
-      setHovered(nearest);
       if (nearest) {
-        // Project lat/lon → screen pixels using linear map projection
+        setHovered(nearest);
         const { width: W, height: H } = containerSize.current;
-        const pinX =
-          W / 2 +
-          ((nearest.lon - region.longitude) / region.longitudeDelta) * W;
-        const pinY =
-          H / 2 - ((nearest.lat - region.latitude) / region.latitudeDelta) * H;
+        const pinX = W / 2 + ((nearest.lon - region.longitude) / region.longitudeDelta) * W;
+        const pinY = H / 2 - ((nearest.lat - region.latitude) / region.latitudeDelta) * H;
         setCardPos({ x: pinX, y: pinY });
+        if (showCardTimer.current) clearTimeout(showCardTimer.current);
+        showCardTimer.current = setTimeout(() => setShowCard(true), 150);
       } else {
-        setCardPos(null);
+        clearHover();
       }
     } else {
-      setHovered(null);
-      setCardPos(null);
+      clearHover();
     }
   };
 
@@ -381,6 +435,7 @@ export const DashboardMap = ({ district, onViewReport }: Props) => {
       }}
     >
       <MapView
+        ref={mapRef}
         style={StyleSheet.absoluteFillObject}
         userInterfaceStyle="dark"
         customMapStyle={DARK_MAP_STYLE}
@@ -395,6 +450,23 @@ export const DashboardMap = ({ district, onViewReport }: Props) => {
         showsBuildings={false}
         showsTraffic={false}
       >
+        {/* Glow ring — rendered as a Marker so it tracks lat/lon exactly.
+            anchor.y = 49/52 ≈ 0.94: places the coordinate at 49px from the top
+            of the 52px view, so the circles' center (26px from top) sits 23px
+            above the coordinate, matching the pin body center (7px tail + 16px
+            half-body above the tail tip). */}
+        {hovered && (
+          <Marker
+            key={`glow-${hovered.id}`}
+            coordinate={{ latitude: hovered.lat, longitude: hovered.lon }}
+            anchor={{ x: 0.5, y: 0.94 }}
+            tracksViewChanges={false}
+            zIndex={5}
+          >
+            <GlowRing color={CATEGORY_CONFIG[hovered.categoryId].color} />
+          </Marker>
+        )}
+
         {clustered.map((item, i) => {
           if (item.kind === "cluster") {
             return (
@@ -415,6 +487,7 @@ export const DashboardMap = ({ district, onViewReport }: Props) => {
               coordinate={{ latitude: r.lat, longitude: r.lon }}
               anchor={{ x: 0.5, y: 1 }}
               tracksViewChanges={false}
+              zIndex={10}
             >
               <ReportMarker report={r} onPress={() => onViewReport(r)} showTimeBadge={recentIds.has(r.id)} />
             </Marker>
@@ -427,13 +500,35 @@ export const DashboardMap = ({ district, onViewReport }: Props) => {
         <Text style={s.countText}>📍 {filtered.length} unresolved reports · via CityFix</Text>
       </View>
 
+      {/* Recenter button */}
+      <Pressable
+        style={s.recenterBtn}
+        onPress={() =>
+          mapRef.current?.animateToRegion(
+            {
+              latitude: center.latitude,
+              longitude: center.longitude,
+              latitudeDelta: 0.04,
+              longitudeDelta: 0.04,
+            },
+            500,
+          )
+        }
+        accessibilityRole="button"
+        accessibilityLabel="Recenter map"
+      >
+        <MaterialCommunityIcons name="crosshairs-gps" size={20} color={D.text1} />
+      </Pressable>
+
       {/* Category filter bar */}
       <View style={s.filterWrap}>
         <FilterBar active={activeFilter} onSelect={setActiveFilter} />
       </View>
 
-      {/* Proximity preview card — floats above the nearest pin */}
-      {hovered &&
+      {/* Proximity preview card — floats above the nearest pin, shown after a
+          brief delay so the glow Marker (which renders immediately) appears first */}
+      {showCard &&
+        hovered &&
         cardPos &&
         (() => {
           const { width: W } = containerSize.current;
@@ -451,6 +546,7 @@ export const DashboardMap = ({ district, onViewReport }: Props) => {
               <PreviewCard
                 report={hovered}
                 onTap={() => onViewReport(hovered)}
+                image={reportImages?.[hovered.id]}
               />
             </View>
           );
@@ -536,9 +632,10 @@ const pc = StyleSheet.create({
     backgroundColor: "#111",
     flexShrink: 0,
   },
-  photoOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(0,0,0,0.12)",
+  photoPlaceholder: {
+    backgroundColor: "#2C2D32",
+    alignItems: "center",
+    justifyContent: "center",
   },
   body: { flex: 1, gap: 3 },
   catDot: { width: 6, height: 6, borderRadius: 3 },
@@ -598,4 +695,22 @@ const s = StyleSheet.create({
     backgroundColor: "rgba(24,25,28,0.92)",
   },
   floatingCard: { position: "absolute" },
+  recenterBtn: {
+    position: "absolute",
+    bottom: 58,
+    right: 12,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "rgba(24,25,28,0.92)",
+    borderWidth: 1,
+    borderColor: "#35373D",
+    alignItems: "center",
+    justifyContent: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.4,
+    shadowRadius: 4,
+    elevation: 4,
+  },
 });

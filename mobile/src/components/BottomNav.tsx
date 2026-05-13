@@ -7,9 +7,9 @@ type BottomNavProps = {
 }
 
 const tabs: { key: AppTab; label: string; icon: string }[] = [
-  { key: 'dashboard', label: 'Dashboard', icon: '\u25A3' },
-  { key: 'report', label: 'Report', icon: '\u25EF' },
-  { key: 'profile', label: 'Profile', icon: '\u25C7' },
+  { key: 'dashboard', label: 'Dashboard', icon: '▣' },
+  { key: 'report', label: 'Report', icon: '◯' },
+  { key: 'profile', label: 'Profile', icon: '◇' },
 ]
 
 export const BottomNav = ({ currentTab, onChangeTab }: BottomNavProps) => {
@@ -36,10 +36,10 @@ export const BottomNav = ({ currentTab, onChangeTab }: BottomNavProps) => {
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
-    backgroundColor: '#121519',
+    backgroundColor: '#18191C',
     paddingTop: 8,
     paddingBottom: 14,
-    borderTopColor: '#20242A',
+    borderTopColor: '#35373D',
     borderTopWidth: 1,
   },
   tab: {
@@ -49,20 +49,20 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
   },
   activeTab: {
-    borderTopColor: '#1F6DFF',
+    borderTopColor: '#F2F3F5',
     borderTopWidth: 3,
     marginTop: -3,
   },
   icon: {
-    color: '#D7DEE9',
+    color: '#8D939E',
     fontSize: 20,
   },
   label: {
-    color: '#D7DEE9',
+    color: '#8D939E',
     fontWeight: '600',
     fontSize: 15,
   },
   activeText: {
-    color: '#1F6DFF',
+    color: '#F2F3F5',
   },
 })

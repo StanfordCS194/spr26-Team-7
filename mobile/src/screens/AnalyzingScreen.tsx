@@ -1,7 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 import { Animated, Easing, StyleSheet, Text, View } from "react-native";
-import { MockStreetPhoto } from "../components/MockStreetPhoto";
-import { T } from "../theme";
 
 type AnalyzingScreenProps = {
   onDone: () => void;
@@ -20,7 +18,6 @@ export const AnalyzingScreen = ({ onDone }: AnalyzingScreenProps) => {
   const phaseOpacity = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
-    // Spinner
     Animated.loop(
       Animated.timing(spinAnim, {
         toValue: 1,
@@ -30,13 +27,11 @@ export const AnalyzingScreen = ({ onDone }: AnalyzingScreenProps) => {
       }),
     ).start();
 
-    // Progress bar
     const interval = setInterval(
       () => setProgress((p) => Math.min(p + 2.5, 100)),
       70,
     );
 
-    // Phase transitions with fade
     const advancePhase = (nextPhase: number) => {
       Animated.timing(phaseOpacity, {
         toValue: 0,
@@ -71,21 +66,12 @@ export const AnalyzingScreen = ({ onDone }: AnalyzingScreenProps) => {
 
   return (
     <View style={styles.page}>
-      {/* Dimmed photo background */}
-      <MockStreetPhoto style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }} />
-      <View style={styles.overlay} />
-
-      {/* Content */}
       <View style={styles.content}>
-        {/* Spinner */}
         <View style={styles.spinnerContainer}>
           <View style={styles.spinnerTrack} />
           <Animated.View
             style={[styles.spinnerArc, { transform: [{ rotate: spin }] }]}
           />
-          <View style={styles.spinnerCenter}>
-            <Text style={styles.zapIcon}>⚡</Text>
-          </View>
         </View>
 
         <View style={styles.textBlock}>
@@ -95,7 +81,6 @@ export const AnalyzingScreen = ({ onDone }: AnalyzingScreenProps) => {
           </Animated.Text>
         </View>
 
-        {/* Progress bar */}
         <View style={styles.progressTrack}>
           <View style={[styles.progressFill, { width: `${progress}%` }]} />
         </View>
@@ -105,11 +90,7 @@ export const AnalyzingScreen = ({ onDone }: AnalyzingScreenProps) => {
 };
 
 const styles = StyleSheet.create({
-  page: { flex: 1, backgroundColor: "#0f0a05" },
-  overlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(15,10,5,0.72)",
-  },
+  page: { flex: 1, backgroundColor: '#18191C' },
   content: {
     flex: 1,
     alignItems: "center",
@@ -139,26 +120,15 @@ const styles = StyleSheet.create({
     height: 72,
     borderRadius: 36,
     borderWidth: 3,
-    borderTopColor: T.blue,
+    borderTopColor: '#4F8EF7',
     borderRightColor: "transparent",
     borderBottomColor: "transparent",
     borderLeftColor: "transparent",
   },
-  spinnerCenter: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  zapIcon: { fontSize: 26 },
-
   textBlock: { alignItems: "center", gap: 8 },
-  title: { color: "white", fontSize: 18, fontWeight: "700" },
+  title: { color: "#F2F3F5", fontSize: 18, fontWeight: "700" },
   phase: {
-    color: "rgba(255,255,255,0.6)",
+    color: '#8D939E',
     fontSize: 14,
     fontWeight: "400",
     minHeight: 20,
@@ -168,13 +138,13 @@ const styles = StyleSheet.create({
   progressTrack: {
     width: "100%",
     height: 3,
-    backgroundColor: "rgba(255,255,255,0.15)",
+    backgroundColor: "rgba(255,255,255,0.1)",
     borderRadius: 4,
     overflow: "hidden",
   },
   progressFill: {
     height: "100%",
-    backgroundColor: T.blue,
+    backgroundColor: '#4F8EF7',
     borderRadius: 4,
   },
 });

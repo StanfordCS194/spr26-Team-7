@@ -1,4 +1,5 @@
 import { Image, ImageStyle, StyleProp, StyleSheet, Text, View, ViewStyle } from 'react-native'
+import { MaterialCommunityIcons } from '@expo/vector-icons'
 import { SampleIssueImage as SampleIssueImageType } from '../types'
 
 type SampleIssueImageProps = {
@@ -12,11 +13,9 @@ export const SampleIssueImage = ({ image, style }: SampleIssueImageProps) => {
   }
 
   return (
-    <View style={[styles.placeholder, { backgroundColor: image.backgroundColor, borderColor: image.accent }, style]}>
-      <View style={[styles.iconBubble, { backgroundColor: image.accent }]}>
-        <Text style={styles.icon}>{image.icon}</Text>
-      </View>
-      <Text style={[styles.label, { color: image.accent }]}>{image.label}</Text>
+    <View style={[styles.placeholder, { backgroundColor: image.backgroundColor }, style]}>
+      <MaterialCommunityIcons name={image.icon as any} size={44} color={image.accent} />
+      <Text style={styles.label}>{image.label}</Text>
     </View>
   )
 }
@@ -25,23 +24,12 @@ const styles = StyleSheet.create({
   placeholder: {
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 1.5,
-    paddingHorizontal: 16,
-  },
-  iconBubble: {
-    width: 62,
-    height: 62,
-    borderRadius: 31,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 12,
-  },
-  icon: {
-    fontSize: 28,
+    gap: 10,
   },
   label: {
-    fontSize: 15,
-    fontWeight: '700',
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#8D939E',
     textAlign: 'center',
   },
 })
