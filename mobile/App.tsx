@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
-import { SafeAreaView, StyleSheet, View } from 'react-native';
-import { useState } from 'react';
+import { ActivityIndicator, SafeAreaView, StyleSheet, View } from 'react-native';
+import { useCallback, useEffect, useState } from 'react';
 import { BottomNav } from './src/components/BottomNav';
 import { DashboardScreen } from './src/screens/DashboardScreen';
 import { ProfileScreen } from './src/screens/ProfileScreen';
@@ -12,7 +12,13 @@ import { ReportConfirmationScreen } from './src/screens/ReportConfirmationScreen
 import { AppTab, ReportRecord } from './src/types';
 import { AuthScreen } from './src/screens/AuthScreen';
 import { IssueStatusScreen } from './src/screens/IssueStatusScreen';
-import { dashboardIssues } from './src/data/mockData';
+import { useAuth } from './src/providers/AuthProvider';
+import {
+  createReportFromClassification,
+  fetchDashboardReports,
+  incrementReportPhotoCount,
+  setReportFollow,
+} from './src/lib/reports';
 
 type ReportStep = 'camera' | 'analyzing' | 'classify' | 'duplicate' | 'confirmation';
 
@@ -36,25 +42,48 @@ const postDifferentIssueReport = (c: Classification) => {
 };
 
 export default function App() {
+  const { session, isLoading } = useAuth();
   const [currentTab, setCurrentTab] = useState<AppTab>('report');
   const [reportStep, setReportStep] = useState<ReportStep>('camera');
   const [classification, setClassification] = useState<Classification | null>(null);
   const [merged, setMerged] = useState(false);
-  const [isSignedIn, setIsSignedIn] = useState(false);
-  const [issues, setIssues] = useState<ReportRecord[]>(dashboardIssues);
+  const [issues, setIssues] = useState<ReportRecord[]>([]);
+  const [issuesLoading, setIssuesLoading] = useState(false);
   const [selectedIssueId, setSelectedIssueId] = useState<string | null>(null);
+  const isSignedIn = Boolean(session);
 
-  const handleAuthenticate = () => {
-    setIsSignedIn(true);
-    setCurrentTab('dashboard');
-  };
+  const loadIssues = useCallback(async () => {
+    if (!session?.user) {
+      setIssues([]);
+      return;
+    }
 
-  const handleSignOut = () => {
-    setIsSignedIn(false);
+    setIssuesLoading(true);
+    try {
+      const nextIssues = await fetchDashboardReports(session.user.id);
+      setIssues(nextIssues);
+    } catch {
+      setIssues([]);
+    } finally {
+      setIssuesLoading(false);
+    }
+  }, [session?.user]);
+
+  useEffect(() => {
+    void loadIssues();
+  }, [loadIssues]);
+
+  useEffect(() => {
+    if (session) {
+      return;
+    }
+
     setCurrentTab('report');
     setSelectedIssueId(null);
-    handleResetFlow();
-  };
+    setReportStep('camera');
+    setClassification(null);
+    setMerged(false);
+  }, [session]);
 
   const handleResetFlow = () => {
     setReportStep('camera');
@@ -75,22 +104,40 @@ export default function App() {
   };
 
   const handleToggleFollow = () => {
-    if (!selectedIssueId) {
+    if (!selectedIssueId || !session?.user) {
       return;
     }
+
+    const selectedIssue = issues.find((issue) => issue.id === selectedIssueId);
+    if (!selectedIssue) {
+      return;
+    }
+
+    const nextFollowing = !selectedIssue.isFollowing;
     setIssues((prev) =>
       prev.map((issue) =>
         issue.id === selectedIssueId
-          ? { ...issue, isFollowing: !issue.isFollowing }
+          ? { ...issue, isFollowing: nextFollowing }
           : issue
       )
     );
+
+    void setReportFollow(session.user.id, selectedIssueId, nextFollowing).catch(() => {
+      setIssues((prev) =>
+        prev.map((issue) =>
+          issue.id === selectedIssueId
+            ? { ...issue, isFollowing: selectedIssue.isFollowing }
+            : issue
+        )
+      );
+    });
   };
 
   const handleAddIssuePhoto = () => {
     if (!selectedIssueId) {
       return;
     }
+
     setIssues((prev) =>
       prev.map((issue) =>
         issue.id === selectedIssueId
@@ -98,6 +145,24 @@ export default function App() {
           : issue
       )
     );
+
+    void incrementReportPhotoCount(selectedIssueId).catch(() => {});
+  };
+
+  const handleCompleteReport = async (nextMerged: boolean) => {
+    if (classification && session?.user) {
+      try {
+        await createReportFromClassification(session.user.id, classification, {
+          merged: nextMerged,
+        });
+        await loadIssues();
+      } catch {
+        // Keep the confirmation screen even if persistence fails.
+      }
+    }
+
+    setMerged(nextMerged);
+    setReportStep('confirmation');
   };
 
   const renderReportFlow = () => {
@@ -121,13 +186,14 @@ export default function App() {
     if (reportStep === 'duplicate') {
       return (
         <DuplicateScreen
-          onMerge={() => { setMerged(true); setReportStep('confirmation'); }}
+          onMerge={() => {
+            void handleCompleteReport(true);
+          }}
           onNew={() => {
             if (classification) {
               postDifferentIssueReport(classification);
             }
-            setMerged(false);
-            setReportStep('confirmation');
+            void handleCompleteReport(false);
           }}
           onBack={() => setReportStep('classify')}
         />
@@ -154,15 +220,10 @@ export default function App() {
           />
         );
       }
-      return <DashboardScreen issues={issues} onOpenIssue={handleOpenIssue} />;
+      return <DashboardScreen issues={issues} isLoading={issuesLoading} onOpenIssue={handleOpenIssue} />;
     }
     if (currentTab === 'profile') {
-      return (
-        <ProfileScreen
-          isSignedIn={isSignedIn}
-          onToggleAuth={handleSignOut}
-        />
-      );
+      return <ProfileScreen />;
     }
     return renderReportFlow();
   };
@@ -176,6 +237,17 @@ export default function App() {
       (currentTab === 'report' && reportStep === 'camera')
     );
 
+  if (isLoading) {
+    return (
+      <SafeAreaView style={styles.safeArea}>
+        <StatusBar style="light" />
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#2563eb" />
+        </View>
+      </SafeAreaView>
+    );
+  }
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar style="light" />
@@ -183,7 +255,7 @@ export default function App() {
         {isSignedIn ? (
           renderCurrentTab()
         ) : (
-          <AuthScreen onAuthenticate={handleAuthenticate} />
+          <AuthScreen />
         )}
       </View>
       {showNav && (
@@ -202,4 +274,5 @@ export default function App() {
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: '#fff' },
   container: { flex: 1, backgroundColor: '#fff' },
+  loadingContainer: { flex: 1, alignItems: 'center', justifyContent: 'center' },
 });
