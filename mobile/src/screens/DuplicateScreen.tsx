@@ -1,20 +1,22 @@
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
-import { MockStreetPhoto } from "../components/MockStreetPhoto";
+import { SampleIssueImage } from "../components/SampleIssueImage";
+import { SampleIssueRecord } from "../types";
 import { T } from "../theme";
 
 type DuplicateScreenProps = {
   onMerge: () => void;
   onNew: () => void;
   onBack: () => void;
+  selectedSampleIssue?: SampleIssueRecord | null;
 };
 
 export const DuplicateScreen = ({
   onMerge,
   onNew,
   onBack,
+  selectedSampleIssue,
 }: DuplicateScreenProps) => (
   <View style={styles.page}>
-    {/* Header */}
     <View style={styles.header}>
       <Pressable
         onPress={onBack}
@@ -27,25 +29,34 @@ export const DuplicateScreen = ({
     </View>
 
     <ScrollView contentContainerStyle={styles.scroll}>
-      {/* Alert banner */}
       <View style={styles.alertBanner}>
         <Text style={styles.alertIcon}>⚠</Text>
         <View style={styles.alertText}>
           <Text style={styles.alertTitle}>Similar report nearby</Text>
           <Text style={styles.alertBody}>
-            Someone reported a pothole on Willow St 0.1 mi away — 3 days ago.
+            {selectedSampleIssue
+              ? `Someone reported a similar ${selectedSampleIssue.type.toLowerCase()} near ${selectedSampleIssue.locationName} 0.1 mi away.`
+              : "Someone reported a pothole on Glen Eyrie Ave 0.1 mi away — 3 days ago."}
           </Text>
         </View>
       </View>
 
-      {/* Existing report card */}
       <View style={styles.reportCard}>
         <View style={styles.reportPhoto}>
-          <MockStreetPhoto style={StyleSheet.absoluteFillObject} />
+          <SampleIssueImage
+            image={
+              selectedSampleIssue?.image ?? {
+                kind: "asset",
+                source: require("../../assets/pothole.jpg"),
+                alt: "Nearby pothole report",
+              }
+            }
+            style={{ width: "100%", height: "100%" }}
+          />
           <View style={styles.reportPhotoOverlay} />
           <View style={styles.reportBadges}>
             <View style={styles.typeBadge}>
-              <Text style={styles.typeBadgeText}>Pothole</Text>
+              <Text style={styles.typeBadgeText}>{selectedSampleIssue?.type ?? "Pothole"}</Text>
             </View>
             <View style={styles.countBadge}>
               <Text style={styles.countBadgeText}>👥 4 reports</Text>
@@ -53,9 +64,15 @@ export const DuplicateScreen = ({
           </View>
         </View>
         <View style={styles.reportBody}>
-          <Text style={styles.reportTitle}>Pothole — Willow St</Text>
+          <Text style={styles.reportTitle}>
+            {selectedSampleIssue
+              ? `${selectedSampleIssue.type} — ${selectedSampleIssue.locationName}`
+              : "Pothole — Glen Eyrie Ave"}
+          </Text>
           <Text style={styles.reportDesc}>
-            Large pothole near Lincoln Ave intersection. Reported 3 days ago.
+            {selectedSampleIssue
+              ? `${selectedSampleIssue.description} Reported recently by a nearby resident.`
+              : "Large pothole near Carolyn Ave intersection. Reported 3 days ago."}
           </Text>
           <View style={styles.reportMeta}>
             <View style={styles.pendingBadge}>
@@ -68,7 +85,6 @@ export const DuplicateScreen = ({
 
       <Text style={styles.question}>Is this the same issue?</Text>
 
-      {/* +1 button */}
       <Pressable
         onPress={onMerge}
         style={styles.mergeButton}
@@ -78,7 +94,6 @@ export const DuplicateScreen = ({
         <Text style={styles.mergeText}>Yes, add my +1 to this report</Text>
       </Pressable>
 
-      {/* New report button */}
       <Pressable
         onPress={onNew}
         style={styles.newButton}
@@ -133,10 +148,10 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   reportPhoto: {
-    height: 100,
+    width: "100%",
+    aspectRatio: 4 / 3,
     backgroundColor: "#111",
     overflow: "hidden",
-    position: "relative",
   },
   reportPhotoOverlay: {
     ...StyleSheet.absoluteFillObject,

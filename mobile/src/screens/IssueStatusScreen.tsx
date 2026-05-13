@@ -1,107 +1,269 @@
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
-import { ReportRecord } from '../types'
+import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { MockStreetPhoto } from '../components/MockStreetPhoto'
+import { SampleIssueImage } from '../components/SampleIssueImage'
 import { WireframeHeader } from '../components/WireframeHeader'
+import { T } from '../theme'
+import { ReportRecord, SampleIssueRecord } from '../types'
 
 type IssueStatusScreenProps = {
-  report: ReportRecord
+  report: ReportRecord | SampleIssueRecord
   onBack: () => void
+  onToggleFollow: () => void
+  onAddPhoto: () => void
+  primaryActionLabel?: string
+  onPrimaryAction?: () => void
 }
 
-export const IssueStatusScreen = ({ report, onBack }: IssueStatusScreenProps) => {
+export const IssueStatusScreen = ({
+  report,
+  onBack,
+  onToggleFollow,
+  onAddPhoto,
+  primaryActionLabel,
+  onPrimaryAction,
+}: IssueStatusScreenProps) => {
+  const isSampleIssue = 'image' in report
+  const coordinatesText = isSampleIssue
+    ? `${report.latitude.toFixed(6)}, ${report.longitude.toFixed(6)}`
+    : null
+
   return (
     <View style={styles.page}>
-      <WireframeHeader title="Status" showBack onBack={onBack} />
+      <WireframeHeader title="Issue" showBack onBack={onBack} />
       <ScrollView contentContainerStyle={styles.content}>
         <View style={styles.headingRow}>
-          <Text style={styles.issueId}>Issue #{report.id}</Text>
-          <Text style={styles.share}>⤴</Text>
-        </View>
-        <View style={styles.badge}>
-          <Text style={styles.badgeText}>{report.status}</Text>
-        </View>
-        <View style={styles.photoArea}>
-          <Text style={styles.photoLabel}>Photo</Text>
-        </View>
-        <View style={styles.card}>
-          <Text style={styles.label}>Location</Text>
-          <View style={styles.mapArea}>
-            <Text style={styles.pin}>📍</Text>
+          <View style={styles.headingCopy}>
+            <Text style={styles.issueId}>{report.id}</Text>
+            <Text style={styles.issueTitle}>{report.title}</Text>
           </View>
-          <Text style={styles.value}>{report.address}</Text>
+          <View style={[styles.badge, report.status === 'Resolved' ? styles.badgeResolved : null]}>
+            <Text style={[styles.badgeText, report.status === 'Resolved' ? styles.badgeTextResolved : null]}>
+              {report.status}
+            </Text>
+          </View>
         </View>
-        <View style={styles.card}>
-          <Text style={styles.label}>Issue Type</Text>
-          <Text style={styles.value}>{report.category}</Text>
-          <Text style={styles.label}>Assigned To</Text>
-          <Text style={styles.value}>{report.assignedTo}</Text>
-          <Text style={styles.label}>Description</Text>
-          <Text style={styles.value}>{report.description}</Text>
+
+        <View style={styles.photoCard}>
+          {isSampleIssue ? (
+            <SampleIssueImage image={report.image} style={{ width: '100%', height: '100%' }} />
+          ) : (
+            <MockStreetPhoto style={{ width: '100%', height: '100%' }} />
+          )}
+          <View style={styles.photoOverlay}>
+            <Text style={styles.photoOverlayText}>{report.photoCount} photo{report.photoCount === 1 ? '' : 's'}</Text>
+          </View>
         </View>
+
         <View style={styles.card}>
-          <Text style={styles.timelineTitle}>Status Timeline</Text>
+          <Text style={styles.sectionTitle}>Location</Text>
+          <View style={styles.mapArea}>
+            <Image source={require('../../assets/new-map.png')} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
+            <View
+              style={[
+                styles.mapPin,
+                {
+                  top: `${report.pin.top}%`,
+                  left: `${report.pin.left}%`,
+                  backgroundColor: report.pin.color,
+                },
+              ]}
+            />
+          </View>
+          <Text style={styles.value}>{isSampleIssue ? report.locationName : report.address}</Text>
+          <Text style={styles.secondaryValue}>{report.address}</Text>
+          {coordinatesText ? <Text style={styles.metaValue}>Coordinates: {coordinatesText}</Text> : null}
+          <View style={styles.tagRow}>
+            <InfoPill label={isSampleIssue ? report.type : report.category} />
+            <InfoPill label={report.tag} />
+            <InfoPill label={report.district} />
+          </View>
+        </View>
+
+        <View style={styles.card}>
+          <Text style={styles.sectionTitle}>Description</Text>
+          <Text style={styles.bodyText}>{report.description}</Text>
+        </View>
+
+        <View style={styles.card}>
+          <Text style={styles.sectionTitle}>Status Timeline</Text>
           {report.timeline.map((entry, index) => (
             <View key={`${entry.label}-${index}`} style={styles.timelineRow}>
-              <View style={[styles.dot, index === 1 ? styles.activeDot : null]} />
-              <View>
+              <View style={[styles.dot, entry.reached ? styles.dotReached : styles.dotPending]} />
+              <View style={styles.timelineTextWrap}>
                 <Text style={styles.timelineLabel}>{entry.label}</Text>
                 <Text style={styles.timelineDate}>{entry.dateText}</Text>
               </View>
             </View>
           ))}
         </View>
-        <Pressable style={styles.followButton} accessibilityRole="button">
-          <Text style={styles.followButtonText}>Follow This Issue</Text>
-        </Pressable>
+
+        <View style={styles.card}>
+          <Text style={styles.sectionTitle}>Insights</Text>
+          <InsightRow label="Estimated resolution time" value={report.estimatedResolution} />
+          <InsightRow
+            label="Reports and confirmations"
+            value={`${report.reportCount} people reported or confirmed this issue`}
+          />
+          <InsightRow label="Assigned team" value={report.assignedTo} />
+          {isSampleIssue ? (
+            <InsightRow
+              label="Integration payload"
+              value={`source=${report.integration.source} · feature=${report.integration.mapFeatureType} · marker=${report.integration.markerColor}`}
+            />
+          ) : null}
+        </View>
+
+        <View style={styles.actionRow}>
+          {primaryActionLabel && onPrimaryAction ? (
+            <Pressable
+              style={styles.followButton}
+              onPress={onPrimaryAction}
+              accessibilityRole="button"
+            >
+              <Text style={styles.followButtonText}>{primaryActionLabel}</Text>
+            </Pressable>
+          ) : (
+            <Pressable
+              style={[styles.followButton, report.isFollowing ? styles.followButtonActive : null]}
+              onPress={onToggleFollow}
+              accessibilityRole="button"
+            >
+              <Text style={[styles.followButtonText, report.isFollowing ? styles.followButtonTextActive : null]}>
+                {report.isFollowing ? 'Following for updates' : 'Follow this issue'}
+              </Text>
+            </Pressable>
+          )}
+
+          {report.isUserOwned ? (
+            <Pressable style={styles.secondaryButton} onPress={onAddPhoto} accessibilityRole="button">
+              <Text style={styles.secondaryButtonText}>{primaryActionLabel ? 'Back to library' : 'Add photo or update'}</Text>
+            </Pressable>
+          ) : null}
+        </View>
       </ScrollView>
     </View>
   )
 }
 
+const InsightRow = ({ label, value }: { label: string; value: string }) => {
+  return (
+    <View style={styles.insightRow}>
+      <Text style={styles.insightLabel}>{label}</Text>
+      <Text style={styles.insightValue}>{value}</Text>
+    </View>
+  )
+}
+
+const InfoPill = ({ label }: { label: string }) => {
+  return (
+    <View style={styles.infoPill}>
+      <Text style={styles.infoPillText}>{label}</Text>
+    </View>
+  )
+}
+
 const styles = StyleSheet.create({
-  page: { flex: 1, backgroundColor: '#fff' },
+  page: { flex: 1, backgroundColor: T.white },
   content: { padding: 14, gap: 14, paddingBottom: 32 },
-  headingRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  issueId: { fontSize: 44 / 2, fontWeight: '800' },
-  share: { fontSize: 22, color: '#4D5A72' },
+  headingRow: { gap: 10 },
+  headingCopy: { gap: 6 },
+  issueId: { fontSize: 13, fontWeight: '700', color: T.ink3, letterSpacing: 0.4 },
+  issueTitle: { fontSize: 24, fontWeight: '900', color: T.ink, lineHeight: 30 },
   badge: {
     backgroundColor: '#FFF2BF',
     alignSelf: 'flex-start',
     paddingHorizontal: 12,
-    paddingVertical: 4,
+    paddingVertical: 6,
     borderRadius: 20,
   },
+  badgeResolved: {
+    backgroundColor: T.greenLight,
+  },
   badgeText: { color: '#6C5600', fontWeight: '700' },
-  photoArea: {
-    height: 170,
-    borderRadius: 14,
-    backgroundColor: '#E5EAF1',
-    justifyContent: 'center',
-    alignItems: 'center',
+  badgeTextResolved: { color: T.green },
+  photoCard: {
+    height: 190,
+    borderRadius: 18,
+    overflow: 'hidden',
+    position: 'relative',
+    backgroundColor: '#D7DEE9',
   },
-  photoLabel: { color: '#7C889B', fontWeight: '700', fontSize: 18 },
-  card: { borderRadius: 14, borderWidth: 1, borderColor: '#E2E9F1', padding: 12, gap: 8 },
-  label: { color: '#4E5A6E', fontWeight: '600', marginTop: 6, fontSize: 28 / 2 },
-  value: { color: '#151B28', fontWeight: '700', fontSize: 36 / 2 },
+  photoOverlay: {
+    position: 'absolute',
+    right: 12,
+    bottom: 12,
+    backgroundColor: 'rgba(17,24,39,0.8)',
+    borderRadius: 999,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+  },
+  photoOverlayText: {
+    color: T.white,
+    fontWeight: '700',
+    fontSize: 12,
+  },
+  card: { borderRadius: 16, borderWidth: 1, borderColor: '#E2E9F1', padding: 14, gap: 10 },
+  sectionTitle: { color: T.ink, fontWeight: '800', fontSize: 18 },
   mapArea: {
-    height: 120,
-    borderRadius: 10,
+    height: 200,
+    borderRadius: 14,
+    overflow: 'hidden',
     backgroundColor: '#EDF2F8',
-    justifyContent: 'center',
-    alignItems: 'center',
   },
-  pin: { fontSize: 30 },
-  timelineTitle: { fontWeight: '800', fontSize: 36 / 2, marginBottom: 4 },
-  timelineRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 12, marginBottom: 10 },
-  dot: { width: 10, height: 10, borderRadius: 999, backgroundColor: '#1F6DFF', marginTop: 7 },
-  activeDot: { backgroundColor: '#BD8A00' },
-  timelineLabel: { fontSize: 34 / 2, fontWeight: '700' },
-  timelineDate: { color: '#667287', fontWeight: '500' },
+  mapPin: {
+    position: 'absolute',
+    width: 14,
+    height: 14,
+    borderRadius: 7,
+    borderWidth: 2,
+    borderColor: '#fff',
+  },
+  value: { color: T.ink, fontWeight: '700', fontSize: 16, lineHeight: 22 },
+  secondaryValue: { color: T.ink2, fontWeight: '500', lineHeight: 21 },
+  metaValue: { color: T.ink3, fontWeight: '600', fontSize: 12 },
+  tagRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  infoPill: {
+    backgroundColor: T.warm,
+    borderRadius: 999,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+  },
+  infoPillText: { color: T.ink2, fontWeight: '700', fontSize: 12 },
+  timelineRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 12 },
+  timelineTextWrap: { flex: 1, gap: 2 },
+  dot: { width: 12, height: 12, borderRadius: 999, marginTop: 6 },
+  dotReached: { backgroundColor: T.blue },
+  dotPending: { backgroundColor: T.ink4 },
+  timelineLabel: { fontSize: 16, fontWeight: '700', color: T.ink },
+  timelineDate: { color: '#667287', fontWeight: '500', lineHeight: 20 },
+  bodyText: { color: T.ink2, lineHeight: 22, fontWeight: '500' },
+  insightRow: { gap: 4 },
+  insightLabel: { color: T.ink3, fontWeight: '700', fontSize: 13, textTransform: 'uppercase' },
+  insightValue: { color: T.ink, fontWeight: '600', lineHeight: 22 },
+  actionRow: { gap: 10 },
   followButton: {
-    marginTop: 2,
-    borderRadius: 12,
-    backgroundColor: '#1565FF',
+    borderRadius: 14,
+    backgroundColor: T.blue,
     paddingVertical: 16,
     alignItems: 'center',
   },
-  followButtonText: { color: '#fff', fontWeight: '800', fontSize: 34 / 2 },
+  followButtonActive: {
+    backgroundColor: T.blueLight,
+    borderWidth: 1,
+    borderColor: '#C7DBFF',
+  },
+  followButtonText: { color: T.white, fontWeight: '800', fontSize: 16 },
+  followButtonTextActive: { color: T.blueDark },
+  secondaryButton: {
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: T.border,
+    paddingVertical: 16,
+    alignItems: 'center',
+  },
+  secondaryButtonText: {
+    color: T.ink,
+    fontWeight: '800',
+    fontSize: 16,
+  },
 })

@@ -1,4 +1,5 @@
 import { Pressable, ScrollView, StyleSheet, Switch, Text, View } from 'react-native'
+import { useState } from 'react'
 import { WireframeHeader } from '../components/WireframeHeader'
 
 type ProfileScreenProps = {
@@ -50,10 +51,11 @@ export const ProfileScreen = ({ isSignedIn, onToggleAuth }: ProfileScreenProps) 
 }
 
 const PreferenceRow = ({ label }: { label: string }) => {
+  const [enabled, setEnabled] = useState(true)
   return (
     <View style={styles.preferenceRow}>
       <Text style={styles.preferenceLabel}>{label}</Text>
-      <Switch value />
+      <Switch value={enabled} onValueChange={setEnabled} />
     </View>
   )
 }

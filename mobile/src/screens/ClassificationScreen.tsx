@@ -9,22 +9,16 @@ import {
   TextInput,
   View,
 } from "react-native";
+import { SampleIssueImage } from "../components/SampleIssueImage";
 import { MiniMapView } from "../components/MiniMapView";
-import { MockStreetPhoto } from "../components/MockStreetPhoto";
+import { SampleIssueRecord } from "../types";
 import { T } from "../theme";
-
-const CATEGORIES = [
-  "Roads & Infrastructure",
-  "Public Transit",
-  "Buildings & Facilities",
-  "Parks & Recreation",
-  "Utilities",
-];
 
 const TAGS_BY_CATEGORY: Record<string, string[]> = {
   "Roads & Infrastructure": [
     "Pothole",
     "Cracked Road",
+    "Damaged sidewalk",
     "Missing Sign",
     "Broken Curb",
     "Flooding",
@@ -43,12 +37,16 @@ const TAGS_BY_CATEGORY: Record<string, string[]> = {
   ],
   "Parks & Recreation": ["Broken Equipment", "Graffiti", "Dead Tree", "Litter"],
   Utilities: [
+    "Broken streetlight",
     "Light Out",
     "Downed Wire",
     "Water Main Break",
     "Leaking Hydrant",
   ],
 };
+
+const LOCATION_MAIN_LINE = "Glen Eyrie Ave & Carolyn Ave";
+const LOCATION_SUB_LINE = "San Jose, CA 95125";
 
 const DEPT_BY_CATEGORY: Record<string, { name: string; division: string }> = {
   "Roads & Infrastructure": {
@@ -77,21 +75,44 @@ export type Classification = {
   category: string;
   tag: string;
   desc: string;
+  locationMain: string;
+  locationSub: string;
 };
 
 type ClassificationScreenProps = {
   onBack: () => void;
   onConfirm: (c: Classification) => void;
+  selectedSampleIssue?: SampleIssueRecord | null;
+};
+
+const getInitialCategory = (selectedSampleIssue?: SampleIssueRecord | null) => {
+  if (!selectedSampleIssue) {
+    return "Roads & Infrastructure";
+  }
+  if (selectedSampleIssue.category === "Streetlight Outage") {
+    return "Utilities";
+  }
+  if (selectedSampleIssue.category === "Graffiti") {
+    return "Buildings & Facilities";
+  }
+  return "Roads & Infrastructure";
 };
 
 export const ClassificationScreen = ({
   onBack,
   onConfirm,
+  selectedSampleIssue,
 }: ClassificationScreenProps) => {
-  const [category, setCategory] = useState("Roads & Infrastructure");
-  const [tag, setTag] = useState("Pothole");
+  const locationMainLine =
+    selectedSampleIssue?.locationName ?? LOCATION_MAIN_LINE;
+  const locationSubLine =
+    selectedSampleIssue?.address ?? LOCATION_SUB_LINE;
+
+  const [category, setCategory] = useState(getInitialCategory(selectedSampleIssue));
+  const [tag, setTag] = useState(selectedSampleIssue?.type ?? "Pothole");
   const [desc, setDesc] = useState(
-    "Significant pothole on Willow St near Lincoln Ave causing road hazard. Approximately 2ft wide with visible asphalt damage.",
+    selectedSampleIssue?.description ??
+      "Significant pothole on Glen Eyrie Ave near Carolyn Ave causing road hazard. Approximately 2ft wide with visible asphalt damage.",
   );
   const [showTagMenu, setShowTagMenu] = useState(false);
 
@@ -106,12 +127,11 @@ export const ClassificationScreen = ({
     }),
   ).current;
 
-  const handleTagSelect = (t: string) => {
-    setTag(t);
-    // update category based on selected tag
-    for (const [cat, tags] of Object.entries(TAGS_BY_CATEGORY)) {
-      if (tags.includes(t)) {
-        setCategory(cat);
+  const handleTagSelect = (nextTag: string) => {
+    setTag(nextTag);
+    for (const [nextCategory, tags] of Object.entries(TAGS_BY_CATEGORY)) {
+      if (tags.includes(nextTag)) {
+        setCategory(nextCategory);
         break;
       }
     }
@@ -123,7 +143,6 @@ export const ClassificationScreen = ({
 
   return (
     <View style={styles.page}>
-      {/* Header */}
       <View style={styles.header}>
         <Pressable
           onPress={onBack}
@@ -133,7 +152,7 @@ export const ClassificationScreen = ({
           <Text style={styles.backIcon}>‹</Text>
         </Pressable>
         <View style={styles.headerText}>
-          <Text style={styles.headerTitle}>Confirm &amp; submit</Text>
+          <Text style={styles.headerTitle}>Confirm & submit</Text>
           <Text style={styles.headerSubtitle}>Review details, then send</Text>
         </View>
       </View>
@@ -143,28 +162,33 @@ export const ClassificationScreen = ({
         contentContainerStyle={styles.scroll}
         keyboardShouldPersistTaps="handled"
       >
-        {/* Photo thumbnail */}
         <View style={styles.photoStrip}>
-          <MockStreetPhoto style={StyleSheet.absoluteFillObject} />
+          <SampleIssueImage
+            image={
+              selectedSampleIssue?.image ?? {
+                kind: "asset",
+                source: require("../../assets/pothole.jpg"),
+                alt: "Captured pothole preview",
+              }
+            }
+            style={{ width: "100%", height: "100%" }}
+          />
           <View style={styles.categoryChip}>
             <View style={styles.categoryDot} />
             <Text style={styles.categoryChipText}>{category}</Text>
           </View>
         </View>
 
-        {/* Classification card */}
         <View style={styles.card}>
-          {/* Category — read-only */}
           <View style={[styles.row, styles.rowBorder]}>
             <Text style={styles.rowLabel}>CATEGORY</Text>
             <Text style={styles.rowValue}>{category}</Text>
           </View>
 
-          {/* Issue type — dropdown */}
           <View style={[styles.row, styles.rowBorder]}>
             <Text style={styles.rowLabel}>ISSUE TYPE</Text>
             <Pressable
-              onPress={() => setShowTagMenu((v) => !v)}
+              onPress={() => setShowTagMenu((value) => !value)}
               style={styles.selector}
               accessibilityRole="button"
             >
@@ -173,23 +197,23 @@ export const ClassificationScreen = ({
             </Pressable>
             {showTagMenu && (
               <View style={styles.dropdown}>
-                {(TAGS_BY_CATEGORY[category] ?? []).map((t) => (
+                {(TAGS_BY_CATEGORY[category] ?? []).map((nextTag) => (
                   <Pressable
-                    key={t}
-                    onPress={() => handleTagSelect(t)}
+                    key={nextTag}
+                    onPress={() => handleTagSelect(nextTag)}
                     style={[
                       styles.dropdownItem,
-                      t === tag && styles.dropdownItemActive,
+                      nextTag === tag && styles.dropdownItemActive,
                     ]}
                     accessibilityRole="button"
                   >
                     <Text
                       style={[
                         styles.dropdownItemText,
-                        t === tag && styles.dropdownItemTextActive,
+                        nextTag === tag && styles.dropdownItemTextActive,
                       ]}
                     >
-                      {t}
+                      {nextTag}
                     </Text>
                   </Pressable>
                 ))}
@@ -197,7 +221,6 @@ export const ClassificationScreen = ({
             )}
           </View>
 
-          {/* Description — editable */}
           <View style={styles.row}>
             <Text style={styles.rowLabel}>DESCRIPTION</Text>
             <TextInput
@@ -210,7 +233,6 @@ export const ClassificationScreen = ({
           </View>
         </View>
 
-        {/* Location card */}
         <View style={styles.card}>
           <View style={[styles.locationHeader, styles.rowBorder]}>
             <Text style={styles.rowLabel}>LOCATION</Text>
@@ -220,10 +242,8 @@ export const ClassificationScreen = ({
             </View>
           </View>
 
-          {/* Mini map with draggable pin overlay */}
           <View style={styles.mapArea}>
             <MiniMapView style={StyleSheet.absoluteFillObject} />
-            {/* Draggable pin — Animated.View so Animated.Value works */}
             <Animated.View
               style={[
                 styles.draggablePin,
@@ -238,16 +258,13 @@ export const ClassificationScreen = ({
             </View>
           </View>
 
-          {/* Address row */}
           <View style={styles.addressRow}>
             <View style={styles.addressIcon}>
               <Text>📍</Text>
             </View>
             <View style={{ flex: 1 }}>
-              <Text style={styles.addressMain}>
-                Willow St &amp; Lincoln Ave
-              </Text>
-              <Text style={styles.addressSub}>San Jose, CA 95125</Text>
+              <Text style={styles.addressMain}>{locationMainLine}</Text>
+              <Text style={styles.addressSub}>{locationSubLine}</Text>
             </View>
             <Pressable accessibilityRole="button">
               <Text style={styles.editLink}>Edit</Text>
@@ -255,7 +272,6 @@ export const ClassificationScreen = ({
           </View>
         </View>
 
-        {/* Routing info */}
         <View style={styles.routingCard}>
           <Text style={styles.routingLabel}>WILL BE ROUTED TO</Text>
           <Text style={styles.routingName}>{dept.name}</Text>
@@ -263,15 +279,22 @@ export const ClassificationScreen = ({
         </View>
       </ScrollView>
 
-      {/* CTA */}
       <View style={styles.ctaBar}>
         <Pressable
-          onPress={() => onConfirm({ category, tag, desc })}
+          onPress={() =>
+            onConfirm({
+              category,
+              tag,
+              desc,
+              locationMain: locationMainLine,
+              locationSub: locationSubLine,
+            })
+          }
           style={styles.submitButton}
           accessibilityRole="button"
         >
           <Text style={styles.submitCheck}>✓</Text>
-          <Text style={styles.submitText}>Confirm &amp; submit</Text>
+          <Text style={styles.submitText}>Confirm & submit</Text>
         </Pressable>
       </View>
     </View>
@@ -300,8 +323,8 @@ const styles = StyleSheet.create({
   scroll: { padding: 14, gap: 10, paddingBottom: 24 },
 
   photoStrip: {
-    height: 120,
-    borderRadius: 0,
+    width: "100%",
+    aspectRatio: 4 / 3,
     overflow: "hidden",
     backgroundColor: "#111",
   },

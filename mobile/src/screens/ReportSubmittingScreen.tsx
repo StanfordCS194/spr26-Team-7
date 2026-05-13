@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { StyleSheet, Text, View } from 'react-native'
+import { Image, StyleSheet, Text, View } from 'react-native'
 import { WireframeHeader } from '../components/WireframeHeader'
 
 type ReportSubmittingScreenProps = {
@@ -14,6 +14,8 @@ export const ReportSubmittingScreen = ({ onDone }: ReportSubmittingScreenProps) 
 
   return (
     <View style={styles.page}>
+      <Image source={require('../../assets/pothole.jpg')} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }} resizeMode="cover" />
+      <View style={styles.overlay} />
       <WireframeHeader title="Submitting" />
       <View style={styles.body}>
         <View style={styles.spinner} />
@@ -26,7 +28,8 @@ export const ReportSubmittingScreen = ({ onDone }: ReportSubmittingScreenProps) 
 }
 
 const styles = StyleSheet.create({
-  page: { flex: 1, backgroundColor: '#fff' },
+  page: { flex: 1, backgroundColor: '#0f0a05' },
+  overlay: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(15,10,5,0.72)' },
   body: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 28 },
   spinner: {
     width: 82,
