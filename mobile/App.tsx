@@ -9,7 +9,7 @@ import { AnalyzingScreen } from './src/screens/AnalyzingScreen';
 import { ClassificationScreen, Classification } from './src/screens/ClassificationScreen';
 import { DuplicateScreen } from './src/screens/DuplicateScreen';
 import { ReportConfirmationScreen } from './src/screens/ReportConfirmationScreen';
-import { AppTab, ReportRecord } from './src/types';
+import { AppTab, ReportRecord, SampleIssueRecord } from './src/types';
 import { AuthScreen } from './src/screens/AuthScreen';
 import { IssueStatusScreen } from './src/screens/IssueStatusScreen';
 import { useAuth } from './src/providers/AuthProvider';
@@ -19,8 +19,11 @@ import {
   incrementReportPhotoCount,
   setReportFollow,
 } from './src/lib/reports';
+import { dashboardIssues } from './src/data/mockData';
+import { SampleIssuePickerScreen } from './src/screens/SampleIssuePickerScreen';
+import { sampleIssues } from './src/data/sampleIssues';
 
-type ReportStep = 'camera' | 'analyzing' | 'classify' | 'duplicate' | 'confirmation';
+type ReportStep = 'picker' | 'camera' | 'analyzing' | 'classify' | 'duplicate' | 'confirmation' | 'issue';
 
 const REPORT_API_BASE = (
   process.env.EXPO_PUBLIC_REPORT_API_URL ?? 'http://127.0.0.1:3001'
@@ -44,13 +47,14 @@ const postDifferentIssueReport = (c: Classification) => {
 export default function App() {
   const { session, isLoading } = useAuth();
   const [currentTab, setCurrentTab] = useState<AppTab>('report');
-  const [reportStep, setReportStep] = useState<ReportStep>('camera');
+  const [reportStep, setReportStep] = useState<ReportStep>('picker');
   const [classification, setClassification] = useState<Classification | null>(null);
   const [merged, setMerged] = useState(false);
   const [issues, setIssues] = useState<ReportRecord[]>([]);
   const [issuesLoading, setIssuesLoading] = useState(false);
   const [selectedIssueId, setSelectedIssueId] = useState<string | null>(null);
   const isSignedIn = Boolean(session);
+  const [selectedSampleIssue, setSelectedSampleIssue] = useState<SampleIssueRecord | null>(null);
 
   const loadIssues = useCallback(async () => {
     if (!session?.user) {
@@ -86,9 +90,10 @@ export default function App() {
   }, [session]);
 
   const handleResetFlow = () => {
-    setReportStep('camera');
+    setReportStep('picker');
     setClassification(null);
     setMerged(false);
+    setSelectedSampleIssue(null);
   };
 
   const selectedIssue = selectedIssueId
@@ -134,6 +139,10 @@ export default function App() {
   };
 
   const handleAddIssuePhoto = () => {
+    if (selectedSampleIssue) {
+      handleResetFlow();
+      return;
+    }
     if (!selectedIssueId) {
       return;
     }
@@ -166,6 +175,33 @@ export default function App() {
   };
 
   const renderReportFlow = () => {
+    if (reportStep === 'picker') {
+      return (
+        <SampleIssuePickerScreen
+          onSelectIssue={(issueId) => {
+            const nextIssue = sampleIssues.find((issue) => issue.id === issueId) ?? null;
+            setSelectedSampleIssue(nextIssue);
+            setReportStep('issue');
+          }}
+          onOpenCamera={() => {
+            setSelectedSampleIssue(null);
+            setReportStep('camera');
+          }}
+        />
+      );
+    }
+    if (reportStep === 'issue' && selectedSampleIssue) {
+      return (
+        <IssueStatusScreen
+          report={selectedSampleIssue}
+          onBack={handleResetFlow}
+          onToggleFollow={() => {}}
+          onAddPhoto={handleResetFlow}
+          primaryActionLabel="Continue demo report"
+          onPrimaryAction={() => setReportStep('classify')}
+        />
+      );
+    }
     if (reportStep === 'camera') {
       return <ReportCameraScreen onCapture={() => setReportStep('analyzing')} />;
     }
@@ -175,11 +211,12 @@ export default function App() {
     if (reportStep === 'classify') {
       return (
         <ClassificationScreen
-          onBack={() => setReportStep('camera')}
+          onBack={() => setReportStep(selectedSampleIssue ? 'issue' : 'camera')}
           onConfirm={(c) => {
             setClassification(c);
             setReportStep('duplicate');
           }}
+          selectedSampleIssue={selectedSampleIssue}
         />
       );
     }
@@ -196,6 +233,7 @@ export default function App() {
             void handleCompleteReport(false);
           }}
           onBack={() => setReportStep('classify')}
+          selectedSampleIssue={selectedSampleIssue}
         />
       );
     }
@@ -204,6 +242,7 @@ export default function App() {
         merged={merged}
         classification={classification}
         onDone={handleResetFlow}
+        selectedSampleIssue={selectedSampleIssue}
       />
     );
   };
@@ -234,7 +273,7 @@ export default function App() {
     (
       currentTab === 'dashboard' ||
       currentTab === 'profile' ||
-      (currentTab === 'report' && reportStep === 'camera')
+      (currentTab === 'report' && reportStep === 'picker')
     );
 
   if (isLoading) {

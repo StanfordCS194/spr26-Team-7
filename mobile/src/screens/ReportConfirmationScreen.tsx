@@ -1,18 +1,22 @@
 import { useEffect, useRef } from 'react';
-import { Animated, Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Animated, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { SampleIssueImage } from '../components/SampleIssueImage';
 import { Classification } from './ClassificationScreen';
 import { T } from '../theme';
+import { SampleIssueRecord } from '../types';
 
 type ReportConfirmationScreenProps = {
   merged: boolean;
   classification: Classification | null;
   onDone: () => void;
+  selectedSampleIssue?: SampleIssueRecord | null;
 };
 
 export const ReportConfirmationScreen = ({
   merged,
   classification,
   onDone,
+  selectedSampleIssue,
 }: ReportConfirmationScreenProps) => {
   const scaleAnim = useRef(new Animated.Value(0)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -42,43 +46,51 @@ export const ReportConfirmationScreen = ({
       ]).start();
     }, 100);
     return () => clearTimeout(delay);
-  }, []);
+  }, [fadeAnim, scaleAnim, slideAnim]);
 
   const tag = classification?.tag ?? 'Pothole';
+  const address = classification?.locationMain
+    ? `${classification.locationMain}, ${classification.locationSub}`
+    : 'Glen Eyrie Ave & Carolyn Ave, San Jose';
   const circleColor = merged ? T.blueLight : T.greenLight;
   const checkColor = merged ? T.blue : T.green;
 
   return (
     <View style={styles.page}>
       <ScrollView contentContainerStyle={styles.scroll}>
-        {/* Check circle */}
         <Animated.View style={[styles.checkCircle, { backgroundColor: circleColor, transform: [{ scale: scaleAnim }] }]}>
           <Text style={[styles.checkMark, { color: checkColor }]}>✓</Text>
         </Animated.View>
 
-        {/* Title */}
         <Animated.Text style={[styles.title, { opacity: fadeAnim, transform: [{ translateY: slideAnim }] }]}>
           {merged ? 'Report added!' : 'Report filed!'}
         </Animated.Text>
 
-        {/* Subtitle */}
         <Animated.Text style={[styles.subtitle, { opacity: fadeAnim, transform: [{ translateY: slideAnim }] }]}>
           {merged
-            ? 'Your report joined 4 others. The city now has 5 confirmations for this pothole on Glen Eyrie Ave.'
-            : 'Thanks for helping improve your neighborhood. Your report has been sent to San Jose Dept. of Transportation.'}
+            ? `Your report joined nearby reports for ${tag.toLowerCase()}.`
+            : `Thanks for helping improve your neighborhood. Your ${tag.toLowerCase()} report is ready for the city workflow.`}
         </Animated.Text>
 
-        {/* Summary card */}
         <Animated.View style={[styles.summaryCard, { opacity: fadeAnim, transform: [{ translateY: slideAnim }] }]}>
           <View style={styles.summaryPhoto}>
-            <Image source={require('../../assets/pothole.jpg')} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
+            <SampleIssueImage
+              image={
+                selectedSampleIssue?.image ?? {
+                  kind: 'asset',
+                  source: require('../../assets/pothole.jpg'),
+                  alt: 'Submitted report preview',
+                }
+              }
+              style={{ width: '100%', height: '100%' }}
+            />
             <View style={styles.summaryPhotoOverlay} />
           </View>
           <View style={styles.summaryBody}>
             <View style={styles.summaryRow}>
               <View style={{ flex: 1 }}>
                 <Text style={styles.summaryTag}>{tag}</Text>
-                <Text style={styles.summaryAddr}>Glen Eyrie Ave & Carolyn Ave, San Jose</Text>
+                <Text style={styles.summaryAddr}>{address}</Text>
               </View>
               <View style={[styles.filedBadge, { backgroundColor: merged ? T.blueLight : T.greenLight }]}>
                 <Text style={[styles.filedBadgeText, { color: merged ? T.blue : T.green }]}>
@@ -88,10 +100,10 @@ export const ReportConfirmationScreen = ({
             </View>
             <View style={styles.tagRow}>
               <View style={styles.tag}>
-                <Text style={styles.tagText}>San Jose D.O.T.</Text>
+                <Text style={styles.tagText}>{selectedSampleIssue?.assignedTo ?? 'San Jose D.O.T.'}</Text>
               </View>
               <View style={styles.tag}>
-                <Text style={styles.tagText}>Est. 2–3 weeks</Text>
+                <Text style={styles.tagText}>{selectedSampleIssue?.district ?? 'San Jose District 3'}</Text>
               </View>
               <View style={[styles.tag, { backgroundColor: '#fef3c7' }]}>
                 <Text style={[styles.tagText, { color: T.amber }]}>Pending</Text>
@@ -100,7 +112,6 @@ export const ReportConfirmationScreen = ({
           </View>
         </Animated.View>
 
-        {/* Back to home */}
         <Animated.View style={{ width: '100%', opacity: fadeAnim, transform: [{ translateY: slideAnim }] }}>
           <Pressable onPress={onDone} style={styles.homeButton} accessibilityRole="button">
             <Text style={styles.homeIcon}>🏠</Text>
