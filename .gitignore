@@ -51,3 +51,6 @@ venv/
 ml/__pycache__/
 *.pyc
 *.pyo
+
+# ML model weights (download with: cd ml && python scripts/download_models.py)
+ml/weights/
