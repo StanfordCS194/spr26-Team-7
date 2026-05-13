@@ -8,12 +8,14 @@ type ReportConfirmationScreenProps = {
   merged: boolean;
   classification: Classification | null;
   onDone: () => void;
+  onViewIssue: () => void;
 };
 
 export const ReportConfirmationScreen = ({
   merged,
   classification,
   onDone,
+  onViewIssue,
 }: ReportConfirmationScreenProps) => {
   const scaleAnim = useRef(new Animated.Value(0)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -69,36 +71,42 @@ export const ReportConfirmationScreen = ({
             : 'Thanks for helping improve Willow Glen. Your report has been sent to San Jose Dept. of Transportation.'}
         </Animated.Text>
 
-        {/* Summary card */}
+        {/* Summary card — tappable to view issue detail */}
         <Animated.View style={[styles.summaryCard, { opacity: fadeAnim, transform: [{ translateY: slideAnim }] }]}>
-          <View style={styles.summaryPhoto}>
-            <MockStreetPhoto style={StyleSheet.absoluteFillObject} />
-            <View style={styles.summaryPhotoOverlay} />
-          </View>
-          <View style={styles.summaryBody}>
-            <View style={styles.summaryRow}>
-              <View style={{ flex: 1 }}>
-                <Text style={styles.summaryTag}>{tag}</Text>
-                <Text style={styles.summaryAddr}>Willow St &amp; Lincoln Ave, San Jose</Text>
+          <Pressable onPress={onViewIssue} accessibilityRole="button" accessibilityLabel="View issue details">
+            <View style={styles.summaryPhoto}>
+              <MockStreetPhoto style={StyleSheet.absoluteFillObject} />
+              <View style={styles.summaryPhotoOverlay} />
+            </View>
+            <View style={styles.summaryBody}>
+              <View style={styles.summaryRow}>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.summaryTag}>{tag}</Text>
+                  <Text style={styles.summaryAddr}>Willow St &amp; Lincoln Ave, San Jose</Text>
+                </View>
+                <View style={[styles.filedBadge, { backgroundColor: merged ? T.blueLight : T.greenLight }]}>
+                  <Text style={[styles.filedBadgeText, { color: merged ? T.blue : T.green }]}>
+                    {merged ? '+1 · 5 total' : 'Filed'}
+                  </Text>
+                </View>
               </View>
-              <View style={[styles.filedBadge, { backgroundColor: merged ? T.blueLight : T.greenLight }]}>
-                <Text style={[styles.filedBadgeText, { color: merged ? T.blue : T.green }]}>
-                  {merged ? '+1 · 5 total' : 'Filed'}
-                </Text>
+              <View style={styles.tagRow}>
+                <View style={styles.tag}>
+                  <Text style={styles.tagText}>San Jose D.O.T.</Text>
+                </View>
+                <View style={styles.tag}>
+                  <Text style={styles.tagText}>Est. 2–3 weeks</Text>
+                </View>
+                <View style={[styles.tag, { backgroundColor: '#fef3c7' }]}>
+                  <Text style={[styles.tagText, { color: T.amber }]}>Pending</Text>
+                </View>
+              </View>
+              <View style={styles.viewDetailRow}>
+                <Text style={styles.viewDetailText}>View issue details</Text>
+                <Text style={styles.viewDetailChevron}>›</Text>
               </View>
             </View>
-            <View style={styles.tagRow}>
-              <View style={styles.tag}>
-                <Text style={styles.tagText}>San Jose D.O.T.</Text>
-              </View>
-              <View style={styles.tag}>
-                <Text style={styles.tagText}>Est. 2–3 weeks</Text>
-              </View>
-              <View style={[styles.tag, { backgroundColor: '#fef3c7' }]}>
-                <Text style={[styles.tagText, { color: T.amber }]}>Pending</Text>
-              </View>
-            </View>
-          </View>
+          </Pressable>
         </Animated.View>
 
         {/* Back to home */}
@@ -174,6 +182,10 @@ const styles = StyleSheet.create({
   tagRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
   tag: { backgroundColor: T.warm, borderRadius: 8, paddingHorizontal: 8, paddingVertical: 4 },
   tagText: { fontSize: 11, color: T.ink3, fontWeight: '500' },
+
+  viewDetailRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', gap: 2, marginTop: 2 },
+  viewDetailText: { fontSize: 12, color: T.blue, fontWeight: '600' },
+  viewDetailChevron: { fontSize: 16, color: T.blue, lineHeight: 18 },
 
   homeButton: {
     backgroundColor: T.blue,

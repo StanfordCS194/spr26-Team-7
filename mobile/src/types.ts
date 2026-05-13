@@ -8,6 +8,9 @@ export type IssueCategory =
   | 'Graffiti'
   | 'Illegal Dumping'
   | 'Transit Signage'
+  | 'Vehicle Concerns'
+  | 'Encampment'
+  | 'Junk Pickup'
 
 export type TimelineEntry = {
   label: ReportStatus

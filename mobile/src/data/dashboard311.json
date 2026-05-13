@@ -1,0 +1,8222 @@
+{
+  "meta": {
+    "generatedAt": "2026-05-13T10:14:43.771Z",
+    "currentMonth": "2026-04",
+    "currentYear": 2026
+  },
+  "citywide": {
+    "resolutionByYear": [
+      96,
+      98,
+      97,
+      90,
+      92,
+      94,
+      93,
+      89,
+      86,
+      86
+    ],
+    "volumeByYear": [
+      89,
+      164,
+      189,
+      185,
+      250,
+      270,
+      282,
+      321,
+      341,
+      124
+    ]
+  },
+  "districts": {
+    "1": {
+      "sparklineRate": [
+        93,
+        98,
+        98,
+        91,
+        91,
+        97,
+        98,
+        93,
+        90,
+        95
+      ],
+      "sparklineOpen": [
+        282,
+        144,
+        245,
+        603,
+        721,
+        262,
+        199,
+        563,
+        1419,
+        219
+      ],
+      "sparklineAvgDays": [
+        6.38,
+        10.03,
+        6.63,
+        4.88,
+        2.96,
+        1.99,
+        1.98,
+        2.86,
+        1.38,
+        0.92
+      ],
+      "monthlyRate": [
+        97,
+        98,
+        96,
+        96
+      ],
+      "monthlyAvgDays": [
+        1.25,
+        0.81,
+        0.7,
+        1.05
+      ],
+      "volumeByYear": [
+        3861,
+        8072,
+        10172,
+        6868,
+        7657,
+        8077,
+        8172,
+        9885,
+        16258,
+        5567
+      ],
+      "totalReports": 84589,
+      "trendsVsMonth": [
+        {
+          "name": "Pothole",
+          "pct": 88
+        },
+        {
+          "name": "Graffiti",
+          "pct": 87
+        },
+        {
+          "name": "Encampment Concerns",
+          "pct": 45
+        },
+        {
+          "name": "Vehicle Concerns",
+          "pct": -20
+        },
+        {
+          "name": "Illegal Dumping",
+          "pct": 14
+        }
+      ],
+      "trendsVsYear": [
+        {
+          "name": "Graffiti",
+          "pct": 146
+        },
+        {
+          "name": "Streetlight Outage",
+          "pct": -45
+        },
+        {
+          "name": "Pothole",
+          "pct": 38
+        },
+        {
+          "name": "Illegal Dumping",
+          "pct": 30
+        },
+        {
+          "name": "Encampment Concerns",
+          "pct": -28
+        },
+        {
+          "name": "Junk Pickup",
+          "pct": 17
+        },
+        {
+          "name": "Vehicle Concerns",
+          "pct": 14
+        },
+        {
+          "name": "Container Issues",
+          "pct": 14
+        }
+      ],
+      "issueTypes": [
+        {
+          "id": "junk",
+          "name": "Junk Pickup",
+          "icon": "🗑️",
+          "iconBg": "rgba(240,160,48,0.18)",
+          "coordinateEstimated": true,
+          "sparkline": [
+            0,
+            0,
+            0,
+            0,
+            5597,
+            7099,
+            7366,
+            8065,
+            8437,
+            3325
+          ],
+          "monthlySparkline": [
+            890,
+            638,
+            807,
+            723
+          ],
+          "peakMonth": null,
+          "firstYear": 2021,
+          "countByPeriod": {
+            "month": 723,
+            "year": 3058,
+            "all": 39888
+          },
+          "month": {
+            "resolvedPct": 55,
+            "avgTimeLabel": "12 days"
+          },
+          "year": {
+            "resolvedPct": 83,
+            "avgTimeLabel": "13 days"
+          },
+          "all": {
+            "resolvedPct": 88,
+            "avgTimeLabel": "14 days"
+          }
+        },
+        {
+          "id": "graffiti",
+          "name": "Graffiti",
+          "icon": "🎨",
+          "iconBg": "rgba(62,207,130,0.18)",
+          "coordinateEstimated": false,
+          "sparkline": [
+            419,
+            776,
+            1751,
+            1073,
+            762,
+            2314,
+            1685,
+            864,
+            4658,
+            1250
+          ],
+          "monthlySparkline": [
+            497,
+            186,
+            172,
+            322
+          ],
+          "peakMonth": null,
+          "firstYear": 2017,
+          "countByPeriod": {
+            "month": 322,
+            "year": 1177,
+            "all": 15552
+          },
+          "month": {
+            "resolvedPct": 97,
+            "avgTimeLabel": "33 hours"
+          },
+          "year": {
+            "resolvedPct": 96,
+            "avgTimeLabel": "18 hours"
+          },
+          "all": {
+            "resolvedPct": 95,
+            "avgTimeLabel": "39 hours"
+          }
+        },
+        {
+          "id": "streetlight",
+          "name": "Streetlight Outage",
+          "icon": "💡",
+          "iconBg": "rgba(91,155,248,0.18)",
+          "coordinateEstimated": false,
+          "sparkline": [
+            249,
+            533,
+            962,
+            1051,
+            631,
+            190,
+            388,
+            291,
+            316,
+            86
+          ],
+          "monthlySparkline": [
+            30,
+            14,
+            16,
+            15
+          ],
+          "peakMonth": "Jan",
+          "firstYear": 2017,
+          "countByPeriod": {
+            "month": 15,
+            "year": 75,
+            "all": 4697
+          },
+          "month": {
+            "resolvedPct": 47,
+            "avgTimeLabel": "Not enough data"
+          },
+          "year": {
+            "resolvedPct": 57,
+            "avgTimeLabel": "Not enough data"
+          },
+          "all": {
+            "resolvedPct": 81,
+            "avgTimeLabel": "43 days"
+          }
+        },
+        {
+          "id": "dumping",
+          "name": "Illegal Dumping",
+          "icon": "🚯",
+          "iconBg": "rgba(240,160,48,0.18)",
+          "coordinateEstimated": false,
+          "sparkline": [
+            469,
+            1573,
+            1723,
+            1671,
+            2485,
+            2452,
+            2811,
+            3326,
+            3625,
+            1375
+          ],
+          "monthlySparkline": [
+            355,
+            254,
+            309,
+            353
+          ],
+          "peakMonth": null,
+          "firstYear": 2017,
+          "countByPeriod": {
+            "month": 353,
+            "year": 1271,
+            "all": 21510
+          },
+          "month": {
+            "resolvedPct": 98,
+            "avgTimeLabel": "20 hours"
+          },
+          "year": {
+            "resolvedPct": 99,
+            "avgTimeLabel": "24 hours"
+          },
+          "all": {
+            "resolvedPct": 98,
+            "avgTimeLabel": "36 hours"
+          }
+        },
+        {
+          "id": "vehicle",
+          "name": "Vehicle Concerns",
+          "icon": "🚗",
+          "iconBg": "rgba(232,81,74,0.18)",
+          "coordinateEstimated": false,
+          "sparkline": [
+            2282,
+            4271,
+            4617,
+            2238,
+            2675,
+            1888,
+            1885,
+            2837,
+            4134,
+            1375
+          ],
+          "monthlySparkline": [
+            341,
+            308,
+            313,
+            249
+          ],
+          "peakMonth": "Aug",
+          "firstYear": 2017,
+          "countByPeriod": {
+            "month": 249,
+            "year": 1211,
+            "all": 28202
+          },
+          "month": {
+            "resolvedPct": 95,
+            "avgTimeLabel": "Auto-closed by city"
+          },
+          "year": {
+            "resolvedPct": 98,
+            "avgTimeLabel": "Auto-closed by city"
+          },
+          "all": {
+            "resolvedPct": 92,
+            "avgTimeLabel": "8 days"
+          }
+        },
+        {
+          "id": "container",
+          "name": "Container Issues",
+          "icon": "📦",
+          "iconBg": "rgba(240,160,48,0.18)",
+          "coordinateEstimated": true,
+          "sparkline": [
+            0,
+            0,
+            0,
+            0,
+            1626,
+            1675,
+            1753,
+            1810,
+            1921,
+            697
+          ],
+          "monthlySparkline": [
+            173,
+            140,
+            159,
+            170
+          ],
+          "peakMonth": null,
+          "firstYear": 2021,
+          "countByPeriod": {
+            "month": 170,
+            "year": 642,
+            "all": 9482
+          },
+          "month": {
+            "resolvedPct": 33,
+            "avgTimeLabel": "7 days"
+          },
+          "year": {
+            "resolvedPct": 40,
+            "avgTimeLabel": "7 days"
+          },
+          "all": {
+            "resolvedPct": 58,
+            "avgTimeLabel": "7 days"
+          }
+        },
+        {
+          "id": "encampment",
+          "name": "Encampment Concerns",
+          "icon": "⛺",
+          "iconBg": "rgba(167,139,250,0.18)",
+          "coordinateEstimated": false,
+          "sparkline": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            284,
+            272,
+            73
+          ],
+          "monthlySparkline": [
+            20,
+            14,
+            11,
+            16
+          ],
+          "peakMonth": "Mar",
+          "firstYear": 2024,
+          "countByPeriod": {
+            "month": 16,
+            "year": 61,
+            "all": 629
+          },
+          "month": {
+            "resolvedPct": 75,
+            "avgTimeLabel": "Not enough data"
+          },
+          "year": {
+            "resolvedPct": 92,
+            "avgTimeLabel": "5 days"
+          },
+          "all": {
+            "resolvedPct": 67,
+            "avgTimeLabel": "14 days"
+          }
+        },
+        {
+          "id": "pothole",
+          "name": "Pothole",
+          "icon": "🛣️",
+          "iconBg": "rgba(232,81,74,0.18)",
+          "coordinateEstimated": false,
+          "sparkline": [
+            105,
+            229,
+            306,
+            154,
+            107,
+            122,
+            213,
+            177,
+            116,
+            74
+          ],
+          "monthlySparkline": [
+            17,
+            10,
+            16,
+            30
+          ],
+          "peakMonth": "Mar",
+          "firstYear": 2017,
+          "countByPeriod": {
+            "month": 30,
+            "year": 73,
+            "all": 1603
+          },
+          "month": {
+            "resolvedPct": 100,
+            "avgTimeLabel": "Not enough data"
+          },
+          "year": {
+            "resolvedPct": 100,
+            "avgTimeLabel": "6 hours"
+          },
+          "all": {
+            "resolvedPct": 96,
+            "avgTimeLabel": "2 days"
+          }
+        }
+      ],
+      "byPeriod": {
+        "month": {
+          "summary": {
+            "resolutionRate": 96,
+            "resolutionRateDelta": 0,
+            "avgFixTimeLabel": "25 hours",
+            "avgFixTimeDays": 1.05,
+            "avgFixTimeDelta": 0.35
+          }
+        },
+        "year": {
+          "summary": {
+            "resolutionRate": 97,
+            "resolutionRateDelta": 7,
+            "avgFixTimeLabel": "22 hours",
+            "avgFixTimeDays": 0.92,
+            "avgFixTimeDelta": -1.92
+          }
+        },
+        "all": {
+          "summary": {
+            "resolutionRate": 94,
+            "resolutionRateDelta": 1,
+            "avgFixTimeLabel": "3 days",
+            "avgFixTimeDays": 2.98,
+            "avgFixTimeDelta": -3.4
+          }
+        }
+      },
+      "chronicSpots": [
+        {
+          "count": 706,
+          "location": "Boynton Avenue, San Jose",
+          "issueType": "Illegal Dumping",
+          "icon": "🚯",
+          "iconBg": "rgba(240,160,48,0.18)",
+          "since": 2017,
+          "reopenCount": 6,
+          "maxConsecYears": 10,
+          "returnMedianDays": 3.59,
+          "timelineEvents": [
+            {
+              "date": "2019-03-02",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2019-03-02",
+              "eventType": "reported"
+            },
+            {
+              "date": "2020-05-25",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2020-06-01",
+              "eventType": "reported"
+            },
+            {
+              "date": "2020-08-07",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2020-08-11",
+              "eventType": "reported"
+            },
+            {
+              "date": "2022-06-30",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2022-06-30",
+              "eventType": "reported"
+            },
+            {
+              "date": "2023-07-19",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2023-07-21",
+              "eventType": "reported"
+            },
+            {
+              "date": "2025-12-11",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2025-12-28",
+              "eventType": "reported"
+            }
+          ],
+          "recentActivity": [
+            {
+              "date": "2026-05-04",
+              "status": "Closed",
+              "resolutionDays": 1.09
+            },
+            {
+              "date": "2026-04-24",
+              "status": "Closed",
+              "resolutionDays": 0
+            },
+            {
+              "date": "2026-04-17",
+              "status": "Closed",
+              "resolutionDays": 0
+            },
+            {
+              "date": "2026-04-13",
+              "status": "Closed",
+              "resolutionDays": 2.29
+            },
+            {
+              "date": "2026-04-11",
+              "status": "Closed",
+              "resolutionDays": 0.04
+            }
+          ]
+        },
+        {
+          "count": 261,
+          "location": "Payne Avenue, San Jose",
+          "issueType": "Vehicle Concerns",
+          "icon": "🚗",
+          "iconBg": "rgba(232,81,74,0.18)",
+          "since": 2017,
+          "reopenCount": 14,
+          "maxConsecYears": 10,
+          "returnMedianDays": 8.64,
+          "timelineEvents": [
+            {
+              "date": "2020-10-15",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2020-10-17",
+              "eventType": "reported"
+            },
+            {
+              "date": "2020-11-17",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2020-11-27",
+              "eventType": "reported"
+            },
+            {
+              "date": "2021-01-18",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2021-01-26",
+              "eventType": "reported"
+            },
+            {
+              "date": "2021-05-22",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2021-06-16",
+              "eventType": "reported"
+            },
+            {
+              "date": "2022-01-27",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2022-02-17",
+              "eventType": "reported"
+            },
+            {
+              "date": "2022-08-06",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2022-08-15",
+              "eventType": "reported"
+            },
+            {
+              "date": "2022-11-30",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2022-12-21",
+              "eventType": "reported"
+            },
+            {
+              "date": "2024-01-24",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2024-05-08",
+              "eventType": "reported"
+            },
+            {
+              "date": "2024-09-03",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2024-09-06",
+              "eventType": "reported"
+            },
+            {
+              "date": "2024-09-08",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2024-09-18",
+              "eventType": "reported"
+            },
+            {
+              "date": "2025-04-14",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2025-06-28",
+              "eventType": "reported"
+            },
+            {
+              "date": "2025-08-06",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2025-08-13",
+              "eventType": "reported"
+            },
+            {
+              "date": "2025-08-16",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2025-08-16",
+              "eventType": "reported"
+            },
+            {
+              "date": "2025-08-21",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2025-08-23",
+              "eventType": "reported"
+            }
+          ],
+          "recentActivity": [
+            {
+              "date": "2026-05-03",
+              "status": "Closed",
+              "resolutionDays": 0
+            },
+            {
+              "date": "2026-04-21",
+              "status": "Closed",
+              "resolutionDays": 0
+            },
+            {
+              "date": "2026-01-24",
+              "status": "Closed",
+              "resolutionDays": 0
+            },
+            {
+              "date": "2026-01-16",
+              "status": "Closed",
+              "resolutionDays": 0
+            },
+            {
+              "date": "2026-01-16",
+              "status": "Closed",
+              "resolutionDays": 0
+            }
+          ]
+        },
+        {
+          "count": 205,
+          "location": "Westfield–Downing Avenue Pedestrian Overcrossing, San Jose",
+          "issueType": "Graffiti",
+          "icon": "🎨",
+          "iconBg": "rgba(62,207,130,0.18)",
+          "since": 2017,
+          "reopenCount": 17,
+          "maxConsecYears": 10,
+          "returnMedianDays": 9.93,
+          "timelineEvents": [
+            {
+              "date": "2018-03-23",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2019-01-07",
+              "eventType": "reported"
+            },
+            {
+              "date": "2024-10-01",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2024-10-01",
+              "eventType": "reported"
+            },
+            {
+              "date": "2024-10-09",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2024-10-17",
+              "eventType": "reported"
+            },
+            {
+              "date": "2024-12-04",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2025-01-13",
+              "eventType": "reported"
+            },
+            {
+              "date": "2025-01-13",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2025-01-15",
+              "eventType": "reported"
+            },
+            {
+              "date": "2025-01-15",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2025-01-15",
+              "eventType": "reported"
+            },
+            {
+              "date": "2025-01-15",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2025-01-16",
+              "eventType": "reported"
+            },
+            {
+              "date": "2025-01-16",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2025-01-16",
+              "eventType": "reported"
+            },
+            {
+              "date": "2025-01-16",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2025-01-18",
+              "eventType": "reported"
+            },
+            {
+              "date": "2025-02-06",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2025-02-12",
+              "eventType": "reported"
+            },
+            {
+              "date": "2025-02-13",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2025-03-11",
+              "eventType": "reported"
+            },
+            {
+              "date": "2025-03-13",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2025-04-16",
+              "eventType": "reported"
+            },
+            {
+              "date": "2025-05-02",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2025-05-21",
+              "eventType": "reported"
+            },
+            {
+              "date": "2025-07-03",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2025-07-16",
+              "eventType": "reported"
+            },
+            {
+              "date": "2025-07-23",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2025-07-29",
+              "eventType": "reported"
+            },
+            {
+              "date": "2025-08-19",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2025-08-19",
+              "eventType": "reported"
+            },
+            {
+              "date": "2026-01-28",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2026-02-18",
+              "eventType": "reported"
+            }
+          ],
+          "recentActivity": [
+            {
+              "date": "2026-04-15",
+              "status": "Closed",
+              "resolutionDays": 0.67
+            },
+            {
+              "date": "2026-04-10",
+              "status": "Closed",
+              "resolutionDays": 2.9
+            },
+            {
+              "date": "2026-04-05",
+              "status": "Closed",
+              "resolutionDays": 1.55
+            },
+            {
+              "date": "2026-02-19",
+              "status": "Closed",
+              "resolutionDays": 1.2
+            },
+            {
+              "date": "2026-02-18",
+              "status": "In Progress",
+              "resolutionDays": null
+            }
+          ]
+        }
+      ]
+    },
+    "2": {
+      "sparklineRate": [
+        95,
+        98,
+        98,
+        94,
+        90,
+        95,
+        97,
+        92,
+        87,
+        94
+      ],
+      "sparklineOpen": [
+        299,
+        309,
+        280,
+        586,
+        1088,
+        429,
+        293,
+        950,
+        1875,
+        359
+      ],
+      "sparklineAvgDays": [
+        4.9,
+        9.63,
+        5.85,
+        3.86,
+        2.69,
+        1.48,
+        1.74,
+        2.74,
+        1.38,
+        0.48
+      ],
+      "monthlyRate": [
+        95,
+        97,
+        96,
+        93
+      ],
+      "monthlyAvgDays": [
+        0.84,
+        0.57,
+        0.08,
+        0.17
+      ],
+      "volumeByYear": [
+        6285,
+        12694,
+        13334,
+        9450,
+        10712,
+        8809,
+        10569,
+        13466,
+        16668,
+        6283
+      ],
+      "totalReports": 108270,
+      "trendsVsMonth": [
+        {
+          "name": "Pothole",
+          "pct": 67
+        },
+        {
+          "name": "Encampment Concerns",
+          "pct": 43
+        },
+        {
+          "name": "Illegal Dumping",
+          "pct": -18
+        },
+        {
+          "name": "Graffiti",
+          "pct": -17
+        }
+      ],
+      "trendsVsYear": [
+        {
+          "name": "Pothole",
+          "pct": 94
+        },
+        {
+          "name": "Encampment Concerns",
+          "pct": -57
+        },
+        {
+          "name": "Graffiti",
+          "pct": 48
+        },
+        {
+          "name": "Streetlight Outage",
+          "pct": -45
+        },
+        {
+          "name": "Vehicle Concerns",
+          "pct": -38
+        },
+        {
+          "name": "Junk Pickup",
+          "pct": 17
+        },
+        {
+          "name": "Container Issues",
+          "pct": 14
+        }
+      ],
+      "issueTypes": [
+        {
+          "id": "junk",
+          "name": "Junk Pickup",
+          "icon": "🗑️",
+          "iconBg": "rgba(240,160,48,0.18)",
+          "coordinateEstimated": true,
+          "sparkline": [
+            0,
+            0,
+            0,
+            0,
+            5393,
+            6840,
+            7098,
+            7771,
+            8129,
+            3204
+          ],
+          "monthlySparkline": [
+            857,
+            615,
+            778,
+            697
+          ],
+          "peakMonth": null,
+          "firstYear": 2021,
+          "countByPeriod": {
+            "month": 697,
+            "year": 2947,
+            "all": 38440
+          },
+          "month": {
+            "resolvedPct": 55,
+            "avgTimeLabel": "12 days"
+          },
+          "year": {
+            "resolvedPct": 83,
+            "avgTimeLabel": "13 days"
+          },
+          "all": {
+            "resolvedPct": 88,
+            "avgTimeLabel": "14 days"
+          }
+        },
+        {
+          "id": "graffiti",
+          "name": "Graffiti",
+          "icon": "🎨",
+          "iconBg": "rgba(62,207,130,0.18)",
+          "coordinateEstimated": false,
+          "sparkline": [
+            1697,
+            2462,
+            2216,
+            1985,
+            1964,
+            2054,
+            2813,
+            2385,
+            4070,
+            2044
+          ],
+          "monthlySparkline": [
+            718,
+            373,
+            448,
+            372
+          ],
+          "peakMonth": null,
+          "firstYear": 2017,
+          "countByPeriod": {
+            "month": 372,
+            "year": 1911,
+            "all": 23690
+          },
+          "month": {
+            "resolvedPct": 90,
+            "avgTimeLabel": "4 hours"
+          },
+          "year": {
+            "resolvedPct": 94,
+            "avgTimeLabel": "11 hours"
+          },
+          "all": {
+            "resolvedPct": 94,
+            "avgTimeLabel": "27 hours"
+          }
+        },
+        {
+          "id": "streetlight",
+          "name": "Streetlight Outage",
+          "icon": "💡",
+          "iconBg": "rgba(91,155,248,0.18)",
+          "coordinateEstimated": false,
+          "sparkline": [
+            148,
+            246,
+            369,
+            292,
+            282,
+            176,
+            593,
+            635,
+            1002,
+            230
+          ],
+          "monthlySparkline": [
+            59,
+            34,
+            62,
+            65
+          ],
+          "peakMonth": "Jan",
+          "firstYear": 2017,
+          "countByPeriod": {
+            "month": 65,
+            "year": 220,
+            "all": 3973
+          },
+          "month": {
+            "resolvedPct": 54,
+            "avgTimeLabel": "Not enough data"
+          },
+          "year": {
+            "resolvedPct": 66,
+            "avgTimeLabel": "4 days"
+          },
+          "all": {
+            "resolvedPct": 79,
+            "avgTimeLabel": "35 days"
+          }
+        },
+        {
+          "id": "dumping",
+          "name": "Illegal Dumping",
+          "icon": "🚯",
+          "iconBg": "rgba(240,160,48,0.18)",
+          "coordinateEstimated": false,
+          "sparkline": [
+            1132,
+            2427,
+            2435,
+            2238,
+            3165,
+            2538,
+            3252,
+            3052,
+            2838,
+            1067
+          ],
+          "monthlySparkline": [
+            267,
+            228,
+            270,
+            221
+          ],
+          "peakMonth": null,
+          "firstYear": 2017,
+          "countByPeriod": {
+            "month": 221,
+            "year": 986,
+            "all": 24144
+          },
+          "month": {
+            "resolvedPct": 99,
+            "avgTimeLabel": "2 hours"
+          },
+          "year": {
+            "resolvedPct": 99,
+            "avgTimeLabel": "3 hours"
+          },
+          "all": {
+            "resolvedPct": 97,
+            "avgTimeLabel": "24 hours"
+          }
+        },
+        {
+          "id": "vehicle",
+          "name": "Vehicle Concerns",
+          "icon": "🚗",
+          "iconBg": "rgba(232,81,74,0.18)",
+          "coordinateEstimated": false,
+          "sparkline": [
+            2782,
+            6268,
+            6852,
+            3776,
+            4071,
+            2711,
+            2412,
+            3956,
+            4391,
+            1185
+          ],
+          "monthlySparkline": [
+            262,
+            229,
+            294,
+            289
+          ],
+          "peakMonth": "Aug",
+          "firstYear": 2017,
+          "countByPeriod": {
+            "month": 289,
+            "year": 1074,
+            "all": 38404
+          },
+          "month": {
+            "resolvedPct": 96,
+            "avgTimeLabel": "Auto-closed by city"
+          },
+          "year": {
+            "resolvedPct": 98,
+            "avgTimeLabel": "Auto-closed by city"
+          },
+          "all": {
+            "resolvedPct": 92,
+            "avgTimeLabel": "8 days"
+          }
+        },
+        {
+          "id": "container",
+          "name": "Container Issues",
+          "icon": "📦",
+          "iconBg": "rgba(240,160,48,0.18)",
+          "coordinateEstimated": true,
+          "sparkline": [
+            0,
+            0,
+            0,
+            0,
+            1566,
+            1614,
+            1689,
+            1744,
+            1851,
+            672
+          ],
+          "monthlySparkline": [
+            167,
+            135,
+            153,
+            164
+          ],
+          "peakMonth": null,
+          "firstYear": 2021,
+          "countByPeriod": {
+            "month": 164,
+            "year": 619,
+            "all": 9140
+          },
+          "month": {
+            "resolvedPct": 33,
+            "avgTimeLabel": "7 days"
+          },
+          "year": {
+            "resolvedPct": 40,
+            "avgTimeLabel": "7 days"
+          },
+          "all": {
+            "resolvedPct": 58,
+            "avgTimeLabel": "7 days"
+          }
+        },
+        {
+          "id": "encampment",
+          "name": "Encampment Concerns",
+          "icon": "⛺",
+          "iconBg": "rgba(167,139,250,0.18)",
+          "coordinateEstimated": false,
+          "sparkline": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            847,
+            642,
+            125
+          ],
+          "monthlySparkline": [
+            25,
+            28,
+            21,
+            30
+          ],
+          "peakMonth": "Mar",
+          "firstYear": 2024,
+          "countByPeriod": {
+            "month": 30,
+            "year": 104,
+            "all": 1614
+          },
+          "month": {
+            "resolvedPct": 100,
+            "avgTimeLabel": "Not enough data"
+          },
+          "year": {
+            "resolvedPct": 98,
+            "avgTimeLabel": "4 days"
+          },
+          "all": {
+            "resolvedPct": 75,
+            "avgTimeLabel": "9 days"
+          }
+        },
+        {
+          "id": "pothole",
+          "name": "Pothole",
+          "icon": "🛣️",
+          "iconBg": "rgba(232,81,74,0.18)",
+          "coordinateEstimated": false,
+          "sparkline": [
+            118,
+            230,
+            290,
+            129,
+            111,
+            108,
+            188,
+            149,
+            104,
+            70
+          ],
+          "monthlySparkline": [
+            16,
+            12,
+            15,
+            25
+          ],
+          "peakMonth": "Mar",
+          "firstYear": 2017,
+          "countByPeriod": {
+            "month": 25,
+            "year": 68,
+            "all": 1497
+          },
+          "month": {
+            "resolvedPct": 92,
+            "avgTimeLabel": "Not enough data"
+          },
+          "year": {
+            "resolvedPct": 91,
+            "avgTimeLabel": "10 hours"
+          },
+          "all": {
+            "resolvedPct": 95,
+            "avgTimeLabel": "43 hours"
+          }
+        }
+      ],
+      "byPeriod": {
+        "month": {
+          "summary": {
+            "resolutionRate": 93,
+            "resolutionRateDelta": -3,
+            "avgFixTimeLabel": "4 hours",
+            "avgFixTimeDays": 0.17,
+            "avgFixTimeDelta": 0.09
+          }
+        },
+        "year": {
+          "summary": {
+            "resolutionRate": 95,
+            "resolutionRateDelta": 8,
+            "avgFixTimeLabel": "12 hours",
+            "avgFixTimeDays": 0.5,
+            "avgFixTimeDelta": -2.18
+          }
+        },
+        "all": {
+          "summary": {
+            "resolutionRate": 94,
+            "resolutionRateDelta": -1,
+            "avgFixTimeLabel": "3 days",
+            "avgFixTimeDays": 2.95,
+            "avgFixTimeDelta": -1.95
+          }
+        }
+      },
+      "chronicSpots": [
+        {
+          "count": 704,
+          "location": "Lean Avenue, San Jose",
+          "issueType": "Illegal Dumping",
+          "icon": "🚯",
+          "iconBg": "rgba(240,160,48,0.18)",
+          "since": 2017,
+          "reopenCount": 6,
+          "maxConsecYears": 10,
+          "returnMedianDays": 3.11,
+          "timelineEvents": [
+            {
+              "date": "2021-07-23",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2021-07-27",
+              "eventType": "reported"
+            },
+            {
+              "date": "2024-09-26",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2024-10-18",
+              "eventType": "reported"
+            },
+            {
+              "date": "2025-02-19",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2025-02-23",
+              "eventType": "reported"
+            },
+            {
+              "date": "2025-02-27",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2025-03-02",
+              "eventType": "reported"
+            },
+            {
+              "date": "2025-03-08",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2025-03-10",
+              "eventType": "reported"
+            },
+            {
+              "date": "2025-05-09",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2025-05-14",
+              "eventType": "reported"
+            }
+          ],
+          "recentActivity": [
+            {
+              "date": "2026-04-22",
+              "status": "Closed",
+              "resolutionDays": 0
+            },
+            {
+              "date": "2026-04-21",
+              "status": "Closed",
+              "resolutionDays": 0.73
+            },
+            {
+              "date": "2026-04-01",
+              "status": "Closed",
+              "resolutionDays": 0
+            },
+            {
+              "date": "2026-03-27",
+              "status": "Closed",
+              "resolutionDays": 4.92
+            },
+            {
+              "date": "2026-03-24",
+              "status": "Closed",
+              "resolutionDays": 0
+            }
+          ]
+        },
+        {
+          "count": 423,
+          "location": "Chynoweth Avenue, Edenvale",
+          "issueType": "Vehicle Concerns",
+          "icon": "🚗",
+          "iconBg": "rgba(232,81,74,0.18)",
+          "since": 2017,
+          "reopenCount": 14,
+          "maxConsecYears": 10,
+          "returnMedianDays": 8.81,
+          "timelineEvents": [
+            {
+              "date": "2019-08-25",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2019-09-06",
+              "eventType": "reported"
+            },
+            {
+              "date": "2020-01-29",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2020-12-18",
+              "eventType": "reported"
+            },
+            {
+              "date": "2021-07-01",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2021-07-07",
+              "eventType": "reported"
+            },
+            {
+              "date": "2022-01-28",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2022-02-07",
+              "eventType": "reported"
+            },
+            {
+              "date": "2022-05-22",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2022-06-19",
+              "eventType": "reported"
+            },
+            {
+              "date": "2023-10-25",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2023-11-05",
+              "eventType": "reported"
+            },
+            {
+              "date": "2024-04-09",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2024-04-11",
+              "eventType": "reported"
+            },
+            {
+              "date": "2024-04-11",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2024-04-14",
+              "eventType": "reported"
+            },
+            {
+              "date": "2024-06-25",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2024-06-28",
+              "eventType": "reported"
+            },
+            {
+              "date": "2024-08-23",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2024-08-24",
+              "eventType": "reported"
+            },
+            {
+              "date": "2024-09-17",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2024-09-18",
+              "eventType": "reported"
+            },
+            {
+              "date": "2024-12-02",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2024-12-07",
+              "eventType": "reported"
+            },
+            {
+              "date": "2024-12-21",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2024-12-30",
+              "eventType": "reported"
+            },
+            {
+              "date": "2025-08-25",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2025-09-03",
+              "eventType": "reported"
+            }
+          ],
+          "recentActivity": [
+            {
+              "date": "2025-09-11",
+              "status": "Closed",
+              "resolutionDays": 0
+            },
+            {
+              "date": "2025-09-03",
+              "status": "Open",
+              "resolutionDays": null
+            },
+            {
+              "date": "2025-08-25",
+              "status": "Closed",
+              "resolutionDays": 16.01
+            },
+            {
+              "date": "2025-06-25",
+              "status": "Closed",
+              "resolutionDays": 92.89
+            },
+            {
+              "date": "2025-06-17",
+              "status": "Closed",
+              "resolutionDays": 97.18
+            }
+          ]
+        },
+        {
+          "count": 407,
+          "location": "Chynoweth Avenue, San Jose",
+          "issueType": "Graffiti",
+          "icon": "🎨",
+          "iconBg": "rgba(62,207,130,0.18)",
+          "since": 2017,
+          "reopenCount": 17,
+          "maxConsecYears": 10,
+          "returnMedianDays": 11.03,
+          "timelineEvents": [
+            {
+              "date": "2021-06-21",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2021-07-10",
+              "eventType": "reported"
+            },
+            {
+              "date": "2022-05-31",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2022-06-02",
+              "eventType": "reported"
+            },
+            {
+              "date": "2022-06-07",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2022-06-13",
+              "eventType": "reported"
+            },
+            {
+              "date": "2022-07-28",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2022-07-28",
+              "eventType": "reported"
+            },
+            {
+              "date": "2022-08-01",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2022-08-01",
+              "eventType": "reported"
+            },
+            {
+              "date": "2022-08-24",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2022-08-28",
+              "eventType": "reported"
+            },
+            {
+              "date": "2022-09-22",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2022-09-22",
+              "eventType": "reported"
+            },
+            {
+              "date": "2022-11-20",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2022-12-05",
+              "eventType": "reported"
+            },
+            {
+              "date": "2022-12-29",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2023-01-14",
+              "eventType": "reported"
+            },
+            {
+              "date": "2023-01-14",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2023-01-18",
+              "eventType": "reported"
+            },
+            {
+              "date": "2023-01-20",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2023-01-21",
+              "eventType": "reported"
+            },
+            {
+              "date": "2023-01-22",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2023-01-26",
+              "eventType": "reported"
+            },
+            {
+              "date": "2023-02-10",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2023-02-16",
+              "eventType": "reported"
+            },
+            {
+              "date": "2023-04-18",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2023-05-07",
+              "eventType": "reported"
+            },
+            {
+              "date": "2025-05-06",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2025-05-07",
+              "eventType": "reported"
+            },
+            {
+              "date": "2025-07-29",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2025-09-05",
+              "eventType": "reported"
+            },
+            {
+              "date": "2026-03-18",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2026-04-03",
+              "eventType": "reported"
+            }
+          ],
+          "recentActivity": [
+            {
+              "date": "2026-05-02",
+              "status": "Closed",
+              "resolutionDays": 0
+            },
+            {
+              "date": "2026-04-30",
+              "status": "Closed",
+              "resolutionDays": 1.98
+            },
+            {
+              "date": "2026-04-18",
+              "status": "Closed",
+              "resolutionDays": 2.52
+            },
+            {
+              "date": "2026-04-15",
+              "status": "Closed",
+              "resolutionDays": 0.37
+            },
+            {
+              "date": "2026-04-03",
+              "status": "Open",
+              "resolutionDays": null
+            }
+          ]
+        }
+      ]
+    },
+    "3": {
+      "sparklineRate": [
+        96,
+        98,
+        98,
+        93,
+        92,
+        98,
+        98,
+        92,
+        87,
+        92
+      ],
+      "sparklineOpen": [
+        461,
+        453,
+        512,
+        1216,
+        1573,
+        711,
+        600,
+        1916,
+        3286,
+        672
+      ],
+      "sparklineAvgDays": [
+        3.78,
+        6.14,
+        4.64,
+        3.63,
+        2.71,
+        1.88,
+        1.9,
+        1.32,
+        1.07,
+        0.83
+      ],
+      "monthlyRate": [
+        94,
+        94,
+        93,
+        94
+      ],
+      "monthlyAvgDays": [
+        0.94,
+        0.49,
+        0.97,
+        0.85
+      ],
+      "volumeByYear": [
+        10962,
+        22385,
+        23849,
+        18276,
+        19978,
+        31992,
+        25213,
+        26639,
+        29676,
+        9957
+      ],
+      "totalReports": 218927,
+      "trendsVsMonth": [
+        {
+          "name": "Streetlight Outage",
+          "pct": -52
+        },
+        {
+          "name": "Pothole",
+          "pct": 32
+        },
+        {
+          "name": "Vehicle Concerns",
+          "pct": -26
+        },
+        {
+          "name": "Graffiti",
+          "pct": 21
+        }
+      ],
+      "trendsVsYear": [
+        {
+          "name": "Encampment Concerns",
+          "pct": -32
+        },
+        {
+          "name": "Graffiti",
+          "pct": -20
+        },
+        {
+          "name": "Illegal Dumping",
+          "pct": 19
+        },
+        {
+          "name": "Junk Pickup",
+          "pct": 17
+        },
+        {
+          "name": "Vehicle Concerns",
+          "pct": -15
+        },
+        {
+          "name": "Container Issues",
+          "pct": 14
+        },
+        {
+          "name": "Streetlight Outage",
+          "pct": -11
+        }
+      ],
+      "issueTypes": [
+        {
+          "id": "junk",
+          "name": "Junk Pickup",
+          "icon": "🗑️",
+          "iconBg": "rgba(240,160,48,0.18)",
+          "coordinateEstimated": true,
+          "sparkline": [
+            0,
+            0,
+            0,
+            0,
+            5665,
+            7185,
+            7456,
+            8164,
+            8539,
+            3366
+          ],
+          "monthlySparkline": [
+            900,
+            646,
+            817,
+            732
+          ],
+          "peakMonth": null,
+          "firstYear": 2021,
+          "countByPeriod": {
+            "month": 732,
+            "year": 3095,
+            "all": 40377
+          },
+          "month": {
+            "resolvedPct": 55,
+            "avgTimeLabel": "12 days"
+          },
+          "year": {
+            "resolvedPct": 83,
+            "avgTimeLabel": "13 days"
+          },
+          "all": {
+            "resolvedPct": 88,
+            "avgTimeLabel": "14 days"
+          }
+        },
+        {
+          "id": "graffiti",
+          "name": "Graffiti",
+          "icon": "🎨",
+          "iconBg": "rgba(62,207,130,0.18)",
+          "coordinateEstimated": false,
+          "sparkline": [
+            3880,
+            6005,
+            5196,
+            5171,
+            5738,
+            6494,
+            5271,
+            6986,
+            7928,
+            2426
+          ],
+          "monthlySparkline": [
+            570,
+            590,
+            507,
+            613
+          ],
+          "peakMonth": null,
+          "firstYear": 2017,
+          "countByPeriod": {
+            "month": 613,
+            "year": 2280,
+            "all": 55095
+          },
+          "month": {
+            "resolvedPct": 89,
+            "avgTimeLabel": "22 hours"
+          },
+          "year": {
+            "resolvedPct": 89,
+            "avgTimeLabel": "13 hours"
+          },
+          "all": {
+            "resolvedPct": 95,
+            "avgTimeLabel": "22 hours"
+          }
+        },
+        {
+          "id": "streetlight",
+          "name": "Streetlight Outage",
+          "icon": "💡",
+          "iconBg": "rgba(91,155,248,0.18)",
+          "coordinateEstimated": false,
+          "sparkline": [
+            507,
+            893,
+            884,
+            780,
+            555,
+            292,
+            888,
+            1041,
+            890,
+            304
+          ],
+          "monthlySparkline": [
+            56,
+            84,
+            100,
+            48
+          ],
+          "peakMonth": "Jan",
+          "firstYear": 2017,
+          "countByPeriod": {
+            "month": 48,
+            "year": 288,
+            "all": 7034
+          },
+          "month": {
+            "resolvedPct": 69,
+            "avgTimeLabel": "Not enough data"
+          },
+          "year": {
+            "resolvedPct": 64,
+            "avgTimeLabel": "8 days"
+          },
+          "all": {
+            "resolvedPct": 78,
+            "avgTimeLabel": "34 days"
+          }
+        },
+        {
+          "id": "dumping",
+          "name": "Illegal Dumping",
+          "icon": "🚯",
+          "iconBg": "rgba(240,160,48,0.18)",
+          "coordinateEstimated": false,
+          "sparkline": [
+            1921,
+            4733,
+            5259,
+            5110,
+            6116,
+            4863,
+            5452,
+            6852,
+            7177,
+            2708
+          ],
+          "monthlySparkline": [
+            620,
+            545,
+            622,
+            682
+          ],
+          "peakMonth": null,
+          "firstYear": 2017,
+          "countByPeriod": {
+            "month": 682,
+            "year": 2469,
+            "all": 50191
+          },
+          "month": {
+            "resolvedPct": 98,
+            "avgTimeLabel": "18 hours"
+          },
+          "year": {
+            "resolvedPct": 99,
+            "avgTimeLabel": "23 hours"
+          },
+          "all": {
+            "resolvedPct": 97,
+            "avgTimeLabel": "41 hours"
+          }
+        },
+        {
+          "id": "vehicle",
+          "name": "Vehicle Concerns",
+          "icon": "🚗",
+          "iconBg": "rgba(232,81,74,0.18)",
+          "coordinateEstimated": false,
+          "sparkline": [
+            3839,
+            8776,
+            9914,
+            5237,
+            5390,
+            4169,
+            4299,
+            6249,
+            7204,
+            1855
+          ],
+          "monthlySparkline": [
+            444,
+            415,
+            487,
+            359
+          ],
+          "peakMonth": "Aug",
+          "firstYear": 2017,
+          "countByPeriod": {
+            "month": 359,
+            "year": 1705,
+            "all": 56932
+          },
+          "month": {
+            "resolvedPct": 96,
+            "avgTimeLabel": "Auto-closed by city"
+          },
+          "year": {
+            "resolvedPct": 97,
+            "avgTimeLabel": "Auto-closed by city"
+          },
+          "all": {
+            "resolvedPct": 92,
+            "avgTimeLabel": "7 days"
+          }
+        },
+        {
+          "id": "container",
+          "name": "Container Issues",
+          "icon": "📦",
+          "iconBg": "rgba(240,160,48,0.18)",
+          "coordinateEstimated": true,
+          "sparkline": [
+            0,
+            0,
+            0,
+            0,
+            1646,
+            1696,
+            1774,
+            1833,
+            1945,
+            706
+          ],
+          "monthlySparkline": [
+            175,
+            142,
+            160,
+            172
+          ],
+          "peakMonth": null,
+          "firstYear": 2021,
+          "countByPeriod": {
+            "month": 172,
+            "year": 649,
+            "all": 9598
+          },
+          "month": {
+            "resolvedPct": 33,
+            "avgTimeLabel": "7 days"
+          },
+          "year": {
+            "resolvedPct": 40,
+            "avgTimeLabel": "7 days"
+          },
+          "all": {
+            "resolvedPct": 58,
+            "avgTimeLabel": "7 days"
+          }
+        },
+        {
+          "id": "encampment",
+          "name": "Encampment Concerns",
+          "icon": "⛺",
+          "iconBg": "rgba(167,139,250,0.18)",
+          "coordinateEstimated": false,
+          "sparkline": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1208,
+            1487,
+            371
+          ],
+          "monthlySparkline": [
+            85,
+            64,
+            98,
+            90
+          ],
+          "peakMonth": "Mar",
+          "firstYear": 2024,
+          "countByPeriod": {
+            "month": 90,
+            "year": 337,
+            "all": 3066
+          },
+          "month": {
+            "resolvedPct": 70,
+            "avgTimeLabel": "4 days"
+          },
+          "year": {
+            "resolvedPct": 83,
+            "avgTimeLabel": "5 days"
+          },
+          "all": {
+            "resolvedPct": 68,
+            "avgTimeLabel": "14 days"
+          }
+        },
+        {
+          "id": "pothole",
+          "name": "Pothole",
+          "icon": "🛣️",
+          "iconBg": "rgba(232,81,74,0.18)",
+          "coordinateEstimated": false,
+          "sparkline": [
+            153,
+            300,
+            556,
+            177,
+            186,
+            167,
+            326,
+            297,
+            233,
+            99
+          ],
+          "monthlySparkline": [
+            19,
+            26,
+            22,
+            29
+          ],
+          "peakMonth": "Mar",
+          "firstYear": 2017,
+          "countByPeriod": {
+            "month": 29,
+            "year": 96,
+            "all": 2494
+          },
+          "month": {
+            "resolvedPct": 86,
+            "avgTimeLabel": "Not enough data"
+          },
+          "year": {
+            "resolvedPct": 91,
+            "avgTimeLabel": "11 hours"
+          },
+          "all": {
+            "resolvedPct": 94,
+            "avgTimeLabel": "40 hours"
+          }
+        }
+      ],
+      "byPeriod": {
+        "month": {
+          "summary": {
+            "resolutionRate": 94,
+            "resolutionRateDelta": 1,
+            "avgFixTimeLabel": "20 hours",
+            "avgFixTimeDays": 0.85,
+            "avgFixTimeDelta": -0.12
+          }
+        },
+        "year": {
+          "summary": {
+            "resolutionRate": 94,
+            "resolutionRateDelta": 7,
+            "avgFixTimeLabel": "21 hours",
+            "avgFixTimeDays": 0.86,
+            "avgFixTimeDelta": -0.61
+          }
+        },
+        "all": {
+          "summary": {
+            "resolutionRate": 94,
+            "resolutionRateDelta": -2,
+            "avgFixTimeLabel": "3 days",
+            "avgFixTimeDays": 2.6,
+            "avgFixTimeDelta": -1.19
+          }
+        }
+      },
+      "chronicSpots": [
+        {
+          "count": 633,
+          "location": "North 23rd Street, Luna Park",
+          "issueType": "Vehicle Concerns",
+          "icon": "🚗",
+          "iconBg": "rgba(232,81,74,0.18)",
+          "since": 2017,
+          "reopenCount": 5,
+          "maxConsecYears": 10,
+          "returnMedianDays": 0.83,
+          "timelineEvents": [
+            {
+              "date": "2024-04-21",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2024-04-21",
+              "eventType": "reported"
+            },
+            {
+              "date": "2024-05-05",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2024-05-07",
+              "eventType": "reported"
+            },
+            {
+              "date": "2025-02-01",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2025-02-01",
+              "eventType": "reported"
+            },
+            {
+              "date": "2025-05-13",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2025-05-14",
+              "eventType": "reported"
+            },
+            {
+              "date": "2025-09-02",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2025-09-03",
+              "eventType": "reported"
+            }
+          ],
+          "recentActivity": [
+            {
+              "date": "2026-05-08",
+              "status": "Closed",
+              "resolutionDays": 0
+            },
+            {
+              "date": "2026-05-07",
+              "status": "Closed",
+              "resolutionDays": 0
+            },
+            {
+              "date": "2026-05-07",
+              "status": "Closed",
+              "resolutionDays": 0
+            },
+            {
+              "date": "2026-05-06",
+              "status": "Closed",
+              "resolutionDays": 0
+            },
+            {
+              "date": "2026-05-05",
+              "status": "Closed",
+              "resolutionDays": 0
+            }
+          ]
+        },
+        {
+          "count": 503,
+          "location": "East Saint John Street, Luna Park",
+          "issueType": "Illegal Dumping",
+          "icon": "🚯",
+          "iconBg": "rgba(240,160,48,0.18)",
+          "since": 2017,
+          "reopenCount": 10,
+          "maxConsecYears": 10,
+          "returnMedianDays": 3.08,
+          "timelineEvents": [
+            {
+              "date": "2020-01-28",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2020-02-05",
+              "eventType": "reported"
+            },
+            {
+              "date": "2020-03-03",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2020-03-04",
+              "eventType": "reported"
+            },
+            {
+              "date": "2020-03-06",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2020-03-09",
+              "eventType": "reported"
+            },
+            {
+              "date": "2020-05-18",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2020-05-24",
+              "eventType": "reported"
+            },
+            {
+              "date": "2022-02-17",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2022-02-21",
+              "eventType": "reported"
+            },
+            {
+              "date": "2022-03-04",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2022-03-07",
+              "eventType": "reported"
+            },
+            {
+              "date": "2022-03-11",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2022-03-11",
+              "eventType": "reported"
+            },
+            {
+              "date": "2022-03-16",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2022-03-17",
+              "eventType": "reported"
+            },
+            {
+              "date": "2022-04-28",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2022-05-01",
+              "eventType": "reported"
+            },
+            {
+              "date": "2024-06-20",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2024-06-25",
+              "eventType": "reported"
+            }
+          ],
+          "recentActivity": [
+            {
+              "date": "2026-04-30",
+              "status": "Closed",
+              "resolutionDays": 0
+            },
+            {
+              "date": "2026-03-29",
+              "status": "Closed",
+              "resolutionDays": 3.68
+            },
+            {
+              "date": "2026-03-17",
+              "status": "Closed",
+              "resolutionDays": 0
+            },
+            {
+              "date": "2026-01-06",
+              "status": "Closed",
+              "resolutionDays": 0
+            },
+            {
+              "date": "2025-12-03",
+              "status": "Closed",
+              "resolutionDays": 0.81
+            }
+          ]
+        },
+        {
+          "count": 487,
+          "location": "North 26th Street, Little Portugal",
+          "issueType": "Graffiti",
+          "icon": "🎨",
+          "iconBg": "rgba(62,207,130,0.18)",
+          "since": 2017,
+          "reopenCount": 9,
+          "maxConsecYears": 10,
+          "returnMedianDays": 12.13,
+          "timelineEvents": [
+            {
+              "date": "2017-10-26",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2017-11-07",
+              "eventType": "reported"
+            },
+            {
+              "date": "2018-12-07",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2018-12-14",
+              "eventType": "reported"
+            },
+            {
+              "date": "2020-02-11",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2020-02-26",
+              "eventType": "reported"
+            },
+            {
+              "date": "2020-05-30",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2020-06-01",
+              "eventType": "reported"
+            },
+            {
+              "date": "2020-06-12",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2020-07-10",
+              "eventType": "reported"
+            },
+            {
+              "date": "2020-07-11",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2020-07-16",
+              "eventType": "reported"
+            },
+            {
+              "date": "2022-03-16",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2022-03-21",
+              "eventType": "reported"
+            },
+            {
+              "date": "2024-02-29",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2024-02-29",
+              "eventType": "reported"
+            },
+            {
+              "date": "2025-11-29",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2026-01-04",
+              "eventType": "reported"
+            }
+          ],
+          "recentActivity": [
+            {
+              "date": "2026-01-19",
+              "status": "Closed",
+              "resolutionDays": 72.01
+            },
+            {
+              "date": "2026-01-13",
+              "status": "Closed",
+              "resolutionDays": 1.87
+            },
+            {
+              "date": "2026-01-07",
+              "status": "Closed",
+              "resolutionDays": 0
+            },
+            {
+              "date": "2026-01-07",
+              "status": "In Progress",
+              "resolutionDays": null
+            },
+            {
+              "date": "2026-01-04",
+              "status": "In Progress",
+              "resolutionDays": null
+            }
+          ]
+        }
+      ]
+    },
+    "4": {
+      "sparklineRate": [
+        94,
+        98,
+        97,
+        93,
+        91,
+        97,
+        97,
+        89,
+        84,
+        95
+      ],
+      "sparklineOpen": [
+        284,
+        173,
+        297,
+        554,
+        684,
+        206,
+        199,
+        947,
+        1624,
+        174
+      ],
+      "sparklineAvgDays": [
+        4.04,
+        10.04,
+        5.69,
+        4.01,
+        2.36,
+        0.99,
+        1.63,
+        2.98,
+        1.86,
+        1.02
+      ],
+      "monthlyRate": [
+        96,
+        97,
+        95,
+        95
+      ],
+      "monthlyAvgDays": [
+        1.06,
+        1.03,
+        1.77,
+        0.86
+      ],
+      "volumeByYear": [
+        4872,
+        9499,
+        9311,
+        7574,
+        7296,
+        5957,
+        7123,
+        10178,
+        12645,
+        4091
+      ],
+      "totalReports": 78546,
+      "trendsVsMonth": [
+        {
+          "name": "Streetlight Outage",
+          "pct": -66
+        },
+        {
+          "name": "Illegal Dumping",
+          "pct": 59
+        },
+        {
+          "name": "Pothole",
+          "pct": -32
+        },
+        {
+          "name": "Graffiti",
+          "pct": -24
+        },
+        {
+          "name": "Vehicle Concerns",
+          "pct": 14
+        }
+      ],
+      "trendsVsYear": [
+        {
+          "name": "Encampment Concerns",
+          "pct": -45
+        },
+        {
+          "name": "Graffiti",
+          "pct": -41
+        },
+        {
+          "name": "Streetlight Outage",
+          "pct": -20
+        },
+        {
+          "name": "Junk Pickup",
+          "pct": 17
+        },
+        {
+          "name": "Illegal Dumping",
+          "pct": -17
+        },
+        {
+          "name": "Pothole",
+          "pct": 15
+        },
+        {
+          "name": "Container Issues",
+          "pct": 14
+        }
+      ],
+      "issueTypes": [
+        {
+          "id": "junk",
+          "name": "Junk Pickup",
+          "icon": "🗑️",
+          "iconBg": "rgba(240,160,48,0.18)",
+          "coordinateEstimated": true,
+          "sparkline": [
+            0,
+            0,
+            0,
+            0,
+            5832,
+            7397,
+            7675,
+            8404,
+            8791,
+            3465
+          ],
+          "monthlySparkline": [
+            927,
+            665,
+            841,
+            753
+          ],
+          "peakMonth": null,
+          "firstYear": 2021,
+          "countByPeriod": {
+            "month": 753,
+            "year": 3186,
+            "all": 41566
+          },
+          "month": {
+            "resolvedPct": 55,
+            "avgTimeLabel": "12 days"
+          },
+          "year": {
+            "resolvedPct": 83,
+            "avgTimeLabel": "13 days"
+          },
+          "all": {
+            "resolvedPct": 88,
+            "avgTimeLabel": "14 days"
+          }
+        },
+        {
+          "id": "graffiti",
+          "name": "Graffiti",
+          "icon": "🎨",
+          "iconBg": "rgba(62,207,130,0.18)",
+          "coordinateEstimated": false,
+          "sparkline": [
+            1300,
+            1869,
+            1716,
+            1461,
+            1136,
+            1057,
+            1421,
+            1870,
+            1615,
+            426
+          ],
+          "monthlySparkline": [
+            119,
+            82,
+            101,
+            77
+          ],
+          "peakMonth": null,
+          "firstYear": 2017,
+          "countByPeriod": {
+            "month": 77,
+            "year": 379,
+            "all": 13871
+          },
+          "month": {
+            "resolvedPct": 92,
+            "avgTimeLabel": "< 1 hour"
+          },
+          "year": {
+            "resolvedPct": 93,
+            "avgTimeLabel": "< 1 hour"
+          },
+          "all": {
+            "resolvedPct": 96,
+            "avgTimeLabel": "2 hours"
+          }
+        },
+        {
+          "id": "streetlight",
+          "name": "Streetlight Outage",
+          "icon": "💡",
+          "iconBg": "rgba(91,155,248,0.18)",
+          "coordinateEstimated": false,
+          "sparkline": [
+            461,
+            1073,
+            982,
+            969,
+            451,
+            215,
+            671,
+            590,
+            854,
+            215
+          ],
+          "monthlySparkline": [
+            63,
+            20,
+            88,
+            30
+          ],
+          "peakMonth": "Jan",
+          "firstYear": 2017,
+          "countByPeriod": {
+            "month": 30,
+            "year": 201,
+            "all": 6481
+          },
+          "month": {
+            "resolvedPct": 43,
+            "avgTimeLabel": "Not enough data"
+          },
+          "year": {
+            "resolvedPct": 83,
+            "avgTimeLabel": "14 days"
+          },
+          "all": {
+            "resolvedPct": 82,
+            "avgTimeLabel": "35 days"
+          }
+        },
+        {
+          "id": "dumping",
+          "name": "Illegal Dumping",
+          "icon": "🚯",
+          "iconBg": "rgba(240,160,48,0.18)",
+          "coordinateEstimated": false,
+          "sparkline": [
+            872,
+            1924,
+            1517,
+            1574,
+            1663,
+            1475,
+            1820,
+            1761,
+            2282,
+            531
+          ],
+          "monthlySparkline": [
+            148,
+            105,
+            94,
+            149
+          ],
+          "peakMonth": null,
+          "firstYear": 2017,
+          "countByPeriod": {
+            "month": 149,
+            "year": 496,
+            "all": 15419
+          },
+          "month": {
+            "resolvedPct": 97,
+            "avgTimeLabel": "26 hours"
+          },
+          "year": {
+            "resolvedPct": 97,
+            "avgTimeLabel": "27 hours"
+          },
+          "all": {
+            "resolvedPct": 97,
+            "avgTimeLabel": "27 hours"
+          }
+        },
+        {
+          "id": "vehicle",
+          "name": "Vehicle Concerns",
+          "icon": "🚗",
+          "iconBg": "rgba(232,81,74,0.18)",
+          "coordinateEstimated": false,
+          "sparkline": [
+            1545,
+            3392,
+            3714,
+            2402,
+            2807,
+            1833,
+            1648,
+            2777,
+            3533,
+            1198
+          ],
+          "monthlySparkline": [
+            261,
+            195,
+            281,
+            319
+          ],
+          "peakMonth": "Aug",
+          "firstYear": 2017,
+          "countByPeriod": {
+            "month": 319,
+            "year": 1056,
+            "all": 24849
+          },
+          "month": {
+            "resolvedPct": 97,
+            "avgTimeLabel": "Auto-closed by city"
+          },
+          "year": {
+            "resolvedPct": 98,
+            "avgTimeLabel": "Auto-closed by city"
+          },
+          "all": {
+            "resolvedPct": 90,
+            "avgTimeLabel": "8 days"
+          }
+        },
+        {
+          "id": "container",
+          "name": "Container Issues",
+          "icon": "📦",
+          "iconBg": "rgba(240,160,48,0.18)",
+          "coordinateEstimated": true,
+          "sparkline": [
+            0,
+            0,
+            0,
+            0,
+            1694,
+            1746,
+            1827,
+            1886,
+            2002,
+            727
+          ],
+          "monthlySparkline": [
+            180,
+            146,
+            165,
+            177
+          ],
+          "peakMonth": null,
+          "firstYear": 2021,
+          "countByPeriod": {
+            "month": 177,
+            "year": 668,
+            "all": 9884
+          },
+          "month": {
+            "resolvedPct": 33,
+            "avgTimeLabel": "7 days"
+          },
+          "year": {
+            "resolvedPct": 40,
+            "avgTimeLabel": "7 days"
+          },
+          "all": {
+            "resolvedPct": 58,
+            "avgTimeLabel": "7 days"
+          }
+        },
+        {
+          "id": "encampment",
+          "name": "Encampment Concerns",
+          "icon": "⛺",
+          "iconBg": "rgba(167,139,250,0.18)",
+          "coordinateEstimated": false,
+          "sparkline": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            714,
+            755,
+            184
+          ],
+          "monthlySparkline": [
+            36,
+            25,
+            51,
+            48
+          ],
+          "peakMonth": "Mar",
+          "firstYear": 2024,
+          "countByPeriod": {
+            "month": 48,
+            "year": 160,
+            "all": 1653
+          },
+          "month": {
+            "resolvedPct": 96,
+            "avgTimeLabel": "Not enough data"
+          },
+          "year": {
+            "resolvedPct": 94,
+            "avgTimeLabel": "5 days"
+          },
+          "all": {
+            "resolvedPct": 70,
+            "avgTimeLabel": "11 days"
+          }
+        },
+        {
+          "id": "pothole",
+          "name": "Pothole",
+          "icon": "🛣️",
+          "iconBg": "rgba(232,81,74,0.18)",
+          "coordinateEstimated": false,
+          "sparkline": [
+            103,
+            236,
+            314,
+            132,
+            102,
+            100,
+            294,
+            177,
+            178,
+            87
+          ],
+          "monthlySparkline": [
+            24,
+            27,
+            19,
+            13
+          ],
+          "peakMonth": "Mar",
+          "firstYear": 2017,
+          "countByPeriod": {
+            "month": 13,
+            "year": 83,
+            "all": 1723
+          },
+          "month": {
+            "resolvedPct": 100,
+            "avgTimeLabel": "Not enough data"
+          },
+          "year": {
+            "resolvedPct": 98,
+            "avgTimeLabel": "20 hours"
+          },
+          "all": {
+            "resolvedPct": 95,
+            "avgTimeLabel": "46 hours"
+          }
+        }
+      ],
+      "byPeriod": {
+        "month": {
+          "summary": {
+            "resolutionRate": 95,
+            "resolutionRateDelta": 0,
+            "avgFixTimeLabel": "21 hours",
+            "avgFixTimeDays": 0.86,
+            "avgFixTimeDelta": -0.91
+          }
+        },
+        "year": {
+          "summary": {
+            "resolutionRate": 96,
+            "resolutionRateDelta": 11,
+            "avgFixTimeLabel": "26 hours",
+            "avgFixTimeDays": 1.07,
+            "avgFixTimeDelta": -1.86
+          }
+        },
+        "all": {
+          "summary": {
+            "resolutionRate": 93,
+            "resolutionRateDelta": -1,
+            "avgFixTimeLabel": "3 days",
+            "avgFixTimeDays": 3.04,
+            "avgFixTimeDelta": -1
+          }
+        }
+      },
+      "chronicSpots": [
+        {
+          "count": 297,
+          "location": "Bright Willow Circle, San Jose",
+          "issueType": "Graffiti",
+          "icon": "🎨",
+          "iconBg": "rgba(62,207,130,0.18)",
+          "since": 2017,
+          "reopenCount": 1,
+          "maxConsecYears": 10,
+          "returnMedianDays": null,
+          "timelineEvents": [
+            {
+              "date": "2023-02-22",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2023-03-15",
+              "eventType": "reported"
+            }
+          ],
+          "recentActivity": [
+            {
+              "date": "2026-04-29",
+              "status": "Closed",
+              "resolutionDays": 0
+            },
+            {
+              "date": "2026-02-03",
+              "status": "Closed",
+              "resolutionDays": 0
+            },
+            {
+              "date": "2026-01-29",
+              "status": "Closed",
+              "resolutionDays": 0
+            },
+            {
+              "date": "2026-01-23",
+              "status": "Closed",
+              "resolutionDays": 0
+            },
+            {
+              "date": "2026-01-14",
+              "status": "Closed",
+              "resolutionDays": 0
+            }
+          ]
+        },
+        {
+          "count": 274,
+          "location": "Donohue Drive, Berryessa",
+          "issueType": "Vehicle Concerns",
+          "icon": "🚗",
+          "iconBg": "rgba(232,81,74,0.18)",
+          "since": 2017,
+          "reopenCount": 7,
+          "maxConsecYears": 10,
+          "returnMedianDays": 16.04,
+          "timelineEvents": [
+            {
+              "date": "2019-03-28",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2019-04-01",
+              "eventType": "reported"
+            },
+            {
+              "date": "2019-07-04",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2019-07-05",
+              "eventType": "reported"
+            },
+            {
+              "date": "2020-02-19",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2020-02-20",
+              "eventType": "reported"
+            },
+            {
+              "date": "2021-01-09",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2021-05-10",
+              "eventType": "reported"
+            },
+            {
+              "date": "2023-01-25",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2023-01-26",
+              "eventType": "reported"
+            },
+            {
+              "date": "2024-04-30",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2024-04-30",
+              "eventType": "reported"
+            },
+            {
+              "date": "2024-10-24",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2024-12-23",
+              "eventType": "reported"
+            }
+          ],
+          "recentActivity": [
+            {
+              "date": "2026-04-08",
+              "status": "Closed",
+              "resolutionDays": 6.15
+            },
+            {
+              "date": "2026-01-26",
+              "status": "Closed",
+              "resolutionDays": 0
+            },
+            {
+              "date": "2025-11-24",
+              "status": "Closed",
+              "resolutionDays": 0.94
+            },
+            {
+              "date": "2025-11-24",
+              "status": "Closed",
+              "resolutionDays": 0
+            },
+            {
+              "date": "2025-11-11",
+              "status": "Closed",
+              "resolutionDays": 0
+            }
+          ]
+        },
+        {
+          "count": 235,
+          "location": "Salamoni Court, Luna Park",
+          "issueType": "Illegal Dumping",
+          "icon": "🚯",
+          "iconBg": "rgba(240,160,48,0.18)",
+          "since": 2017,
+          "reopenCount": 11,
+          "maxConsecYears": 10,
+          "returnMedianDays": 5.04,
+          "timelineEvents": [
+            {
+              "date": "2020-03-04",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2020-03-06",
+              "eventType": "reported"
+            },
+            {
+              "date": "2021-07-02",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2021-07-07",
+              "eventType": "reported"
+            },
+            {
+              "date": "2021-08-04",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2021-08-05",
+              "eventType": "reported"
+            },
+            {
+              "date": "2021-08-09",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2021-08-14",
+              "eventType": "reported"
+            },
+            {
+              "date": "2022-03-01",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2022-05-12",
+              "eventType": "reported"
+            },
+            {
+              "date": "2022-11-02",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2022-11-05",
+              "eventType": "reported"
+            },
+            {
+              "date": "2024-09-06",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2024-09-07",
+              "eventType": "reported"
+            },
+            {
+              "date": "2024-10-15",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2024-11-17",
+              "eventType": "reported"
+            },
+            {
+              "date": "2024-12-02",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2024-12-21",
+              "eventType": "reported"
+            },
+            {
+              "date": "2025-01-31",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2025-03-19",
+              "eventType": "reported"
+            },
+            {
+              "date": "2025-08-31",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2025-12-16",
+              "eventType": "reported"
+            }
+          ],
+          "recentActivity": [
+            {
+              "date": "2026-03-23",
+              "status": "Closed",
+              "resolutionDays": 0
+            },
+            {
+              "date": "2025-12-16",
+              "status": "Open",
+              "resolutionDays": null
+            },
+            {
+              "date": "2025-08-31",
+              "status": "Closed",
+              "resolutionDays": 2.95
+            },
+            {
+              "date": "2025-03-19",
+              "status": "Open",
+              "resolutionDays": null
+            },
+            {
+              "date": "2025-01-31",
+              "status": "Closed",
+              "resolutionDays": 56
+            }
+          ]
+        }
+      ]
+    },
+    "5": {
+      "sparklineRate": [
+        95,
+        99,
+        98,
+        94,
+        91,
+        97,
+        97,
+        92,
+        87,
+        94
+      ],
+      "sparklineOpen": [
+        309,
+        199,
+        269,
+        623,
+        1118,
+        273,
+        288,
+        1035,
+        1893,
+        298
+      ],
+      "sparklineAvgDays": [
+        4.05,
+        8.03,
+        4.71,
+        3.77,
+        2,
+        0.91,
+        1.02,
+        1.48,
+        0.79,
+        0.07
+      ],
+      "monthlyRate": [
+        95,
+        95,
+        94,
+        94
+      ],
+      "monthlyAvgDays": [
+        0.64,
+        0.08,
+        0.28,
+        0.01
+      ],
+      "volumeByYear": [
+        6203,
+        13315,
+        14531,
+        10663,
+        12783,
+        9496,
+        11087,
+        14542,
+        17197,
+        6073
+      ],
+      "totalReports": 115890,
+      "trendsVsMonth": [
+        {
+          "name": "Pothole",
+          "pct": 100
+        },
+        {
+          "name": "Streetlight Outage",
+          "pct": -67
+        },
+        {
+          "name": "Graffiti",
+          "pct": 19
+        },
+        {
+          "name": "Vehicle Concerns",
+          "pct": -16
+        },
+        {
+          "name": "Encampment Concerns",
+          "pct": 14
+        },
+        {
+          "name": "Illegal Dumping",
+          "pct": 12
+        }
+      ],
+      "trendsVsYear": [
+        {
+          "name": "Encampment Concerns",
+          "pct": -49
+        },
+        {
+          "name": "Junk Pickup",
+          "pct": 17
+        },
+        {
+          "name": "Streetlight Outage",
+          "pct": -15
+        },
+        {
+          "name": "Container Issues",
+          "pct": 14
+        },
+        {
+          "name": "Pothole",
+          "pct": 14
+        },
+        {
+          "name": "Vehicle Concerns",
+          "pct": 13
+        },
+        {
+          "name": "Illegal Dumping",
+          "pct": 11
+        }
+      ],
+      "issueTypes": [
+        {
+          "id": "junk",
+          "name": "Junk Pickup",
+          "icon": "🗑️",
+          "iconBg": "rgba(240,160,48,0.18)",
+          "coordinateEstimated": true,
+          "sparkline": [
+            0,
+            0,
+            0,
+            0,
+            5748,
+            7291,
+            7565,
+            8284,
+            8665,
+            3415
+          ],
+          "monthlySparkline": [
+            914,
+            655,
+            829,
+            743
+          ],
+          "peakMonth": null,
+          "firstYear": 2021,
+          "countByPeriod": {
+            "month": 743,
+            "year": 3141,
+            "all": 40972
+          },
+          "month": {
+            "resolvedPct": 55,
+            "avgTimeLabel": "12 days"
+          },
+          "year": {
+            "resolvedPct": 83,
+            "avgTimeLabel": "13 days"
+          },
+          "all": {
+            "resolvedPct": 88,
+            "avgTimeLabel": "14 days"
+          }
+        },
+        {
+          "id": "graffiti",
+          "name": "Graffiti",
+          "icon": "🎨",
+          "iconBg": "rgba(62,207,130,0.18)",
+          "coordinateEstimated": false,
+          "sparkline": [
+            1596,
+            3130,
+            3352,
+            2738,
+            3445,
+            2825,
+            3080,
+            3693,
+            4452,
+            1551
+          ],
+          "monthlySparkline": [
+            389,
+            330,
+            318,
+            380
+          ],
+          "peakMonth": null,
+          "firstYear": 2017,
+          "countByPeriod": {
+            "month": 380,
+            "year": 1417,
+            "all": 29862
+          },
+          "month": {
+            "resolvedPct": 89,
+            "avgTimeLabel": "< 1 hour"
+          },
+          "year": {
+            "resolvedPct": 89,
+            "avgTimeLabel": "< 1 hour"
+          },
+          "all": {
+            "resolvedPct": 94,
+            "avgTimeLabel": "2 hours"
+          }
+        },
+        {
+          "id": "streetlight",
+          "name": "Streetlight Outage",
+          "icon": "💡",
+          "iconBg": "rgba(91,155,248,0.18)",
+          "coordinateEstimated": false,
+          "sparkline": [
+            155,
+            253,
+            343,
+            334,
+            224,
+            144,
+            425,
+            638,
+            596,
+            202
+          ],
+          "monthlySparkline": [
+            90,
+            18,
+            66,
+            22
+          ],
+          "peakMonth": "Jan",
+          "firstYear": 2017,
+          "countByPeriod": {
+            "month": 22,
+            "year": 196,
+            "all": 3314
+          },
+          "month": {
+            "resolvedPct": 45,
+            "avgTimeLabel": "Not enough data"
+          },
+          "year": {
+            "resolvedPct": 82,
+            "avgTimeLabel": "16 days"
+          },
+          "all": {
+            "resolvedPct": 79,
+            "avgTimeLabel": "29 days"
+          }
+        },
+        {
+          "id": "dumping",
+          "name": "Illegal Dumping",
+          "icon": "🚯",
+          "iconBg": "rgba(240,160,48,0.18)",
+          "coordinateEstimated": false,
+          "sparkline": [
+            1112,
+            2497,
+            2770,
+            2617,
+            3889,
+            2332,
+            3511,
+            3696,
+            3846,
+            1242
+          ],
+          "monthlySparkline": [
+            333,
+            242,
+            278,
+            312
+          ],
+          "peakMonth": null,
+          "firstYear": 2017,
+          "countByPeriod": {
+            "month": 312,
+            "year": 1165,
+            "all": 27512
+          },
+          "month": {
+            "resolvedPct": 97,
+            "avgTimeLabel": "4 hours"
+          },
+          "year": {
+            "resolvedPct": 98,
+            "avgTimeLabel": "18 hours"
+          },
+          "all": {
+            "resolvedPct": 97,
+            "avgTimeLabel": "37 hours"
+          }
+        },
+        {
+          "id": "vehicle",
+          "name": "Vehicle Concerns",
+          "icon": "🚗",
+          "iconBg": "rgba(232,81,74,0.18)",
+          "coordinateEstimated": false,
+          "sparkline": [
+            2743,
+            6199,
+            6561,
+            3748,
+            3932,
+            2761,
+            2654,
+            3555,
+            3992,
+            1303
+          ],
+          "monthlySparkline": [
+            247,
+            225,
+            392,
+            329
+          ],
+          "peakMonth": "Aug",
+          "firstYear": 2017,
+          "countByPeriod": {
+            "month": 329,
+            "year": 1193,
+            "all": 37448
+          },
+          "month": {
+            "resolvedPct": 97,
+            "avgTimeLabel": "Auto-closed by city"
+          },
+          "year": {
+            "resolvedPct": 97,
+            "avgTimeLabel": "Auto-closed by city"
+          },
+          "all": {
+            "resolvedPct": 93,
+            "avgTimeLabel": "8 days"
+          }
+        },
+        {
+          "id": "container",
+          "name": "Container Issues",
+          "icon": "📦",
+          "iconBg": "rgba(240,160,48,0.18)",
+          "coordinateEstimated": true,
+          "sparkline": [
+            0,
+            0,
+            0,
+            0,
+            1670,
+            1721,
+            1800,
+            1859,
+            1973,
+            716
+          ],
+          "monthlySparkline": [
+            178,
+            144,
+            163,
+            175
+          ],
+          "peakMonth": null,
+          "firstYear": 2021,
+          "countByPeriod": {
+            "month": 175,
+            "year": 660,
+            "all": 9741
+          },
+          "month": {
+            "resolvedPct": 33,
+            "avgTimeLabel": "7 days"
+          },
+          "year": {
+            "resolvedPct": 40,
+            "avgTimeLabel": "7 days"
+          },
+          "all": {
+            "resolvedPct": 58,
+            "avgTimeLabel": "7 days"
+          }
+        },
+        {
+          "id": "encampment",
+          "name": "Encampment Concerns",
+          "icon": "⛺",
+          "iconBg": "rgba(167,139,250,0.18)",
+          "coordinateEstimated": false,
+          "sparkline": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            521,
+            612,
+            115
+          ],
+          "monthlySparkline": [
+            29,
+            15,
+            28,
+            32
+          ],
+          "peakMonth": "Mar",
+          "firstYear": 2024,
+          "countByPeriod": {
+            "month": 32,
+            "year": 104,
+            "all": 1248
+          },
+          "month": {
+            "resolvedPct": 72,
+            "avgTimeLabel": "Not enough data"
+          },
+          "year": {
+            "resolvedPct": 88,
+            "avgTimeLabel": "4 days"
+          },
+          "all": {
+            "resolvedPct": 71,
+            "avgTimeLabel": "13 days"
+          }
+        },
+        {
+          "id": "pothole",
+          "name": "Pothole",
+          "icon": "🛣️",
+          "iconBg": "rgba(232,81,74,0.18)",
+          "coordinateEstimated": false,
+          "sparkline": [
+            126,
+            256,
+            360,
+            143,
+            145,
+            121,
+            215,
+            200,
+            149,
+            59
+          ],
+          "monthlySparkline": [
+            16,
+            12,
+            10,
+            20
+          ],
+          "peakMonth": "Mar",
+          "firstYear": 2017,
+          "countByPeriod": {
+            "month": 20,
+            "year": 58,
+            "all": 1774
+          },
+          "month": {
+            "resolvedPct": 100,
+            "avgTimeLabel": "Not enough data"
+          },
+          "year": {
+            "resolvedPct": 100,
+            "avgTimeLabel": "9 hours"
+          },
+          "all": {
+            "resolvedPct": 96,
+            "avgTimeLabel": "42 hours"
+          }
+        }
+      ],
+      "byPeriod": {
+        "month": {
+          "summary": {
+            "resolutionRate": 94,
+            "resolutionRateDelta": 0,
+            "avgFixTimeLabel": "< 1 hour",
+            "avgFixTimeDays": 0.01,
+            "avgFixTimeDelta": -0.27
+          }
+        },
+        "year": {
+          "summary": {
+            "resolutionRate": 95,
+            "resolutionRateDelta": 9,
+            "avgFixTimeLabel": "2 hours",
+            "avgFixTimeDays": 0.09,
+            "avgFixTimeDelta": -1.46
+          }
+        },
+        "all": {
+          "summary": {
+            "resolutionRate": 94,
+            "resolutionRateDelta": -1,
+            "avgFixTimeLabel": "47 hours",
+            "avgFixTimeDays": 1.95,
+            "avgFixTimeDelta": -2.11
+          }
+        }
+      },
+      "chronicSpots": [
+        {
+          "count": 500,
+          "location": "Lochner Drive, Alum Rock",
+          "issueType": "Illegal Dumping",
+          "icon": "🚯",
+          "iconBg": "rgba(240,160,48,0.18)",
+          "since": 2017,
+          "reopenCount": 9,
+          "maxConsecYears": 10,
+          "returnMedianDays": 16.53,
+          "timelineEvents": [
+            {
+              "date": "2019-02-12",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2019-03-04",
+              "eventType": "reported"
+            },
+            {
+              "date": "2020-04-21",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2020-05-16",
+              "eventType": "reported"
+            },
+            {
+              "date": "2020-05-20",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2020-05-20",
+              "eventType": "reported"
+            },
+            {
+              "date": "2020-05-22",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2020-05-26",
+              "eventType": "reported"
+            },
+            {
+              "date": "2021-03-22",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2021-03-26",
+              "eventType": "reported"
+            },
+            {
+              "date": "2021-06-09",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2021-07-06",
+              "eventType": "reported"
+            },
+            {
+              "date": "2021-10-13",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2021-10-14",
+              "eventType": "reported"
+            },
+            {
+              "date": "2022-07-06",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2022-07-20",
+              "eventType": "reported"
+            },
+            {
+              "date": "2022-09-09",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2022-10-02",
+              "eventType": "reported"
+            }
+          ],
+          "recentActivity": [
+            {
+              "date": "2026-04-24",
+              "status": "Closed",
+              "resolutionDays": 0
+            },
+            {
+              "date": "2026-04-08",
+              "status": "Closed",
+              "resolutionDays": 0
+            },
+            {
+              "date": "2026-03-13",
+              "status": "Closed",
+              "resolutionDays": 0
+            },
+            {
+              "date": "2026-03-13",
+              "status": "Closed",
+              "resolutionDays": 0
+            },
+            {
+              "date": "2026-03-13",
+              "status": "Closed",
+              "resolutionDays": 0
+            }
+          ]
+        },
+        {
+          "count": 375,
+          "location": "North King Road, Little Portugal",
+          "issueType": "Graffiti",
+          "icon": "🎨",
+          "iconBg": "rgba(62,207,130,0.18)",
+          "since": 2017,
+          "reopenCount": 8,
+          "maxConsecYears": 10,
+          "returnMedianDays": 21.36,
+          "timelineEvents": [
+            {
+              "date": "2018-12-03",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2018-12-19",
+              "eventType": "reported"
+            },
+            {
+              "date": "2020-05-13",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2020-06-03",
+              "eventType": "reported"
+            },
+            {
+              "date": "2021-09-15",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2021-09-20",
+              "eventType": "reported"
+            },
+            {
+              "date": "2022-07-03",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2022-08-09",
+              "eventType": "reported"
+            },
+            {
+              "date": "2023-09-20",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2023-09-20",
+              "eventType": "reported"
+            },
+            {
+              "date": "2024-01-26",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2024-01-30",
+              "eventType": "reported"
+            },
+            {
+              "date": "2024-07-13",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2024-09-03",
+              "eventType": "reported"
+            },
+            {
+              "date": "2025-07-01",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2025-07-29",
+              "eventType": "reported"
+            }
+          ],
+          "recentActivity": [
+            {
+              "date": "2026-04-17",
+              "status": "Closed",
+              "resolutionDays": 0
+            },
+            {
+              "date": "2026-04-13",
+              "status": "Closed",
+              "resolutionDays": 0
+            },
+            {
+              "date": "2026-04-02",
+              "status": "Closed",
+              "resolutionDays": 0
+            },
+            {
+              "date": "2026-03-30",
+              "status": "Closed",
+              "resolutionDays": 0
+            },
+            {
+              "date": "2026-03-27",
+              "status": "Closed",
+              "resolutionDays": 0
+            }
+          ]
+        },
+        {
+          "count": 292,
+          "location": "Alum Rock Avenue, Alum Rock",
+          "issueType": "Vehicle Concerns",
+          "icon": "🚗",
+          "iconBg": "rgba(232,81,74,0.18)",
+          "since": 2017,
+          "reopenCount": 10,
+          "maxConsecYears": 10,
+          "returnMedianDays": 17.38,
+          "timelineEvents": [
+            {
+              "date": "2019-08-07",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2019-08-10",
+              "eventType": "reported"
+            },
+            {
+              "date": "2019-10-23",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2019-10-25",
+              "eventType": "reported"
+            },
+            {
+              "date": "2020-08-19",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2020-09-23",
+              "eventType": "reported"
+            },
+            {
+              "date": "2020-09-23",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2020-09-23",
+              "eventType": "reported"
+            },
+            {
+              "date": "2020-12-23",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2021-01-23",
+              "eventType": "reported"
+            },
+            {
+              "date": "2021-02-11",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2021-02-13",
+              "eventType": "reported"
+            },
+            {
+              "date": "2021-03-05",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2021-03-13",
+              "eventType": "reported"
+            },
+            {
+              "date": "2021-05-10",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2021-05-17",
+              "eventType": "reported"
+            },
+            {
+              "date": "2021-09-17",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2022-03-08",
+              "eventType": "reported"
+            },
+            {
+              "date": "2025-07-23",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2025-08-24",
+              "eventType": "reported"
+            }
+          ],
+          "recentActivity": [
+            {
+              "date": "2026-01-05",
+              "status": "Closed",
+              "resolutionDays": 0
+            },
+            {
+              "date": "2025-10-14",
+              "status": "Closed",
+              "resolutionDays": 0
+            },
+            {
+              "date": "2025-08-24",
+              "status": "Open",
+              "resolutionDays": null
+            },
+            {
+              "date": "2025-07-23",
+              "status": "Closed",
+              "resolutionDays": 5.79
+            },
+            {
+              "date": "2025-06-07",
+              "status": "Closed",
+              "resolutionDays": 2.03
+            }
+          ]
+        }
+      ]
+    },
+    "6": {
+      "sparklineRate": [
+        95,
+        98,
+        97,
+        92,
+        89,
+        97,
+        96,
+        90,
+        84,
+        93
+      ],
+      "sparklineOpen": [
+        404,
+        285,
+        402,
+        952,
+        1304,
+        395,
+        483,
+        1514,
+        3155,
+        519
+      ],
+      "sparklineAvgDays": [
+        4.93,
+        6.88,
+        5.24,
+        3.74,
+        2.35,
+        1.75,
+        2.57,
+        2.59,
+        1.34,
+        0.78
+      ],
+      "monthlyRate": [
+        94,
+        93,
+        94,
+        93
+      ],
+      "monthlyAvgDays": [
+        1.04,
+        0.8,
+        0.86,
+        0.57
+      ],
+      "volumeByYear": [
+        7346,
+        15454,
+        15903,
+        11202,
+        12099,
+        11461,
+        13375,
+        17623,
+        22738,
+        7931
+      ],
+      "totalReports": 135132,
+      "trendsVsMonth": [
+        {
+          "name": "Pothole",
+          "pct": -31
+        },
+        {
+          "name": "Encampment Concerns",
+          "pct": 23
+        }
+      ],
+      "trendsVsYear": [
+        {
+          "name": "Illegal Dumping",
+          "pct": 37
+        },
+        {
+          "name": "Pothole",
+          "pct": 32
+        },
+        {
+          "name": "Encampment Concerns",
+          "pct": -31
+        },
+        {
+          "name": "Graffiti",
+          "pct": -24
+        },
+        {
+          "name": "Junk Pickup",
+          "pct": 17
+        },
+        {
+          "name": "Container Issues",
+          "pct": 14
+        },
+        {
+          "name": "Vehicle Concerns",
+          "pct": -13
+        },
+        {
+          "name": "Streetlight Outage",
+          "pct": 11
+        }
+      ],
+      "issueTypes": [
+        {
+          "id": "junk",
+          "name": "Junk Pickup",
+          "icon": "🗑️",
+          "iconBg": "rgba(240,160,48,0.18)",
+          "coordinateEstimated": true,
+          "sparkline": [
+            0,
+            0,
+            0,
+            0,
+            5545,
+            7034,
+            7298,
+            7991,
+            8359,
+            3295
+          ],
+          "monthlySparkline": [
+            881,
+            632,
+            800,
+            716
+          ],
+          "peakMonth": null,
+          "firstYear": 2021,
+          "countByPeriod": {
+            "month": 716,
+            "year": 3029,
+            "all": 39521
+          },
+          "month": {
+            "resolvedPct": 55,
+            "avgTimeLabel": "12 days"
+          },
+          "year": {
+            "resolvedPct": 83,
+            "avgTimeLabel": "13 days"
+          },
+          "all": {
+            "resolvedPct": 88,
+            "avgTimeLabel": "14 days"
+          }
+        },
+        {
+          "id": "graffiti",
+          "name": "Graffiti",
+          "icon": "🎨",
+          "iconBg": "rgba(62,207,130,0.18)",
+          "coordinateEstimated": false,
+          "sparkline": [
+            2250,
+            4702,
+            3450,
+            2677,
+            2885,
+            3780,
+            4137,
+            4253,
+            6708,
+            2006
+          ],
+          "monthlySparkline": [
+            460,
+            380,
+            506,
+            508
+          ],
+          "peakMonth": null,
+          "firstYear": 2017,
+          "countByPeriod": {
+            "month": 508,
+            "year": 1854,
+            "all": 36848
+          },
+          "month": {
+            "resolvedPct": 86,
+            "avgTimeLabel": "9 hours"
+          },
+          "year": {
+            "resolvedPct": 86,
+            "avgTimeLabel": "13 hours"
+          },
+          "all": {
+            "resolvedPct": 93,
+            "avgTimeLabel": "27 hours"
+          }
+        },
+        {
+          "id": "streetlight",
+          "name": "Streetlight Outage",
+          "icon": "💡",
+          "iconBg": "rgba(91,155,248,0.18)",
+          "coordinateEstimated": false,
+          "sparkline": [
+            488,
+            814,
+            880,
+            1023,
+            750,
+            301,
+            832,
+            831,
+            814,
+            377
+          ],
+          "monthlySparkline": [
+            86,
+            102,
+            84,
+            91
+          ],
+          "peakMonth": "Jan",
+          "firstYear": 2017,
+          "countByPeriod": {
+            "month": 91,
+            "year": 363,
+            "all": 7110
+          },
+          "month": {
+            "resolvedPct": 68,
+            "avgTimeLabel": "5 days"
+          },
+          "year": {
+            "resolvedPct": 75,
+            "avgTimeLabel": "11 days"
+          },
+          "all": {
+            "resolvedPct": 80,
+            "avgTimeLabel": "32 days"
+          }
+        },
+        {
+          "id": "dumping",
+          "name": "Illegal Dumping",
+          "icon": "🚯",
+          "iconBg": "rgba(240,160,48,0.18)",
+          "coordinateEstimated": false,
+          "sparkline": [
+            896,
+            2149,
+            2145,
+            1917,
+            2163,
+            2003,
+            2566,
+            2721,
+            3151,
+            1377
+          ],
+          "monthlySparkline": [
+            331,
+            325,
+            291,
+            296
+          ],
+          "peakMonth": null,
+          "firstYear": 2017,
+          "countByPeriod": {
+            "month": 296,
+            "year": 1243,
+            "all": 21088
+          },
+          "month": {
+            "resolvedPct": 98,
+            "avgTimeLabel": "15 hours"
+          },
+          "year": {
+            "resolvedPct": 98,
+            "avgTimeLabel": "19 hours"
+          },
+          "all": {
+            "resolvedPct": 97,
+            "avgTimeLabel": "44 hours"
+          }
+        },
+        {
+          "id": "vehicle",
+          "name": "Vehicle Concerns",
+          "icon": "🚗",
+          "iconBg": "rgba(232,81,74,0.18)",
+          "coordinateEstimated": false,
+          "sparkline": [
+            2847,
+            6097,
+            7360,
+            3879,
+            4376,
+            3158,
+            3255,
+            5094,
+            5918,
+            1652
+          ],
+          "monthlySparkline": [
+            404,
+            276,
+            444,
+            403
+          ],
+          "peakMonth": "Aug",
+          "firstYear": 2017,
+          "countByPeriod": {
+            "month": 403,
+            "year": 1527,
+            "all": 43636
+          },
+          "month": {
+            "resolvedPct": 98,
+            "avgTimeLabel": "Auto-closed by city"
+          },
+          "year": {
+            "resolvedPct": 98,
+            "avgTimeLabel": "Auto-closed by city"
+          },
+          "all": {
+            "resolvedPct": 91,
+            "avgTimeLabel": "7 days"
+          }
+        },
+        {
+          "id": "container",
+          "name": "Container Issues",
+          "icon": "📦",
+          "iconBg": "rgba(240,160,48,0.18)",
+          "coordinateEstimated": true,
+          "sparkline": [
+            0,
+            0,
+            0,
+            0,
+            1611,
+            1660,
+            1737,
+            1794,
+            1904,
+            691
+          ],
+          "monthlySparkline": [
+            171,
+            139,
+            157,
+            169
+          ],
+          "peakMonth": null,
+          "firstYear": 2021,
+          "countByPeriod": {
+            "month": 169,
+            "year": 636,
+            "all": 9392
+          },
+          "month": {
+            "resolvedPct": 33,
+            "avgTimeLabel": "7 days"
+          },
+          "year": {
+            "resolvedPct": 40,
+            "avgTimeLabel": "7 days"
+          },
+          "all": {
+            "resolvedPct": 58,
+            "avgTimeLabel": "7 days"
+          }
+        },
+        {
+          "id": "encampment",
+          "name": "Encampment Concerns",
+          "icon": "⛺",
+          "iconBg": "rgba(167,139,250,0.18)",
+          "coordinateEstimated": false,
+          "sparkline": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1134,
+            1277,
+            326
+          ],
+          "monthlySparkline": [
+            69,
+            82,
+            65,
+            80
+          ],
+          "peakMonth": "Mar",
+          "firstYear": 2024,
+          "countByPeriod": {
+            "month": 80,
+            "year": 296,
+            "all": 2737
+          },
+          "month": {
+            "resolvedPct": 89,
+            "avgTimeLabel": "2 days"
+          },
+          "year": {
+            "resolvedPct": 94,
+            "avgTimeLabel": "3 days"
+          },
+          "all": {
+            "resolvedPct": 72,
+            "avgTimeLabel": "11 days"
+          }
+        },
+        {
+          "id": "pothole",
+          "name": "Pothole",
+          "icon": "🛣️",
+          "iconBg": "rgba(232,81,74,0.18)",
+          "coordinateEstimated": false,
+          "sparkline": [
+            199,
+            406,
+            552,
+            260,
+            215,
+            208,
+            388,
+            365,
+            254,
+            137
+          ],
+          "monthlySparkline": [
+            18,
+            30,
+            48,
+            33
+          ],
+          "peakMonth": "Mar",
+          "firstYear": 2017,
+          "countByPeriod": {
+            "month": 33,
+            "year": 129,
+            "all": 2984
+          },
+          "month": {
+            "resolvedPct": 94,
+            "avgTimeLabel": "Not enough data"
+          },
+          "year": {
+            "resolvedPct": 95,
+            "avgTimeLabel": "16 hours"
+          },
+          "all": {
+            "resolvedPct": 94,
+            "avgTimeLabel": "48 hours"
+          }
+        }
+      ],
+      "byPeriod": {
+        "month": {
+          "summary": {
+            "resolutionRate": 93,
+            "resolutionRateDelta": -1,
+            "avgFixTimeLabel": "14 hours",
+            "avgFixTimeDays": 0.57,
+            "avgFixTimeDelta": -0.29
+          }
+        },
+        "year": {
+          "summary": {
+            "resolutionRate": 93,
+            "resolutionRateDelta": 11,
+            "avgFixTimeLabel": "20 hours",
+            "avgFixTimeDays": 0.83,
+            "avgFixTimeDelta": -0.94
+          }
+        },
+        "all": {
+          "summary": {
+            "resolutionRate": 92,
+            "resolutionRateDelta": -3,
+            "avgFixTimeLabel": "3 days",
+            "avgFixTimeDays": 2.8,
+            "avgFixTimeDelta": -2.13
+          }
+        }
+      },
+      "chronicSpots": [
+        {
+          "count": 850,
+          "location": "South Willard Avenue, Buena Vista",
+          "issueType": "Vehicle Concerns",
+          "icon": "🚗",
+          "iconBg": "rgba(232,81,74,0.18)",
+          "since": 2017,
+          "reopenCount": 4,
+          "maxConsecYears": 10,
+          "returnMedianDays": null,
+          "timelineEvents": [
+            {
+              "date": "2017-08-28",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2017-09-15",
+              "eventType": "reported"
+            },
+            {
+              "date": "2019-10-19",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2019-10-19",
+              "eventType": "reported"
+            },
+            {
+              "date": "2024-09-18",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2024-09-18",
+              "eventType": "reported"
+            },
+            {
+              "date": "2024-09-21",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2024-09-22",
+              "eventType": "reported"
+            }
+          ],
+          "recentActivity": [
+            {
+              "date": "2026-05-02",
+              "status": "Closed",
+              "resolutionDays": 2.59
+            },
+            {
+              "date": "2026-04-05",
+              "status": "Closed",
+              "resolutionDays": 0
+            },
+            {
+              "date": "2026-04-05",
+              "status": "Closed",
+              "resolutionDays": 0
+            },
+            {
+              "date": "2026-04-04",
+              "status": "Closed",
+              "resolutionDays": 0
+            },
+            {
+              "date": "2026-04-03",
+              "status": "Closed",
+              "resolutionDays": 0
+            }
+          ]
+        },
+        {
+          "count": 682,
+          "location": "West San Carlos Street, Buena Vista",
+          "issueType": "Graffiti",
+          "icon": "🎨",
+          "iconBg": "rgba(62,207,130,0.18)",
+          "since": 2017,
+          "reopenCount": 7,
+          "maxConsecYears": 10,
+          "returnMedianDays": 26.08,
+          "timelineEvents": [
+            {
+              "date": "2018-09-05",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2018-09-11",
+              "eventType": "reported"
+            },
+            {
+              "date": "2018-10-31",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2018-10-31",
+              "eventType": "reported"
+            },
+            {
+              "date": "2018-11-30",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2018-12-26",
+              "eventType": "reported"
+            },
+            {
+              "date": "2020-02-17",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2020-02-17",
+              "eventType": "reported"
+            },
+            {
+              "date": "2025-02-19",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2025-04-09",
+              "eventType": "reported"
+            },
+            {
+              "date": "2025-07-10",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2025-08-01",
+              "eventType": "reported"
+            },
+            {
+              "date": "2025-08-30",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2025-09-27",
+              "eventType": "reported"
+            }
+          ],
+          "recentActivity": [
+            {
+              "date": "2025-10-15",
+              "status": "Closed",
+              "resolutionDays": 0.02
+            },
+            {
+              "date": "2025-09-29",
+              "status": "Closed",
+              "resolutionDays": 0.99
+            },
+            {
+              "date": "2025-09-27",
+              "status": "In Progress",
+              "resolutionDays": null
+            },
+            {
+              "date": "2025-08-30",
+              "status": "Closed",
+              "resolutionDays": 0.04
+            },
+            {
+              "date": "2025-08-01",
+              "status": "Closed",
+              "resolutionDays": 2.92
+            }
+          ]
+        },
+        {
+          "count": 527,
+          "location": "South Willard Avenue, Buena Vista",
+          "issueType": "Illegal Dumping",
+          "icon": "🚯",
+          "iconBg": "rgba(240,160,48,0.18)",
+          "since": 2017,
+          "reopenCount": 4,
+          "maxConsecYears": 10,
+          "returnMedianDays": 2.8,
+          "timelineEvents": [
+            {
+              "date": "2021-05-08",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2021-05-18",
+              "eventType": "reported"
+            },
+            {
+              "date": "2021-07-27",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2021-07-29",
+              "eventType": "reported"
+            },
+            {
+              "date": "2022-02-27",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2022-03-09",
+              "eventType": "reported"
+            },
+            {
+              "date": "2024-07-23",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2024-07-30",
+              "eventType": "reported"
+            }
+          ],
+          "recentActivity": [
+            {
+              "date": "2026-05-08",
+              "status": "Closed",
+              "resolutionDays": 0
+            },
+            {
+              "date": "2026-05-06",
+              "status": "Closed",
+              "resolutionDays": 0
+            },
+            {
+              "date": "2026-05-06",
+              "status": "Closed",
+              "resolutionDays": 0
+            },
+            {
+              "date": "2026-04-29",
+              "status": "Closed",
+              "resolutionDays": 0
+            },
+            {
+              "date": "2026-04-21",
+              "status": "Closed",
+              "resolutionDays": 0
+            }
+          ]
+        }
+      ]
+    },
+    "7": {
+      "sparklineRate": [
+        95,
+        99,
+        98,
+        93,
+        91,
+        96,
+        97,
+        91,
+        86,
+        92
+      ],
+      "sparklineOpen": [
+        380,
+        212,
+        362,
+        766,
+        1197,
+        364,
+        354,
+        1061,
+        2081,
+        463
+      ],
+      "sparklineAvgDays": [
+        5.03,
+        8.67,
+        5.65,
+        3.8,
+        2.75,
+        1.76,
+        1.98,
+        2.14,
+        1.07,
+        0.86
+      ],
+      "monthlyRate": [
+        92,
+        94,
+        93,
+        92
+      ],
+      "monthlyAvgDays": [
+        1.08,
+        0.81,
+        0.89,
+        0.77
+      ],
+      "volumeByYear": [
+        7162,
+        15206,
+        15704,
+        11149,
+        13000,
+        10108,
+        11002,
+        14410,
+        16998,
+        6149
+      ],
+      "totalReports": 120888,
+      "trendsVsMonth": [
+        {
+          "name": "Vehicle Concerns",
+          "pct": -30
+        },
+        {
+          "name": "Pothole",
+          "pct": 28
+        },
+        {
+          "name": "Streetlight Outage",
+          "pct": 26
+        }
+      ],
+      "trendsVsYear": [
+        {
+          "name": "Pothole",
+          "pct": 158
+        },
+        {
+          "name": "Encampment Concerns",
+          "pct": 18
+        },
+        {
+          "name": "Junk Pickup",
+          "pct": 17
+        },
+        {
+          "name": "Container Issues",
+          "pct": 14
+        }
+      ],
+      "issueTypes": [
+        {
+          "id": "junk",
+          "name": "Junk Pickup",
+          "icon": "🗑️",
+          "iconBg": "rgba(240,160,48,0.18)",
+          "coordinateEstimated": true,
+          "sparkline": [
+            0,
+            0,
+            0,
+            0,
+            5445,
+            6906,
+            7166,
+            7847,
+            8208,
+            3235
+          ],
+          "monthlySparkline": [
+            865,
+            621,
+            785,
+            704
+          ],
+          "peakMonth": null,
+          "firstYear": 2021,
+          "countByPeriod": {
+            "month": 704,
+            "year": 2975,
+            "all": 38809
+          },
+          "month": {
+            "resolvedPct": 55,
+            "avgTimeLabel": "12 days"
+          },
+          "year": {
+            "resolvedPct": 83,
+            "avgTimeLabel": "13 days"
+          },
+          "all": {
+            "resolvedPct": 88,
+            "avgTimeLabel": "14 days"
+          }
+        },
+        {
+          "id": "graffiti",
+          "name": "Graffiti",
+          "icon": "🎨",
+          "iconBg": "rgba(62,207,130,0.18)",
+          "coordinateEstimated": false,
+          "sparkline": [
+            2067,
+            2439,
+            2435,
+            2422,
+            2464,
+            2227,
+            2874,
+            3193,
+            3497,
+            1266
+          ],
+          "monthlySparkline": [
+            201,
+            273,
+            362,
+            341
+          ],
+          "peakMonth": null,
+          "firstYear": 2017,
+          "countByPeriod": {
+            "month": 341,
+            "year": 1177,
+            "all": 24884
+          },
+          "month": {
+            "resolvedPct": 87,
+            "avgTimeLabel": "12 hours"
+          },
+          "year": {
+            "resolvedPct": 85,
+            "avgTimeLabel": "8 hours"
+          },
+          "all": {
+            "resolvedPct": 94,
+            "avgTimeLabel": "23 hours"
+          }
+        },
+        {
+          "id": "streetlight",
+          "name": "Streetlight Outage",
+          "icon": "💡",
+          "iconBg": "rgba(91,155,248,0.18)",
+          "coordinateEstimated": false,
+          "sparkline": [
+            166,
+            211,
+            279,
+            353,
+            350,
+            280,
+            810,
+            727,
+            813,
+            266
+          ],
+          "monthlySparkline": [
+            75,
+            42,
+            50,
+            63
+          ],
+          "peakMonth": "Jan",
+          "firstYear": 2017,
+          "countByPeriod": {
+            "month": 63,
+            "year": 230,
+            "all": 4255
+          },
+          "month": {
+            "resolvedPct": 67,
+            "avgTimeLabel": "Not enough data"
+          },
+          "year": {
+            "resolvedPct": 73,
+            "avgTimeLabel": "6 days"
+          },
+          "all": {
+            "resolvedPct": 79,
+            "avgTimeLabel": "24 days"
+          }
+        },
+        {
+          "id": "dumping",
+          "name": "Illegal Dumping",
+          "icon": "🚯",
+          "iconBg": "rgba(240,160,48,0.18)",
+          "coordinateEstimated": false,
+          "sparkline": [
+            1187,
+            3472,
+            3263,
+            3086,
+            3656,
+            2831,
+            2893,
+            3460,
+            3533,
+            1061
+          ],
+          "monthlySparkline": [
+            250,
+            197,
+            264,
+            281
+          ],
+          "peakMonth": null,
+          "firstYear": 2017,
+          "countByPeriod": {
+            "month": 281,
+            "year": 992,
+            "all": 28442
+          },
+          "month": {
+            "resolvedPct": 98,
+            "avgTimeLabel": "26 hours"
+          },
+          "year": {
+            "resolvedPct": 98,
+            "avgTimeLabel": "25 hours"
+          },
+          "all": {
+            "resolvedPct": 97,
+            "avgTimeLabel": "39 hours"
+          }
+        },
+        {
+          "id": "vehicle",
+          "name": "Vehicle Concerns",
+          "icon": "🚗",
+          "iconBg": "rgba(232,81,74,0.18)",
+          "coordinateEstimated": false,
+          "sparkline": [
+            3013,
+            7288,
+            7677,
+            3913,
+            4624,
+            3098,
+            2838,
+            3714,
+            4720,
+            1529
+          ],
+          "monthlySparkline": [
+            299,
+            254,
+            497,
+            347
+          ],
+          "peakMonth": "Aug",
+          "firstYear": 2017,
+          "countByPeriod": {
+            "month": 347,
+            "year": 1397,
+            "all": 42414
+          },
+          "month": {
+            "resolvedPct": 96,
+            "avgTimeLabel": "Auto-closed by city"
+          },
+          "year": {
+            "resolvedPct": 97,
+            "avgTimeLabel": "Auto-closed by city"
+          },
+          "all": {
+            "resolvedPct": 92,
+            "avgTimeLabel": "8 days"
+          }
+        },
+        {
+          "id": "container",
+          "name": "Container Issues",
+          "icon": "📦",
+          "iconBg": "rgba(240,160,48,0.18)",
+          "coordinateEstimated": true,
+          "sparkline": [
+            0,
+            0,
+            0,
+            0,
+            1582,
+            1630,
+            1705,
+            1761,
+            1869,
+            679
+          ],
+          "monthlySparkline": [
+            168,
+            136,
+            154,
+            166
+          ],
+          "peakMonth": null,
+          "firstYear": 2021,
+          "countByPeriod": {
+            "month": 166,
+            "year": 624,
+            "all": 9229
+          },
+          "month": {
+            "resolvedPct": 33,
+            "avgTimeLabel": "7 days"
+          },
+          "year": {
+            "resolvedPct": 40,
+            "avgTimeLabel": "7 days"
+          },
+          "all": {
+            "resolvedPct": 58,
+            "avgTimeLabel": "7 days"
+          }
+        },
+        {
+          "id": "encampment",
+          "name": "Encampment Concerns",
+          "icon": "⛺",
+          "iconBg": "rgba(167,139,250,0.18)",
+          "coordinateEstimated": false,
+          "sparkline": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            884,
+            966,
+            347
+          ],
+          "monthlySparkline": [
+            68,
+            64,
+            87,
+            90
+          ],
+          "peakMonth": "Mar",
+          "firstYear": 2024,
+          "countByPeriod": {
+            "month": 90,
+            "year": 309,
+            "all": 2197
+          },
+          "month": {
+            "resolvedPct": 74,
+            "avgTimeLabel": "2 days"
+          },
+          "year": {
+            "resolvedPct": 86,
+            "avgTimeLabel": "4 days"
+          },
+          "all": {
+            "resolvedPct": 71,
+            "avgTimeLabel": "10 days"
+          }
+        },
+        {
+          "id": "pothole",
+          "name": "Pothole",
+          "icon": "🛣️",
+          "iconBg": "rgba(232,81,74,0.18)",
+          "coordinateEstimated": false,
+          "sparkline": [
+            131,
+            222,
+            362,
+            125,
+            93,
+            101,
+            171,
+            186,
+            125,
+            81
+          ],
+          "monthlySparkline": [
+            28,
+            11,
+            18,
+            23
+          ],
+          "peakMonth": "Mar",
+          "firstYear": 2017,
+          "countByPeriod": {
+            "month": 23,
+            "year": 80,
+            "all": 1597
+          },
+          "month": {
+            "resolvedPct": 87,
+            "avgTimeLabel": "Not enough data"
+          },
+          "year": {
+            "resolvedPct": 78,
+            "avgTimeLabel": "14 hours"
+          },
+          "all": {
+            "resolvedPct": 93,
+            "avgTimeLabel": "2 days"
+          }
+        }
+      ],
+      "byPeriod": {
+        "month": {
+          "summary": {
+            "resolutionRate": 92,
+            "resolutionRateDelta": -1,
+            "avgFixTimeLabel": "19 hours",
+            "avgFixTimeDays": 0.77,
+            "avgFixTimeDelta": -0.12
+          }
+        },
+        "year": {
+          "summary": {
+            "resolutionRate": 93,
+            "resolutionRateDelta": 7,
+            "avgFixTimeLabel": "21 hours",
+            "avgFixTimeDays": 0.88,
+            "avgFixTimeDelta": -0.75
+          }
+        },
+        "all": {
+          "summary": {
+            "resolutionRate": 94,
+            "resolutionRateDelta": -1,
+            "avgFixTimeLabel": "3 days",
+            "avgFixTimeDays": 3.03,
+            "avgFixTimeDelta": -2
+          }
+        }
+      },
+      "chronicSpots": [
+        {
+          "count": 584,
+          "location": "Tully Road, San Jose",
+          "issueType": "Illegal Dumping",
+          "icon": "🚯",
+          "iconBg": "rgba(240,160,48,0.18)",
+          "since": 2017,
+          "reopenCount": 4,
+          "maxConsecYears": 10,
+          "returnMedianDays": 11.67,
+          "timelineEvents": [
+            {
+              "date": "2019-06-25",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2019-07-08",
+              "eventType": "reported"
+            },
+            {
+              "date": "2019-08-23",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2019-09-10",
+              "eventType": "reported"
+            },
+            {
+              "date": "2024-11-15",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2024-12-31",
+              "eventType": "reported"
+            },
+            {
+              "date": "2026-01-29",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2026-02-03",
+              "eventType": "reported"
+            }
+          ],
+          "recentActivity": [
+            {
+              "date": "2026-04-29",
+              "status": "Closed",
+              "resolutionDays": 0
+            },
+            {
+              "date": "2026-04-23",
+              "status": "Closed",
+              "resolutionDays": 0.75
+            },
+            {
+              "date": "2026-04-23",
+              "status": "Closed",
+              "resolutionDays": 0.75
+            },
+            {
+              "date": "2026-04-20",
+              "status": "Closed",
+              "resolutionDays": 3.74
+            },
+            {
+              "date": "2026-04-15",
+              "status": "Closed",
+              "resolutionDays": 5.52
+            }
+          ]
+        },
+        {
+          "count": 384,
+          "location": "Forestdale Avenue, Little Portugal",
+          "issueType": "Graffiti",
+          "icon": "🎨",
+          "iconBg": "rgba(62,207,130,0.18)",
+          "since": 2017,
+          "reopenCount": 13,
+          "maxConsecYears": 10,
+          "returnMedianDays": 13.07,
+          "timelineEvents": [
+            {
+              "date": "2018-10-22",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2018-11-12",
+              "eventType": "reported"
+            },
+            {
+              "date": "2020-11-05",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2020-11-07",
+              "eventType": "reported"
+            },
+            {
+              "date": "2022-10-19",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2022-10-19",
+              "eventType": "reported"
+            },
+            {
+              "date": "2024-10-20",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2024-10-21",
+              "eventType": "reported"
+            },
+            {
+              "date": "2025-01-09",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2025-01-09",
+              "eventType": "reported"
+            },
+            {
+              "date": "2025-04-03",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2025-04-21",
+              "eventType": "reported"
+            },
+            {
+              "date": "2025-04-23",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2025-06-13",
+              "eventType": "reported"
+            },
+            {
+              "date": "2025-08-23",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2025-10-13",
+              "eventType": "reported"
+            },
+            {
+              "date": "2025-12-20",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2025-12-30",
+              "eventType": "reported"
+            },
+            {
+              "date": "2026-02-07",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2026-02-09",
+              "eventType": "reported"
+            },
+            {
+              "date": "2026-03-23",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2026-03-24",
+              "eventType": "reported"
+            },
+            {
+              "date": "2026-03-27",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2026-03-30",
+              "eventType": "reported"
+            },
+            {
+              "date": "2026-05-04",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2026-05-07",
+              "eventType": "reported"
+            }
+          ],
+          "recentActivity": [
+            {
+              "date": "2026-05-07",
+              "status": "Closed",
+              "resolutionDays": 0.02
+            },
+            {
+              "date": "2026-05-07",
+              "status": "Open",
+              "resolutionDays": null
+            },
+            {
+              "date": "2026-05-07",
+              "status": "Open",
+              "resolutionDays": null
+            },
+            {
+              "date": "2026-05-04",
+              "status": "Closed",
+              "resolutionDays": 0
+            },
+            {
+              "date": "2026-05-04",
+              "status": "Closed",
+              "resolutionDays": 0.69
+            }
+          ]
+        },
+        {
+          "count": 307,
+          "location": "Umbarger Road, San Jose",
+          "issueType": "Vehicle Concerns",
+          "icon": "🚗",
+          "iconBg": "rgba(232,81,74,0.18)",
+          "since": 2017,
+          "reopenCount": 11,
+          "maxConsecYears": 10,
+          "returnMedianDays": 13.45,
+          "timelineEvents": [
+            {
+              "date": "2017-08-29",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2017-08-29",
+              "eventType": "reported"
+            },
+            {
+              "date": "2017-08-29",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2017-09-11",
+              "eventType": "reported"
+            },
+            {
+              "date": "2019-06-17",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2019-07-10",
+              "eventType": "reported"
+            },
+            {
+              "date": "2021-02-13",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2021-03-01",
+              "eventType": "reported"
+            },
+            {
+              "date": "2021-11-21",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2021-12-08",
+              "eventType": "reported"
+            },
+            {
+              "date": "2022-02-23",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2022-07-27",
+              "eventType": "reported"
+            },
+            {
+              "date": "2022-09-03",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2022-10-14",
+              "eventType": "reported"
+            },
+            {
+              "date": "2023-10-27",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2023-11-10",
+              "eventType": "reported"
+            },
+            {
+              "date": "2024-06-26",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2024-06-26",
+              "eventType": "reported"
+            },
+            {
+              "date": "2024-10-24",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2024-11-20",
+              "eventType": "reported"
+            },
+            {
+              "date": "2024-12-02",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2024-12-04",
+              "eventType": "reported"
+            }
+          ],
+          "recentActivity": [
+            {
+              "date": "2026-05-05",
+              "status": "Closed",
+              "resolutionDays": 0
+            },
+            {
+              "date": "2026-03-25",
+              "status": "Closed",
+              "resolutionDays": 0.19
+            },
+            {
+              "date": "2026-03-24",
+              "status": "Closed",
+              "resolutionDays": 8.21
+            },
+            {
+              "date": "2026-03-24",
+              "status": "Closed",
+              "resolutionDays": 2.2
+            },
+            {
+              "date": "2026-03-24",
+              "status": "Closed",
+              "resolutionDays": 23.65
+            }
+          ]
+        }
+      ]
+    },
+    "8": {
+      "sparklineRate": [
+        97,
+        98,
+        98,
+        93,
+        90,
+        96,
+        96,
+        91,
+        89,
+        93
+      ],
+      "sparklineOpen": [
+        162,
+        189,
+        207,
+        612,
+        825,
+        287,
+        288,
+        793,
+        1074,
+        312
+      ],
+      "sparklineAvgDays": [
+        5.1,
+        10.87,
+        6.1,
+        4.84,
+        2.71,
+        1.36,
+        1.91,
+        2.98,
+        1.65,
+        0.66
+      ],
+      "monthlyRate": [
+        92,
+        93,
+        96,
+        92
+      ],
+      "monthlyAvgDays": [
+        0.8,
+        0.28,
+        0.4,
+        0.69
+      ],
+      "volumeByYear": [
+        6224,
+        11272,
+        11392,
+        8226,
+        8579,
+        7448,
+        7099,
+        9917,
+        12011,
+        4635
+      ],
+      "totalReports": 86803,
+      "trendsVsMonth": [
+        {
+          "name": "Pothole",
+          "pct": 50
+        },
+        {
+          "name": "Streetlight Outage",
+          "pct": 39
+        }
+      ],
+      "trendsVsYear": [
+        {
+          "name": "Streetlight Outage",
+          "pct": -48
+        },
+        {
+          "name": "Encampment Concerns",
+          "pct": -47
+        },
+        {
+          "name": "Graffiti",
+          "pct": -23
+        },
+        {
+          "name": "Junk Pickup",
+          "pct": 17
+        },
+        {
+          "name": "Container Issues",
+          "pct": 14
+        }
+      ],
+      "issueTypes": [
+        {
+          "id": "junk",
+          "name": "Junk Pickup",
+          "icon": "🗑️",
+          "iconBg": "rgba(240,160,48,0.18)",
+          "coordinateEstimated": true,
+          "sparkline": [
+            0,
+            0,
+            0,
+            0,
+            5579,
+            7076,
+            7343,
+            8040,
+            8410,
+            3315
+          ],
+          "monthlySparkline": [
+            887,
+            636,
+            805,
+            721
+          ],
+          "peakMonth": null,
+          "firstYear": 2021,
+          "countByPeriod": {
+            "month": 721,
+            "year": 3049,
+            "all": 39762
+          },
+          "month": {
+            "resolvedPct": 55,
+            "avgTimeLabel": "12 days"
+          },
+          "year": {
+            "resolvedPct": 83,
+            "avgTimeLabel": "13 days"
+          },
+          "all": {
+            "resolvedPct": 88,
+            "avgTimeLabel": "14 days"
+          }
+        },
+        {
+          "id": "graffiti",
+          "name": "Graffiti",
+          "icon": "🎨",
+          "iconBg": "rgba(62,207,130,0.18)",
+          "coordinateEstimated": false,
+          "sparkline": [
+            817,
+            1269,
+            1421,
+            1367,
+            1133,
+            1064,
+            1207,
+            1213,
+            1450,
+            516
+          ],
+          "monthlySparkline": [
+            132,
+            95,
+            132,
+            129
+          ],
+          "peakMonth": null,
+          "firstYear": 2017,
+          "countByPeriod": {
+            "month": 129,
+            "year": 488,
+            "all": 11457
+          },
+          "month": {
+            "resolvedPct": 92,
+            "avgTimeLabel": "2 hours"
+          },
+          "year": {
+            "resolvedPct": 93,
+            "avgTimeLabel": "1 hour"
+          },
+          "all": {
+            "resolvedPct": 96,
+            "avgTimeLabel": "21 hours"
+          }
+        },
+        {
+          "id": "streetlight",
+          "name": "Streetlight Outage",
+          "icon": "💡",
+          "iconBg": "rgba(91,155,248,0.18)",
+          "coordinateEstimated": false,
+          "sparkline": [
+            278,
+            477,
+            458,
+            600,
+            625,
+            561,
+            729,
+            1129,
+            1255,
+            360
+          ],
+          "monthlySparkline": [
+            91,
+            84,
+            71,
+            99
+          ],
+          "peakMonth": "Jan",
+          "firstYear": 2017,
+          "countByPeriod": {
+            "month": 99,
+            "year": 345,
+            "all": 6472
+          },
+          "month": {
+            "resolvedPct": 46,
+            "avgTimeLabel": "Not enough data"
+          },
+          "year": {
+            "resolvedPct": 48,
+            "avgTimeLabel": "22 days"
+          },
+          "all": {
+            "resolvedPct": 75,
+            "avgTimeLabel": "48 days"
+          }
+        },
+        {
+          "id": "dumping",
+          "name": "Illegal Dumping",
+          "icon": "🚯",
+          "iconBg": "rgba(240,160,48,0.18)",
+          "coordinateEstimated": false,
+          "sparkline": [
+            724,
+            1596,
+            1530,
+            1428,
+            1584,
+            1548,
+            1690,
+            1982,
+            1914,
+            661
+          ],
+          "monthlySparkline": [
+            134,
+            130,
+            161,
+            173
+          ],
+          "peakMonth": null,
+          "firstYear": 2017,
+          "countByPeriod": {
+            "month": 173,
+            "year": 598,
+            "all": 14657
+          },
+          "month": {
+            "resolvedPct": 96,
+            "avgTimeLabel": "17 hours"
+          },
+          "year": {
+            "resolvedPct": 98,
+            "avgTimeLabel": "16 hours"
+          },
+          "all": {
+            "resolvedPct": 97,
+            "avgTimeLabel": "25 hours"
+          }
+        },
+        {
+          "id": "vehicle",
+          "name": "Vehicle Concerns",
+          "icon": "🚗",
+          "iconBg": "rgba(232,81,74,0.18)",
+          "coordinateEstimated": false,
+          "sparkline": [
+            1780,
+            4069,
+            4150,
+            2404,
+            2782,
+            1829,
+            1712,
+            2533,
+            2827,
+            968
+          ],
+          "monthlySparkline": [
+            209,
+            212,
+            232,
+            236
+          ],
+          "peakMonth": "Aug",
+          "firstYear": 2017,
+          "countByPeriod": {
+            "month": 236,
+            "year": 889,
+            "all": 25054
+          },
+          "month": {
+            "resolvedPct": 96,
+            "avgTimeLabel": "Auto-closed by city"
+          },
+          "year": {
+            "resolvedPct": 98,
+            "avgTimeLabel": "Auto-closed by city"
+          },
+          "all": {
+            "resolvedPct": 92,
+            "avgTimeLabel": "9 days"
+          }
+        },
+        {
+          "id": "container",
+          "name": "Container Issues",
+          "icon": "📦",
+          "iconBg": "rgba(240,160,48,0.18)",
+          "coordinateEstimated": true,
+          "sparkline": [
+            0,
+            0,
+            0,
+            0,
+            1621,
+            1670,
+            1747,
+            1805,
+            1915,
+            695
+          ],
+          "monthlySparkline": [
+            172,
+            139,
+            158,
+            170
+          ],
+          "peakMonth": null,
+          "firstYear": 2021,
+          "countByPeriod": {
+            "month": 170,
+            "year": 639,
+            "all": 9451
+          },
+          "month": {
+            "resolvedPct": 33,
+            "avgTimeLabel": "7 days"
+          },
+          "year": {
+            "resolvedPct": 40,
+            "avgTimeLabel": "7 days"
+          },
+          "all": {
+            "resolvedPct": 58,
+            "avgTimeLabel": "7 days"
+          }
+        },
+        {
+          "id": "encampment",
+          "name": "Encampment Concerns",
+          "icon": "⛺",
+          "iconBg": "rgba(167,139,250,0.18)",
+          "coordinateEstimated": false,
+          "sparkline": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            296,
+            293,
+            78
+          ],
+          "monthlySparkline": [
+            15,
+            11,
+            23,
+            21
+          ],
+          "peakMonth": "Mar",
+          "firstYear": 2024,
+          "countByPeriod": {
+            "month": 21,
+            "year": 70,
+            "all": 667
+          },
+          "month": {
+            "resolvedPct": 62,
+            "avgTimeLabel": "Not enough data"
+          },
+          "year": {
+            "resolvedPct": 83,
+            "avgTimeLabel": "7 days"
+          },
+          "all": {
+            "resolvedPct": 69,
+            "avgTimeLabel": "18 days"
+          }
+        },
+        {
+          "id": "pothole",
+          "name": "Pothole",
+          "icon": "🛣️",
+          "iconBg": "rgba(232,81,74,0.18)",
+          "coordinateEstimated": false,
+          "sparkline": [
+            145,
+            223,
+            260,
+            141,
+            112,
+            81,
+            148,
+            82,
+            69,
+            28
+          ],
+          "monthlySparkline": [
+            3,
+            8,
+            4,
+            6
+          ],
+          "peakMonth": "Mar",
+          "firstYear": 2017,
+          "countByPeriod": {
+            "month": 6,
+            "year": 21,
+            "all": 1289
+          },
+          "month": {
+            "resolvedPct": 100,
+            "avgTimeLabel": "Not enough data"
+          },
+          "year": {
+            "resolvedPct": 95,
+            "avgTimeLabel": "Not enough data"
+          },
+          "all": {
+            "resolvedPct": 93,
+            "avgTimeLabel": "2 days"
+          }
+        }
+      ],
+      "byPeriod": {
+        "month": {
+          "summary": {
+            "resolutionRate": 92,
+            "resolutionRateDelta": -4,
+            "avgFixTimeLabel": "17 hours",
+            "avgFixTimeDays": 0.69,
+            "avgFixTimeDelta": 0.29
+          }
+        },
+        "year": {
+          "summary": {
+            "resolutionRate": 93,
+            "resolutionRateDelta": 4,
+            "avgFixTimeLabel": "16 hours",
+            "avgFixTimeDays": 0.68,
+            "avgFixTimeDelta": -3.22
+          }
+        },
+        "all": {
+          "summary": {
+            "resolutionRate": 94,
+            "resolutionRateDelta": -3,
+            "avgFixTimeLabel": "4 days",
+            "avgFixTimeDays": 3.72,
+            "avgFixTimeDelta": -1.38
+          }
+        }
+      },
+      "chronicSpots": [
+        {
+          "count": 283,
+          "location": "South King Road, San Jose",
+          "issueType": "Graffiti",
+          "icon": "🎨",
+          "iconBg": "rgba(62,207,130,0.18)",
+          "since": 2017,
+          "reopenCount": 20,
+          "maxConsecYears": 10,
+          "returnMedianDays": 18.18,
+          "timelineEvents": [
+            {
+              "date": "2018-12-03",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2018-12-07",
+              "eventType": "reported"
+            },
+            {
+              "date": "2021-02-01",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2021-02-03",
+              "eventType": "reported"
+            },
+            {
+              "date": "2021-02-22",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2021-03-04",
+              "eventType": "reported"
+            },
+            {
+              "date": "2022-01-19",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2022-01-20",
+              "eventType": "reported"
+            },
+            {
+              "date": "2024-09-24",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2024-12-03",
+              "eventType": "reported"
+            },
+            {
+              "date": "2025-01-07",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2025-02-21",
+              "eventType": "reported"
+            },
+            {
+              "date": "2025-02-24",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2025-04-01",
+              "eventType": "reported"
+            },
+            {
+              "date": "2025-04-02",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2025-04-15",
+              "eventType": "reported"
+            },
+            {
+              "date": "2025-04-22",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2025-05-15",
+              "eventType": "reported"
+            },
+            {
+              "date": "2025-06-16",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2025-06-23",
+              "eventType": "reported"
+            },
+            {
+              "date": "2025-07-22",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2025-07-22",
+              "eventType": "reported"
+            },
+            {
+              "date": "2025-07-31",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2025-09-10",
+              "eventType": "reported"
+            },
+            {
+              "date": "2025-09-11",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2025-09-22",
+              "eventType": "reported"
+            },
+            {
+              "date": "2025-09-23",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2025-10-27",
+              "eventType": "reported"
+            },
+            {
+              "date": "2025-10-28",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2025-10-28",
+              "eventType": "reported"
+            },
+            {
+              "date": "2025-10-28",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2025-10-29",
+              "eventType": "reported"
+            },
+            {
+              "date": "2025-11-11",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2025-12-09",
+              "eventType": "reported"
+            },
+            {
+              "date": "2025-12-09",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2025-12-09",
+              "eventType": "reported"
+            },
+            {
+              "date": "2025-12-30",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2026-01-05",
+              "eventType": "reported"
+            },
+            {
+              "date": "2026-01-06",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2026-01-08",
+              "eventType": "reported"
+            }
+          ],
+          "recentActivity": [
+            {
+              "date": "2026-04-13",
+              "status": "Closed",
+              "resolutionDays": 0.04
+            },
+            {
+              "date": "2026-03-05",
+              "status": "Closed",
+              "resolutionDays": 0.01
+            },
+            {
+              "date": "2026-03-03",
+              "status": "Closed",
+              "resolutionDays": 1.83
+            },
+            {
+              "date": "2026-01-28",
+              "status": "Closed",
+              "resolutionDays": 0.02
+            },
+            {
+              "date": "2026-01-28",
+              "status": "Closed",
+              "resolutionDays": 0.02
+            }
+          ]
+        },
+        {
+          "count": 231,
+          "location": "Sturla Drive, Evergreen",
+          "issueType": "Vehicle Concerns",
+          "icon": "🚗",
+          "iconBg": "rgba(232,81,74,0.18)",
+          "since": 2018,
+          "reopenCount": 9,
+          "maxConsecYears": 9,
+          "returnMedianDays": 22.88,
+          "timelineEvents": [
+            {
+              "date": "2020-08-02",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2020-08-25",
+              "eventType": "reported"
+            },
+            {
+              "date": "2023-04-14",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2023-05-03",
+              "eventType": "reported"
+            },
+            {
+              "date": "2024-01-12",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2024-02-21",
+              "eventType": "reported"
+            },
+            {
+              "date": "2024-02-21",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2024-03-20",
+              "eventType": "reported"
+            },
+            {
+              "date": "2024-03-20",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2024-03-23",
+              "eventType": "reported"
+            },
+            {
+              "date": "2024-03-23",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2024-04-07",
+              "eventType": "reported"
+            },
+            {
+              "date": "2024-05-22",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2024-06-05",
+              "eventType": "reported"
+            },
+            {
+              "date": "2025-01-31",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2025-02-27",
+              "eventType": "reported"
+            },
+            {
+              "date": "2025-03-30",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2025-06-06",
+              "eventType": "reported"
+            }
+          ],
+          "recentActivity": [
+            {
+              "date": "2026-03-04",
+              "status": "Closed",
+              "resolutionDays": 19.98
+            },
+            {
+              "date": "2026-03-02",
+              "status": "Closed",
+              "resolutionDays": 17.87
+            },
+            {
+              "date": "2026-01-12",
+              "status": "Closed",
+              "resolutionDays": 0
+            },
+            {
+              "date": "2025-10-15",
+              "status": "Closed",
+              "resolutionDays": 0
+            },
+            {
+              "date": "2025-07-23",
+              "status": "Closed",
+              "resolutionDays": 1.02
+            }
+          ]
+        },
+        {
+          "count": 220,
+          "location": "Brahms Avenue, Meadowfair",
+          "issueType": "Illegal Dumping",
+          "icon": "🚯",
+          "iconBg": "rgba(240,160,48,0.18)",
+          "since": 2017,
+          "reopenCount": 2,
+          "maxConsecYears": 10,
+          "returnMedianDays": null,
+          "timelineEvents": [
+            {
+              "date": "2018-07-26",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2018-09-08",
+              "eventType": "reported"
+            },
+            {
+              "date": "2024-10-28",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2024-12-29",
+              "eventType": "reported"
+            }
+          ],
+          "recentActivity": [
+            {
+              "date": "2026-04-30",
+              "status": "Closed",
+              "resolutionDays": 0.12
+            },
+            {
+              "date": "2026-03-01",
+              "status": "Closed",
+              "resolutionDays": 2.68
+            },
+            {
+              "date": "2026-01-05",
+              "status": "Closed",
+              "resolutionDays": 0.78
+            },
+            {
+              "date": "2025-12-24",
+              "status": "Closed",
+              "resolutionDays": 7.44
+            },
+            {
+              "date": "2025-12-08",
+              "status": "Closed",
+              "resolutionDays": 1.58
+            }
+          ]
+        }
+      ]
+    },
+    "9": {
+      "sparklineRate": [
+        92,
+        97,
+        89,
+        72,
+        91,
+        96,
+        97,
+        92,
+        88,
+        93
+      ],
+      "sparklineOpen": [
+        355,
+        299,
+        2181,
+        11815,
+        874,
+        571,
+        324,
+        662,
+        1299,
+        253
+      ],
+      "sparklineAvgDays": [
+        6.62,
+        9.92,
+        1.86,
+        0.55,
+        2.18,
+        0.98,
+        0.73,
+        1.27,
+        0.72,
+        0.01
+      ],
+      "monthlyRate": [
+        92,
+        95,
+        94,
+        95
+      ],
+      "monthlyAvgDays": [
+        0.06,
+        0.02,
+        0,
+        0.01
+      ],
+      "volumeByYear": [
+        4707,
+        10651,
+        19894,
+        42963,
+        9965,
+        13232,
+        12262,
+        10687,
+        12576,
+        4466
+      ],
+      "totalReports": 141403,
+      "trendsVsMonth": [
+        {
+          "name": "Pothole",
+          "pct": 58
+        },
+        {
+          "name": "Graffiti",
+          "pct": -27
+        },
+        {
+          "name": "Vehicle Concerns",
+          "pct": -22
+        },
+        {
+          "name": "Encampment Concerns",
+          "pct": -14
+        }
+      ],
+      "trendsVsYear": [
+        {
+          "name": "Encampment Concerns",
+          "pct": -63
+        },
+        {
+          "name": "Streetlight Outage",
+          "pct": -58
+        },
+        {
+          "name": "Pothole",
+          "pct": -27
+        },
+        {
+          "name": "Vehicle Concerns",
+          "pct": 18
+        },
+        {
+          "name": "Junk Pickup",
+          "pct": 17
+        },
+        {
+          "name": "Container Issues",
+          "pct": 14
+        }
+      ],
+      "issueTypes": [
+        {
+          "id": "junk",
+          "name": "Junk Pickup",
+          "icon": "🗑️",
+          "iconBg": "rgba(240,160,48,0.18)",
+          "coordinateEstimated": true,
+          "sparkline": [
+            0,
+            0,
+            0,
+            0,
+            5413,
+            6865,
+            7124,
+            7800,
+            8159,
+            3216
+          ],
+          "monthlySparkline": [
+            860,
+            617,
+            781,
+            699
+          ],
+          "peakMonth": null,
+          "firstYear": 2021,
+          "countByPeriod": {
+            "month": 699,
+            "year": 2957,
+            "all": 38575
+          },
+          "month": {
+            "resolvedPct": 55,
+            "avgTimeLabel": "12 days"
+          },
+          "year": {
+            "resolvedPct": 83,
+            "avgTimeLabel": "13 days"
+          },
+          "all": {
+            "resolvedPct": 88,
+            "avgTimeLabel": "14 days"
+          }
+        },
+        {
+          "id": "graffiti",
+          "name": "Graffiti",
+          "icon": "🎨",
+          "iconBg": "rgba(62,207,130,0.18)",
+          "coordinateEstimated": false,
+          "sparkline": [
+            1387,
+            2657,
+            4923,
+            17870,
+            1792,
+            2661,
+            2369,
+            2686,
+            2915,
+            1012
+          ],
+          "monthlySparkline": [
+            236,
+            235,
+            262,
+            190
+          ],
+          "peakMonth": null,
+          "firstYear": 2017,
+          "countByPeriod": {
+            "month": 190,
+            "year": 923,
+            "all": 40272
+          },
+          "month": {
+            "resolvedPct": 93,
+            "avgTimeLabel": "< 1 hour"
+          },
+          "year": {
+            "resolvedPct": 87,
+            "avgTimeLabel": "< 1 hour"
+          },
+          "all": {
+            "resolvedPct": 95,
+            "avgTimeLabel": "12 hours"
+          }
+        },
+        {
+          "id": "streetlight",
+          "name": "Streetlight Outage",
+          "icon": "💡",
+          "iconBg": "rgba(91,155,248,0.18)",
+          "coordinateEstimated": false,
+          "sparkline": [
+            384,
+            917,
+            935,
+            1328,
+            1162,
+            241,
+            520,
+            435,
+            498,
+            97
+          ],
+          "monthlySparkline": [
+            31,
+            17,
+            23,
+            21
+          ],
+          "peakMonth": "Jan",
+          "firstYear": 2017,
+          "countByPeriod": {
+            "month": 21,
+            "year": 92,
+            "all": 6517
+          },
+          "month": {
+            "resolvedPct": 19,
+            "avgTimeLabel": "Not enough data"
+          },
+          "year": {
+            "resolvedPct": 49,
+            "avgTimeLabel": "Not enough data"
+          },
+          "all": {
+            "resolvedPct": 81,
+            "avgTimeLabel": "37 days"
+          }
+        },
+        {
+          "id": "dumping",
+          "name": "Illegal Dumping",
+          "icon": "🚯",
+          "iconBg": "rgba(240,160,48,0.18)",
+          "coordinateEstimated": false,
+          "sparkline": [
+            369,
+            1018,
+            2439,
+            5874,
+            1028,
+            1139,
+            1161,
+            1045,
+            1358,
+            485
+          ],
+          "monthlySparkline": [
+            131,
+            99,
+            109,
+            115
+          ],
+          "peakMonth": null,
+          "firstYear": 2017,
+          "countByPeriod": {
+            "month": 115,
+            "year": 454,
+            "all": 15916
+          },
+          "month": {
+            "resolvedPct": 95,
+            "avgTimeLabel": "16 hours"
+          },
+          "year": {
+            "resolvedPct": 97,
+            "avgTimeLabel": "21 hours"
+          },
+          "all": {
+            "resolvedPct": 62,
+            "avgTimeLabel": "28 hours"
+          }
+        },
+        {
+          "id": "vehicle",
+          "name": "Vehicle Concerns",
+          "icon": "🚗",
+          "iconBg": "rgba(232,81,74,0.18)",
+          "coordinateEstimated": false,
+          "sparkline": [
+            2008,
+            5107,
+            5785,
+            7042,
+            4640,
+            7608,
+            6453,
+            3579,
+            2908,
+            999
+          ],
+          "monthlySparkline": [
+            223,
+            208,
+            277,
+            215
+          ],
+          "peakMonth": "Aug",
+          "firstYear": 2017,
+          "countByPeriod": {
+            "month": 215,
+            "year": 923,
+            "all": 46129
+          },
+          "month": {
+            "resolvedPct": 96,
+            "avgTimeLabel": "Auto-closed by city"
+          },
+          "year": {
+            "resolvedPct": 98,
+            "avgTimeLabel": "Auto-closed by city"
+          },
+          "all": {
+            "resolvedPct": 95,
+            "avgTimeLabel": "42 hours"
+          }
+        },
+        {
+          "id": "container",
+          "name": "Container Issues",
+          "icon": "📦",
+          "iconBg": "rgba(240,160,48,0.18)",
+          "coordinateEstimated": true,
+          "sparkline": [
+            0,
+            0,
+            0,
+            0,
+            1572,
+            1620,
+            1695,
+            1751,
+            1858,
+            675
+          ],
+          "monthlySparkline": [
+            167,
+            135,
+            153,
+            165
+          ],
+          "peakMonth": null,
+          "firstYear": 2021,
+          "countByPeriod": {
+            "month": 165,
+            "year": 620,
+            "all": 9171
+          },
+          "month": {
+            "resolvedPct": 33,
+            "avgTimeLabel": "7 days"
+          },
+          "year": {
+            "resolvedPct": 40,
+            "avgTimeLabel": "7 days"
+          },
+          "all": {
+            "resolvedPct": 58,
+            "avgTimeLabel": "7 days"
+          }
+        },
+        {
+          "id": "encampment",
+          "name": "Encampment Concerns",
+          "icon": "⛺",
+          "iconBg": "rgba(167,139,250,0.18)",
+          "coordinateEstimated": false,
+          "sparkline": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            262,
+            541,
+            64
+          ],
+          "monthlySparkline": [
+            18,
+            12,
+            14,
+            12
+          ],
+          "peakMonth": "Mar",
+          "firstYear": 2024,
+          "countByPeriod": {
+            "month": 12,
+            "year": 56,
+            "all": 867
+          },
+          "month": {
+            "resolvedPct": 83,
+            "avgTimeLabel": "Not enough data"
+          },
+          "year": {
+            "resolvedPct": 91,
+            "avgTimeLabel": "4 days"
+          },
+          "all": {
+            "resolvedPct": 72,
+            "avgTimeLabel": "11 days"
+          }
+        },
+        {
+          "id": "pothole",
+          "name": "Pothole",
+          "icon": "🛣️",
+          "iconBg": "rgba(232,81,74,0.18)",
+          "coordinateEstimated": false,
+          "sparkline": [
+            129,
+            177,
+            1654,
+            5463,
+            124,
+            206,
+            240,
+            221,
+            192,
+            60
+          ],
+          "monthlySparkline": [
+            10,
+            18,
+            12,
+            19
+          ],
+          "peakMonth": "Mar",
+          "firstYear": 2017,
+          "countByPeriod": {
+            "month": 19,
+            "year": 59,
+            "all": 8466
+          },
+          "month": {
+            "resolvedPct": 95,
+            "avgTimeLabel": "Not enough data"
+          },
+          "year": {
+            "resolvedPct": 95,
+            "avgTimeLabel": "17 hours"
+          },
+          "all": {
+            "resolvedPct": 26,
+            "avgTimeLabel": "25 hours"
+          }
+        }
+      ],
+      "byPeriod": {
+        "month": {
+          "summary": {
+            "resolutionRate": 95,
+            "resolutionRateDelta": 1,
+            "avgFixTimeLabel": "< 1 hour",
+            "avgFixTimeDays": 0.01,
+            "avgFixTimeDelta": 0
+          }
+        },
+        "year": {
+          "summary": {
+            "resolutionRate": 94,
+            "resolutionRateDelta": 6,
+            "avgFixTimeLabel": "< 1 hour",
+            "avgFixTimeDays": 0.01,
+            "avgFixTimeDelta": -0.99
+          }
+        },
+        "all": {
+          "summary": {
+            "resolutionRate": 86,
+            "resolutionRateDelta": -6,
+            "avgFixTimeLabel": "23 hours",
+            "avgFixTimeDays": 0.94,
+            "avgFixTimeDelta": -5.68
+          }
+        }
+      },
+      "chronicSpots": [
+        {
+          "count": 937,
+          "location": "Cherry Avenue, San Jose",
+          "issueType": "Graffiti",
+          "icon": "🎨",
+          "iconBg": "rgba(62,207,130,0.18)",
+          "since": 2017,
+          "reopenCount": 18,
+          "maxConsecYears": 10,
+          "returnMedianDays": 35.02,
+          "timelineEvents": [
+            {
+              "date": "2020-05-31",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2020-06-01",
+              "eventType": "reported"
+            },
+            {
+              "date": "2020-06-01",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2020-06-01",
+              "eventType": "reported"
+            },
+            {
+              "date": "2020-06-01",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2020-06-01",
+              "eventType": "reported"
+            },
+            {
+              "date": "2020-06-01",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2020-06-01",
+              "eventType": "reported"
+            },
+            {
+              "date": "2020-06-01",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2020-06-01",
+              "eventType": "reported"
+            },
+            {
+              "date": "2020-06-01",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2020-06-01",
+              "eventType": "reported"
+            },
+            {
+              "date": "2020-06-01",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2020-06-01",
+              "eventType": "reported"
+            },
+            {
+              "date": "2020-06-01",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2020-06-01",
+              "eventType": "reported"
+            },
+            {
+              "date": "2020-06-01",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2020-06-01",
+              "eventType": "reported"
+            },
+            {
+              "date": "2020-06-01",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2020-06-01",
+              "eventType": "reported"
+            },
+            {
+              "date": "2020-06-01",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2020-06-01",
+              "eventType": "reported"
+            },
+            {
+              "date": "2020-06-01",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2020-06-01",
+              "eventType": "reported"
+            },
+            {
+              "date": "2020-06-01",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2020-06-01",
+              "eventType": "reported"
+            },
+            {
+              "date": "2022-04-09",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2022-07-09",
+              "eventType": "reported"
+            },
+            {
+              "date": "2024-09-16",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2024-10-14",
+              "eventType": "reported"
+            },
+            {
+              "date": "2025-03-01",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2025-03-04",
+              "eventType": "reported"
+            },
+            {
+              "date": "2025-08-08",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2025-09-19",
+              "eventType": "reported"
+            },
+            {
+              "date": "2025-09-19",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2025-09-19",
+              "eventType": "reported"
+            }
+          ],
+          "recentActivity": [
+            {
+              "date": "2026-04-17",
+              "status": "Closed",
+              "resolutionDays": 0
+            },
+            {
+              "date": "2026-04-01",
+              "status": "Closed",
+              "resolutionDays": 0
+            },
+            {
+              "date": "2026-03-18",
+              "status": "Closed",
+              "resolutionDays": 0
+            },
+            {
+              "date": "2026-01-06",
+              "status": "Closed",
+              "resolutionDays": 0
+            },
+            {
+              "date": "2025-12-18",
+              "status": "Closed",
+              "resolutionDays": 0
+            }
+          ]
+        },
+        {
+          "count": 298,
+          "location": "Ross Avenue, San Jose",
+          "issueType": "Vehicle Concerns",
+          "icon": "🚗",
+          "iconBg": "rgba(232,81,74,0.18)",
+          "since": 2017,
+          "reopenCount": 2,
+          "maxConsecYears": 10,
+          "returnMedianDays": null,
+          "timelineEvents": [
+            {
+              "date": "2017-08-07",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2017-09-10",
+              "eventType": "reported"
+            },
+            {
+              "date": "2025-08-27",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2025-08-29",
+              "eventType": "reported"
+            }
+          ],
+          "recentActivity": [
+            {
+              "date": "2026-02-05",
+              "status": "Closed",
+              "resolutionDays": 0
+            },
+            {
+              "date": "2025-08-29",
+              "status": "Open",
+              "resolutionDays": null
+            },
+            {
+              "date": "2025-08-27",
+              "status": "Closed",
+              "resolutionDays": 0
+            },
+            {
+              "date": "2024-06-09",
+              "status": "Closed",
+              "resolutionDays": 12.65
+            },
+            {
+              "date": "2023-10-10",
+              "status": "Closed",
+              "resolutionDays": 9.15
+            }
+          ]
+        },
+        {
+          "count": 190,
+          "location": "Farm Drive, San Jose",
+          "issueType": "Illegal Dumping",
+          "icon": "🚯",
+          "iconBg": "rgba(240,160,48,0.18)",
+          "since": 2017,
+          "reopenCount": 4,
+          "maxConsecYears": 10,
+          "returnMedianDays": 12.95,
+          "timelineEvents": [
+            {
+              "date": "2021-03-12",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2021-03-31",
+              "eventType": "reported"
+            },
+            {
+              "date": "2021-05-06",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2021-05-20",
+              "eventType": "reported"
+            },
+            {
+              "date": "2022-02-24",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2022-03-08",
+              "eventType": "reported"
+            },
+            {
+              "date": "2022-10-12",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2022-10-20",
+              "eventType": "reported"
+            }
+          ],
+          "recentActivity": [
+            {
+              "date": "2026-04-30",
+              "status": "Closed",
+              "resolutionDays": 0
+            },
+            {
+              "date": "2026-04-28",
+              "status": "Closed",
+              "resolutionDays": 10.09
+            },
+            {
+              "date": "2026-02-02",
+              "status": "Closed",
+              "resolutionDays": 0.83
+            },
+            {
+              "date": "2026-01-05",
+              "status": "Closed",
+              "resolutionDays": 0
+            },
+            {
+              "date": "2025-12-16",
+              "status": "Closed",
+              "resolutionDays": 0
+            }
+          ]
+        }
+      ]
+    },
+    "10": {
+      "sparklineRate": [
+        96,
+        97,
+        97,
+        88,
+        89,
+        93,
+        96,
+        90,
+        87,
+        94
+      ],
+      "sparklineOpen": [
+        174,
+        214,
+        272,
+        792,
+        920,
+        378,
+        256,
+        650,
+        1074,
+        196
+      ],
+      "sparklineAvgDays": [
+        6.21,
+        12.02,
+        6.75,
+        7.73,
+        4,
+        2.1,
+        2.83,
+        4.88,
+        1.66,
+        0.88
+      ],
+      "monthlyRate": [
+        95,
+        97,
+        96,
+        95
+      ],
+      "monthlyAvgDays": [
+        1.32,
+        0.92,
+        0.64,
+        1.46
+      ],
+      "volumeByYear": [
+        3887,
+        7446,
+        8317,
+        6725,
+        8240,
+        5794,
+        6641,
+        8799,
+        10799,
+        4193
+      ],
+      "totalReports": 70841,
+      "trendsVsMonth": [
+        {
+          "name": "Encampment Concerns",
+          "pct": 60
+        },
+        {
+          "name": "Pothole",
+          "pct": -38
+        },
+        {
+          "name": "Illegal Dumping",
+          "pct": -31
+        },
+        {
+          "name": "Vehicle Concerns",
+          "pct": -26
+        },
+        {
+          "name": "Graffiti",
+          "pct": -15
+        }
+      ],
+      "trendsVsYear": [
+        {
+          "name": "Graffiti",
+          "pct": 60
+        },
+        {
+          "name": "Vehicle Concerns",
+          "pct": -26
+        },
+        {
+          "name": "Streetlight Outage",
+          "pct": -20
+        },
+        {
+          "name": "Encampment Concerns",
+          "pct": -19
+        },
+        {
+          "name": "Junk Pickup",
+          "pct": 17
+        },
+        {
+          "name": "Pothole",
+          "pct": 16
+        },
+        {
+          "name": "Container Issues",
+          "pct": 14
+        },
+        {
+          "name": "Illegal Dumping",
+          "pct": 13
+        }
+      ],
+      "issueTypes": [
+        {
+          "id": "junk",
+          "name": "Junk Pickup",
+          "icon": "🗑️",
+          "iconBg": "rgba(240,160,48,0.18)",
+          "coordinateEstimated": true,
+          "sparkline": [
+            0,
+            0,
+            0,
+            0,
+            5385,
+            6830,
+            7087,
+            7760,
+            8117,
+            3199
+          ],
+          "monthlySparkline": [
+            856,
+            614,
+            777,
+            696
+          ],
+          "peakMonth": null,
+          "firstYear": 2021,
+          "countByPeriod": {
+            "month": 696,
+            "year": 2943,
+            "all": 38383
+          },
+          "month": {
+            "resolvedPct": 55,
+            "avgTimeLabel": "12 days"
+          },
+          "year": {
+            "resolvedPct": 83,
+            "avgTimeLabel": "13 days"
+          },
+          "all": {
+            "resolvedPct": 88,
+            "avgTimeLabel": "14 days"
+          }
+        },
+        {
+          "id": "graffiti",
+          "name": "Graffiti",
+          "icon": "🎨",
+          "iconBg": "rgba(62,207,130,0.18)",
+          "coordinateEstimated": false,
+          "sparkline": [
+            1060,
+            1514,
+            1690,
+            921,
+            1597,
+            1625,
+            1863,
+            1484,
+            1710,
+            779
+          ],
+          "monthlySparkline": [
+            197,
+            145,
+            215,
+            182
+          ],
+          "peakMonth": null,
+          "firstYear": 2017,
+          "countByPeriod": {
+            "month": 182,
+            "year": 739,
+            "all": 14243
+          },
+          "month": {
+            "resolvedPct": 92,
+            "avgTimeLabel": "25 hours"
+          },
+          "year": {
+            "resolvedPct": 94,
+            "avgTimeLabel": "15 hours"
+          },
+          "all": {
+            "resolvedPct": 94,
+            "avgTimeLabel": "45 hours"
+          }
+        },
+        {
+          "id": "streetlight",
+          "name": "Streetlight Outage",
+          "icon": "💡",
+          "iconBg": "rgba(91,155,248,0.18)",
+          "coordinateEstimated": false,
+          "sparkline": [
+            569,
+            1141,
+            1241,
+            1862,
+            1416,
+            307,
+            545,
+            461,
+            603,
+            210
+          ],
+          "monthlySparkline": [
+            56,
+            46,
+            50,
+            52
+          ],
+          "peakMonth": "Jan",
+          "firstYear": 2017,
+          "countByPeriod": {
+            "month": 52,
+            "year": 204,
+            "all": 8355
+          },
+          "month": {
+            "resolvedPct": 62,
+            "avgTimeLabel": "Not enough data"
+          },
+          "year": {
+            "resolvedPct": 72,
+            "avgTimeLabel": "16 days"
+          },
+          "all": {
+            "resolvedPct": 81,
+            "avgTimeLabel": "37 days"
+          }
+        },
+        {
+          "id": "dumping",
+          "name": "Illegal Dumping",
+          "icon": "🚯",
+          "iconBg": "rgba(240,160,48,0.18)",
+          "coordinateEstimated": false,
+          "sparkline": [
+            353,
+            838,
+            846,
+            771,
+            1110,
+            980,
+            1240,
+            1332,
+            1512,
+            505
+          ],
+          "monthlySparkline": [
+            124,
+            119,
+            133,
+            92
+          ],
+          "peakMonth": null,
+          "firstYear": 2017,
+          "countByPeriod": {
+            "month": 92,
+            "year": 468,
+            "all": 9487
+          },
+          "month": {
+            "resolvedPct": 98,
+            "avgTimeLabel": "2 days"
+          },
+          "year": {
+            "resolvedPct": 98,
+            "avgTimeLabel": "24 hours"
+          },
+          "all": {
+            "resolvedPct": 97,
+            "avgTimeLabel": "45 hours"
+          }
+        },
+        {
+          "id": "vehicle",
+          "name": "Vehicle Concerns",
+          "icon": "🚗",
+          "iconBg": "rgba(232,81,74,0.18)",
+          "coordinateEstimated": false,
+          "sparkline": [
+            1396,
+            3021,
+            3298,
+            2094,
+            2691,
+            1573,
+            1488,
+            2296,
+            2497,
+            669
+          ],
+          "monthlySparkline": [
+            145,
+            110,
+            192,
+            142
+          ],
+          "peakMonth": "Aug",
+          "firstYear": 2017,
+          "countByPeriod": {
+            "month": 142,
+            "year": 589,
+            "all": 21023
+          },
+          "month": {
+            "resolvedPct": 96,
+            "avgTimeLabel": "Auto-closed by city"
+          },
+          "year": {
+            "resolvedPct": 98,
+            "avgTimeLabel": "Auto-closed by city"
+          },
+          "all": {
+            "resolvedPct": 91,
+            "avgTimeLabel": "9 days"
+          }
+        },
+        {
+          "id": "container",
+          "name": "Container Issues",
+          "icon": "📦",
+          "iconBg": "rgba(240,160,48,0.18)",
+          "coordinateEstimated": true,
+          "sparkline": [
+            0,
+            0,
+            0,
+            0,
+            1564,
+            1612,
+            1687,
+            1742,
+            1849,
+            671
+          ],
+          "monthlySparkline": [
+            166,
+            135,
+            153,
+            164
+          ],
+          "peakMonth": null,
+          "firstYear": 2021,
+          "countByPeriod": {
+            "month": 164,
+            "year": 618,
+            "all": 9129
+          },
+          "month": {
+            "resolvedPct": 33,
+            "avgTimeLabel": "7 days"
+          },
+          "year": {
+            "resolvedPct": 40,
+            "avgTimeLabel": "7 days"
+          },
+          "all": {
+            "resolvedPct": 58,
+            "avgTimeLabel": "7 days"
+          }
+        },
+        {
+          "id": "encampment",
+          "name": "Encampment Concerns",
+          "icon": "⛺",
+          "iconBg": "rgba(167,139,250,0.18)",
+          "coordinateEstimated": false,
+          "sparkline": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            338,
+            252,
+            86
+          ],
+          "monthlySparkline": [
+            22,
+            18,
+            15,
+            24
+          ],
+          "peakMonth": "Mar",
+          "firstYear": 2024,
+          "countByPeriod": {
+            "month": 24,
+            "year": 79,
+            "all": 676
+          },
+          "month": {
+            "resolvedPct": 75,
+            "avgTimeLabel": "Not enough data"
+          },
+          "year": {
+            "resolvedPct": 89,
+            "avgTimeLabel": "6 days"
+          },
+          "all": {
+            "resolvedPct": 71,
+            "avgTimeLabel": "21 days"
+          }
+        },
+        {
+          "id": "pothole",
+          "name": "Pothole",
+          "icon": "🛣️",
+          "iconBg": "rgba(232,81,74,0.18)",
+          "coordinateEstimated": false,
+          "sparkline": [
+            88,
+            172,
+            337,
+            180,
+            160,
+            181,
+            297,
+            202,
+            120,
+            53
+          ],
+          "monthlySparkline": [
+            22,
+            9,
+            13,
+            8
+          ],
+          "peakMonth": "Mar",
+          "firstYear": 2017,
+          "countByPeriod": {
+            "month": 8,
+            "year": 52,
+            "all": 1790
+          },
+          "month": {
+            "resolvedPct": 100,
+            "avgTimeLabel": "Not enough data"
+          },
+          "year": {
+            "resolvedPct": 100,
+            "avgTimeLabel": "19 hours"
+          },
+          "all": {
+            "resolvedPct": 95,
+            "avgTimeLabel": "46 hours"
+          }
+        }
+      ],
+      "byPeriod": {
+        "month": {
+          "summary": {
+            "resolutionRate": 95,
+            "resolutionRateDelta": -1,
+            "avgFixTimeLabel": "35 hours",
+            "avgFixTimeDays": 1.46,
+            "avgFixTimeDelta": 0.82
+          }
+        },
+        "year": {
+          "summary": {
+            "resolutionRate": 95,
+            "resolutionRateDelta": 7,
+            "avgFixTimeLabel": "21 hours",
+            "avgFixTimeDays": 0.88,
+            "avgFixTimeDelta": -2.67
+          }
+        },
+        "all": {
+          "summary": {
+            "resolutionRate": 92,
+            "resolutionRateDelta": -4,
+            "avgFixTimeLabel": "4 days",
+            "avgFixTimeDays": 4.34,
+            "avgFixTimeDelta": -1.88
+          }
+        }
+      },
+      "chronicSpots": [
+        {
+          "count": 229,
+          "location": "Homeward Place, San Jose",
+          "issueType": "Graffiti",
+          "icon": "🎨",
+          "iconBg": "rgba(62,207,130,0.18)",
+          "since": 2017,
+          "reopenCount": 10,
+          "maxConsecYears": 10,
+          "returnMedianDays": 16.05,
+          "timelineEvents": [
+            {
+              "date": "2018-11-24",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2019-01-04",
+              "eventType": "reported"
+            },
+            {
+              "date": "2020-06-17",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2020-08-31",
+              "eventType": "reported"
+            },
+            {
+              "date": "2021-09-07",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2021-09-16",
+              "eventType": "reported"
+            },
+            {
+              "date": "2022-02-18",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2022-02-26",
+              "eventType": "reported"
+            },
+            {
+              "date": "2022-05-14",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2022-05-29",
+              "eventType": "reported"
+            },
+            {
+              "date": "2022-06-03",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2022-06-13",
+              "eventType": "reported"
+            },
+            {
+              "date": "2022-12-05",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2022-12-06",
+              "eventType": "reported"
+            },
+            {
+              "date": "2023-11-23",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2024-04-12",
+              "eventType": "reported"
+            },
+            {
+              "date": "2024-09-09",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2024-10-03",
+              "eventType": "reported"
+            },
+            {
+              "date": "2025-04-14",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2025-06-11",
+              "eventType": "reported"
+            }
+          ],
+          "recentActivity": [
+            {
+              "date": "2026-03-09",
+              "status": "Closed",
+              "resolutionDays": 0
+            },
+            {
+              "date": "2026-03-08",
+              "status": "Closed",
+              "resolutionDays": 1.77
+            },
+            {
+              "date": "2026-03-05",
+              "status": "Closed",
+              "resolutionDays": 0
+            },
+            {
+              "date": "2026-02-19",
+              "status": "Closed",
+              "resolutionDays": 1.05
+            },
+            {
+              "date": "2026-01-28",
+              "status": "Closed",
+              "resolutionDays": 5.8
+            }
+          ]
+        },
+        {
+          "count": 228,
+          "location": "Santa Teresa Boulevard, San Jose",
+          "issueType": "Illegal Dumping",
+          "icon": "🚯",
+          "iconBg": "rgba(240,160,48,0.18)",
+          "since": 2017,
+          "reopenCount": 0,
+          "maxConsecYears": 10,
+          "returnMedianDays": null,
+          "timelineEvents": [],
+          "recentActivity": [
+            {
+              "date": "2026-04-01",
+              "status": "Closed",
+              "resolutionDays": 0.81
+            },
+            {
+              "date": "2026-02-20",
+              "status": "Closed",
+              "resolutionDays": 0.1
+            },
+            {
+              "date": "2026-02-20",
+              "status": "Closed",
+              "resolutionDays": 0.17
+            },
+            {
+              "date": "2026-02-20",
+              "status": "Closed",
+              "resolutionDays": 0.28
+            },
+            {
+              "date": "2026-02-09",
+              "status": "Closed",
+              "resolutionDays": 2.15
+            }
+          ]
+        },
+        {
+          "count": 202,
+          "location": "Nature Drive, San Jose",
+          "issueType": "Vehicle Concerns",
+          "icon": "🚗",
+          "iconBg": "rgba(232,81,74,0.18)",
+          "since": 2017,
+          "reopenCount": 3,
+          "maxConsecYears": 10,
+          "returnMedianDays": 9.04,
+          "timelineEvents": [
+            {
+              "date": "2019-07-28",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2019-07-28",
+              "eventType": "reported"
+            },
+            {
+              "date": "2021-04-26",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2021-06-02",
+              "eventType": "reported"
+            },
+            {
+              "date": "2024-09-08",
+              "eventType": "resolved"
+            },
+            {
+              "date": "2024-09-17",
+              "eventType": "reported"
+            }
+          ],
+          "recentActivity": [
+            {
+              "date": "2026-05-02",
+              "status": "Closed",
+              "resolutionDays": 0
+            },
+            {
+              "date": "2026-04-23",
+              "status": "Closed",
+              "resolutionDays": 0
+            },
+            {
+              "date": "2026-04-23",
+              "status": "Closed",
+              "resolutionDays": 0
+            },
+            {
+              "date": "2026-04-21",
+              "status": "Closed",
+              "resolutionDays": 0
+            },
+            {
+              "date": "2026-04-01",
+              "status": "Closed",
+              "resolutionDays": 8.64
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

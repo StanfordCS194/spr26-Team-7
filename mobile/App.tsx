@@ -9,16 +9,53 @@ import { AnalyzingScreen } from './src/screens/AnalyzingScreen';
 import { ClassificationScreen, Classification } from './src/screens/ClassificationScreen';
 import { DuplicateScreen } from './src/screens/DuplicateScreen';
 import { ReportConfirmationScreen } from './src/screens/ReportConfirmationScreen';
-import { AppTab } from './src/types';
+import { IssueStatusScreen } from './src/screens/IssueStatusScreen';
+import { RecurringIssueDetailScreen } from './src/screens/RecurringIssueDetailScreen';
+import { demoReport } from './src/data/mockData';
+import { AppTab, IssueCategory, ReportRecord, ReportStatus, TimelineEntry } from './src/types';
+import { MapReport, MapReportCategoryId } from './src/data/mockMapReports';
+import { ChronicSpot } from './src/data/dashboard311';
 
-type ReportStep = 'camera' | 'analyzing' | 'classify' | 'duplicate' | 'confirmation';
+const CATEGORY_LABEL: Record<MapReportCategoryId, IssueCategory> = {
+  pothole:     'Pothole',
+  streetlight: 'Streetlight Outage',
+  graffiti:    'Graffiti',
+  dumping:     'Illegal Dumping',
+  vehicle:     'Vehicle Concerns',
+  container:   'Illegal Dumping',
+  encampment:  'Encampment',
+  junk:        'Junk Pickup',
+};
+
+const STATUS_MAP: Record<string, ReportStatus> = {
+  'Submitted':   'Submitted',
+  'Open':        'In Review',
+  'In Progress': 'In Progress',
+  'Closed':      'Resolved',
+};
+
+function mapReportToRecord(r: MapReport): ReportRecord {
+  return {
+    id:          r.id,
+    category:    CATEGORY_LABEL[r.categoryId],
+    status:      STATUS_MAP[r.status] ?? 'Submitted',
+    description: r.description,
+    address:     r.address,
+    assignedTo:  r.assignedTo,
+    timeline:    r.timeline as TimelineEntry[],
+  };
+}
+
+type ReportStep = 'camera' | 'analyzing' | 'classify' | 'duplicate' | 'confirmation' | 'issueStatus';
 
 export default function App() {
   const [currentTab, setCurrentTab] = useState<AppTab>('report');
   const [reportStep, setReportStep] = useState<ReportStep>('camera');
   const [classification, setClassification] = useState<Classification | null>(null);
   const [merged, setMerged] = useState(false);
-  const [isSignedIn, setIsSignedIn] = useState(false);
+  const [isSignedIn,    setIsSignedIn]    = useState(false);
+  const [mapReport,     setMapReport]     = useState<MapReport | null>(null);
+  const [chronicSpot,   setChronicSpot]   = useState<ChronicSpot | null>(null);
 
   const handleResetFlow = () => {
     setReportStep('camera');
@@ -53,18 +90,48 @@ export default function App() {
         />
       );
     }
+    if (reportStep === 'issueStatus') {
+      return (
+        <IssueStatusScreen
+          report={demoReport}
+          onBack={() => setReportStep('confirmation')}
+        />
+      );
+    }
     return (
       <ReportConfirmationScreen
         merged={merged}
         classification={classification}
         onDone={handleResetFlow}
+        onViewIssue={() => setReportStep('issueStatus')}
       />
     );
   };
 
   const renderCurrentTab = () => {
     if (currentTab === 'dashboard') {
-      return <DashboardScreen />;
+      if (chronicSpot) {
+        return (
+          <RecurringIssueDetailScreen
+            spot={chronicSpot}
+            onBack={() => setChronicSpot(null)}
+          />
+        );
+      }
+      if (mapReport) {
+        return (
+          <IssueStatusScreen
+            report={mapReportToRecord(mapReport)}
+            onBack={() => setMapReport(null)}
+          />
+        );
+      }
+      return (
+        <DashboardScreen
+          onViewReport={(r) => setMapReport(r)}
+          onViewChronicSpot={(spot) => setChronicSpot(spot)}
+        />
+      );
     }
     if (currentTab === 'profile') {
       return (

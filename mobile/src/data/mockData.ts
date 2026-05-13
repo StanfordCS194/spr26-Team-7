@@ -14,6 +14,9 @@ const categoryGroupMap: Record<IssueCategory, string> = {
   'Graffiti': 'Public Spaces',
   'Illegal Dumping': 'Public Spaces',
   'Transit Signage': 'Public Transit',
+  'Vehicle Concerns': 'Public Safety',
+  'Encampment': 'Housing & Homelessness',
+  'Junk Pickup': 'Environmental Services',
 }
 
 export const getCategoryGroup = (category: IssueCategory): string =>
@@ -25,6 +28,9 @@ const departmentMap: Record<IssueCategory, { name: string; division: string }> =
   'Graffiti': { name: 'Parks & Recreation Dept.', division: 'Beautification Division · 311' },
   'Illegal Dumping': { name: 'Environmental Services', division: 'Code Enforcement · 311' },
   'Transit Signage': { name: 'Transportation Authority', division: 'Transit Operations · 311' },
+  'Vehicle Concerns': { name: 'San Jose Police Dept.', division: 'Traffic Operations · 311' },
+  'Encampment': { name: 'Dept. of Housing', division: 'Encampment Management · 311' },
+  'Junk Pickup': { name: 'Environmental Services', division: 'Bulky Item Pickup · 311' },
 }
 
 export const getDepartment = (category: IssueCategory): { name: string; division: string } =>
