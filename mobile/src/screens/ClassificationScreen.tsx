@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import { SampleIssueImage } from "../components/SampleIssueImage";
 import { MiniMapView } from "../components/MiniMapView";
-import { SampleIssueRecord } from "../types";
+import { SampleIssueImage as SampleIssueImageType, SampleIssueRecord } from "../types";
 import { T } from "../theme";
 
 const TAGS_BY_CATEGORY: Record<string, string[]> = {
@@ -83,6 +83,7 @@ type ClassificationScreenProps = {
   onBack: () => void;
   onConfirm: (c: Classification) => void;
   selectedSampleIssue?: SampleIssueRecord | null;
+  reportImage?: SampleIssueImageType | null;
 };
 
 const getInitialCategory = (selectedSampleIssue?: SampleIssueRecord | null) => {
@@ -102,6 +103,7 @@ export const ClassificationScreen = ({
   onBack,
   onConfirm,
   selectedSampleIssue,
+  reportImage,
 }: ClassificationScreenProps) => {
   const locationMainLine =
     selectedSampleIssue?.locationName ?? LOCATION_MAIN_LINE;
@@ -165,7 +167,7 @@ export const ClassificationScreen = ({
         <View style={styles.photoStrip}>
           <SampleIssueImage
             image={
-              selectedSampleIssue?.image ?? {
+              reportImage ?? selectedSampleIssue?.image ?? {
                 kind: "asset",
                 source: require("../../assets/pothole.jpg"),
                 alt: "Captured pothole preview",

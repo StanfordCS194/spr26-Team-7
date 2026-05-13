@@ -3,13 +3,14 @@ import { Animated, Pressable, ScrollView, StyleSheet, Text, View } from 'react-n
 import { SampleIssueImage } from '../components/SampleIssueImage';
 import { Classification } from './ClassificationScreen';
 import { T } from '../theme';
-import { SampleIssueRecord } from '../types';
+import { SampleIssueImage as SampleIssueImageType, SampleIssueRecord } from '../types';
 
 type ReportConfirmationScreenProps = {
   merged: boolean;
   classification: Classification | null;
   onDone: () => void;
   selectedSampleIssue?: SampleIssueRecord | null;
+  reportImage?: SampleIssueImageType | null;
 };
 
 export const ReportConfirmationScreen = ({
@@ -17,6 +18,7 @@ export const ReportConfirmationScreen = ({
   classification,
   onDone,
   selectedSampleIssue,
+  reportImage,
 }: ReportConfirmationScreenProps) => {
   const scaleAnim = useRef(new Animated.Value(0)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -76,7 +78,7 @@ export const ReportConfirmationScreen = ({
           <View style={styles.summaryPhoto}>
             <SampleIssueImage
               image={
-                selectedSampleIssue?.image ?? {
+                reportImage ?? selectedSampleIssue?.image ?? {
                   kind: 'asset',
                   source: require('../../assets/pothole.jpg'),
                   alt: 'Submitted report preview',

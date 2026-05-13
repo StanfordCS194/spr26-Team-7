@@ -1,61 +1,132 @@
-import { useState } from "react";
+import * as DocumentPicker from "expo-document-picker";
+import * as ImagePicker from "expo-image-picker";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { MockStreetPhoto } from "../components/MockStreetPhoto";
+import { SampleIssueImage } from "../components/SampleIssueImage";
+import { SampleIssueImage as SampleIssueImageType } from "../types";
 import { T } from "../theme";
 
 type ReportCameraScreenProps = {
   onCapture: () => void;
+  onBack: () => void;
+  photos: SampleIssueImageType[];
+  onChangePhotos: (photos: SampleIssueImageType[]) => void;
 };
 
-export const ReportCameraScreen = ({ onCapture }: ReportCameraScreenProps) => {
-  const [photos, setPhotos] = useState([1]);
-  const [nextId, setNextId] = useState(2);
+const MAX_PHOTOS = 5;
 
-  const addPhoto = () => {
-    if (photos.length < 5) {
-      setPhotos((p) => [...p, nextId]);
-      setNextId((n) => n + 1);
+export const ReportCameraScreen = ({
+  onCapture,
+  onBack,
+  photos,
+  onChangePhotos,
+}: ReportCameraScreenProps) => {
+  const addPhoto = (photo: SampleIssueImageType) => {
+    if (photos.length >= MAX_PHOTOS) {
+      return;
     }
+    onChangePhotos([...photos, photo]);
   };
 
-  const removePhoto = (id: number) =>
-    setPhotos((p) => p.filter((x) => x !== id));
+  const removePhoto = (uri: string) => {
+    onChangePhotos(
+      photos.filter((photo) => photo.kind !== "uri" || photo.uri !== uri),
+    );
+  };
 
-  const handleShutter = () => {
+  const handleTakePhoto = async () => {
+    if (photos.length >= MAX_PHOTOS) {
+      return;
+    }
+
+    const permission = await ImagePicker.requestCameraPermissionsAsync();
+    if (!permission.granted) {
+      return;
+    }
+
+    const result = await ImagePicker.launchCameraAsync({
+      mediaTypes: ["images"],
+      allowsEditing: true,
+      quality: 0.8,
+    });
+
+    if (result.canceled || !result.assets[0]?.uri) {
+      return;
+    }
+
+    addPhoto({
+      kind: "uri",
+      uri: result.assets[0].uri,
+      alt: "Captured issue photo",
+    });
+  };
+
+  const handlePickFile = async () => {
+    if (photos.length >= MAX_PHOTOS) {
+      return;
+    }
+
+    const result = await DocumentPicker.getDocumentAsync({
+      multiple: false,
+      type: ["image/*"],
+      copyToCacheDirectory: true,
+    });
+
+    if (result.canceled || !result.assets[0]?.uri) {
+      return;
+    }
+
+    addPhoto({
+      kind: "uri",
+      uri: result.assets[0].uri,
+      alt: result.assets[0].name || "Uploaded issue image",
+    });
+  };
+
+  const handleContinue = () => {
     if (photos.length > 0) {
       onCapture();
-    } else {
-      addPhoto();
     }
   };
 
   return (
     <View style={styles.page}>
-      {/* Viewfinder */}
       <View style={styles.viewfinder}>
-        <MockStreetPhoto style={{ width: '100%', height: '100%' }} />
+        {photos[0] ? (
+          <SampleIssueImage
+            image={photos[0]}
+            style={{ width: "100%", height: "100%" }}
+          />
+        ) : (
+          <MockStreetPhoto style={{ width: "100%", height: "100%" }} />
+        )}
 
-        {/* Corner guides */}
         <View style={[styles.corner, styles.cornerTL]} />
         <View style={[styles.corner, styles.cornerTR]} />
         <View style={[styles.corner, styles.cornerBL]} />
         <View style={[styles.corner, styles.cornerBR]} />
 
-        {/* Top bar */}
         <View style={styles.topBar}>
-          <Pressable style={styles.iconButton} accessibilityRole="button">
+          <Pressable
+            style={styles.iconButton}
+            onPress={onBack}
+            accessibilityRole="button"
+          >
             <Text style={styles.iconText}>✕</Text>
           </Pressable>
           <View style={styles.reportBadge}>
-            <Text style={styles.reportBadgeText}>REPORT ISSUE</Text>
+            <Text style={styles.reportBadgeText}>
+              {photos.length > 0 ? "REVIEW PHOTOS" : "REPORT ISSUE"}
+            </Text>
           </View>
-          <Pressable style={styles.iconButton} accessibilityRole="button">
-            <Text style={styles.iconText}>⚡</Text>
-          </Pressable>
+          <View style={styles.counterBubble}>
+            <Text style={styles.counterText}>
+              {photos.length}/{MAX_PHOTOS}
+            </Text>
+          </View>
         </View>
 
-        {/* Photo strip */}
-        {photos.length > 0 && (
+        {photos.length > 0 ? (
           <View style={styles.photoStrip}>
             <View style={{ flex: 1 }}>
               <ScrollView
@@ -63,70 +134,93 @@ export const ReportCameraScreen = ({ onCapture }: ReportCameraScreenProps) => {
                 showsHorizontalScrollIndicator={false}
                 contentContainerStyle={styles.photoStripContent}
               >
-                {photos.map((id, i) => (
-                  <View key={id} style={styles.thumbnail}>
-                    <MockStreetPhoto style={styles.thumbnailPhoto} />
-                    <Pressable
-                      onPress={() => removePhoto(id)}
-                      style={styles.removeButton}
-                      accessibilityRole="button"
-                    >
-                      <Text style={styles.removeButtonText}>✕</Text>
-                    </Pressable>
-                    {i === 0 && (
+                {photos.map((photo, i) => (
+                  <View
+                    key={photo.kind === "uri" ? photo.uri : `${photo.kind}-${i}`}
+                    style={styles.thumbnail}
+                  >
+                    <SampleIssueImage image={photo} style={styles.thumbnailPhoto} />
+                    {photo.kind === "uri" ? (
+                      <Pressable
+                        onPress={() => removePhoto(photo.uri)}
+                        style={styles.removeButton}
+                        accessibilityRole="button"
+                      >
+                        <Text style={styles.removeButtonText}>✕</Text>
+                      </Pressable>
+                    ) : null}
+                    {i === 0 ? (
                       <View style={styles.mainBadge}>
                         <Text style={styles.mainBadgeText}>MAIN</Text>
                       </View>
-                    )}
+                    ) : null}
                   </View>
                 ))}
-                {photos.length < 5 && (
+                {photos.length < MAX_PHOTOS ? (
                   <Pressable
-                    onPress={addPhoto}
+                    onPress={handleTakePhoto}
                     style={styles.addPhotoButton}
                     accessibilityRole="button"
                   >
                     <Text style={styles.addPhotoPlus}>+</Text>
-                    <Text style={styles.addPhotoLabel}>photo</Text>
+                    <Text style={styles.addPhotoLabel}>camera</Text>
                   </Pressable>
-                )}
+                ) : null}
               </ScrollView>
             </View>
-            <Text style={styles.photoCount}>{photos.length}/5</Text>
+            <Text style={styles.photoCount}>
+              {photos.length}/{MAX_PHOTOS}
+            </Text>
+          </View>
+        ) : (
+          <View style={styles.emptyState}>
+            <Text style={styles.emptyTitle}>
+              Take a photo or upload one from files
+            </Text>
+            <Text style={styles.emptyCopy}>
+              Add at least one image before continuing with the report.
+            </Text>
           </View>
         )}
       </View>
 
-      {/* Camera controls */}
       <View style={styles.controls}>
-        <View style={{ width: 60 }} />
         <Pressable
-          onPress={handleShutter}
-          style={styles.shutter}
+          onPress={handleTakePhoto}
+          style={styles.secondaryAction}
           accessibilityRole="button"
-          accessibilityLabel="Capture photo"
+          accessibilityLabel="Take photo"
         >
-          <View style={styles.shutterInner} />
-          {photos.length > 0 && (
-            <View style={styles.nextBadge}>
-              <Text style={styles.nextBadgeText}>Next</Text>
-            </View>
-          )}
+          <Text style={styles.secondaryActionText}>Camera</Text>
         </Pressable>
-        <Pressable style={styles.libraryButton} accessibilityRole="button">
+
+        <Pressable
+          onPress={handleContinue}
+          style={[styles.shutter, photos.length === 0 && styles.shutterDisabled]}
+          accessibilityRole="button"
+          accessibilityLabel="Continue to report details"
+        >
+          <View style={styles.shutterInner}>
+            <Text style={styles.nextText}>Next</Text>
+          </View>
+        </Pressable>
+
+        <Pressable
+          style={styles.libraryButton}
+          onPress={handlePickFile}
+          accessibilityRole="button"
+          accessibilityLabel="Choose image file"
+        >
           <View style={styles.libraryIconBox}>
-            {/* Photo frame */}
             <View style={styles.libFrame}>
-              {/* Sun dot */}
               <View style={styles.libSun} />
-              {/* Mountains */}
               <View style={styles.libMountainRow}>
                 <View style={styles.libMtnSmall} />
                 <View style={styles.libMtnLarge} />
               </View>
             </View>
           </View>
-          <Text style={styles.libraryLabel}>Library</Text>
+          <Text style={styles.libraryLabel}>Files</Text>
         </Pressable>
       </View>
     </View>
@@ -135,7 +229,6 @@ export const ReportCameraScreen = ({ onCapture }: ReportCameraScreenProps) => {
 
 const styles = StyleSheet.create({
   page: { flex: 1, backgroundColor: "#0f0f0f" },
-
   viewfinder: { flex: 1, overflow: "hidden" },
 
   corner: { position: "absolute", width: 22, height: 22 },
@@ -201,6 +294,16 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     letterSpacing: 1,
   },
+  counterBubble: {
+    minWidth: 36,
+    height: 36,
+    paddingHorizontal: 10,
+    borderRadius: 18,
+    backgroundColor: "rgba(0,0,0,0.45)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  counterText: { color: "white", fontSize: 12, fontWeight: "700" },
 
   photoStrip: {
     position: "absolute",
@@ -279,44 +382,73 @@ const styles = StyleSheet.create({
   },
   photoCount: { color: "rgba(255,255,255,0.5)", fontSize: 11 },
 
+  emptyState: {
+    position: "absolute",
+    left: 24,
+    right: 24,
+    bottom: 120,
+    backgroundColor: "rgba(0,0,0,0.56)",
+    borderRadius: 18,
+    paddingHorizontal: 18,
+    paddingVertical: 16,
+    gap: 6,
+  },
+  emptyTitle: {
+    color: "white",
+    fontSize: 18,
+    fontWeight: "700",
+    textAlign: "center",
+  },
+  emptyCopy: {
+    color: "rgba(255,255,255,0.72)",
+    fontSize: 13,
+    lineHeight: 20,
+    textAlign: "center",
+  },
+
   controls: {
     backgroundColor: "#111",
+    paddingHorizontal: 18,
     paddingBottom: 10,
     paddingTop: 14,
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-around",
+    justifyContent: "space-between",
+    gap: 14,
   },
+  secondaryAction: {
+    minWidth: 76,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    borderRadius: 14,
+    backgroundColor: "rgba(255,255,255,0.12)",
+    alignItems: "center",
+  },
+  secondaryActionText: { color: "white", fontSize: 13, fontWeight: "700" },
   shutter: {
-    width: 72,
-    height: 72,
-    borderRadius: 36,
+    width: 84,
+    height: 84,
+    borderRadius: 42,
     backgroundColor: "white",
     borderWidth: 3,
     borderColor: "rgba(255,255,255,0.4)",
     alignItems: "center",
     justifyContent: "center",
   },
+  shutterDisabled: {
+    opacity: 0.45,
+  },
   shutterInner: {
-    width: 58,
-    height: 58,
-    borderRadius: 29,
+    width: 66,
+    height: 66,
+    borderRadius: 33,
     backgroundColor: "white",
     borderWidth: 2,
     borderColor: "#ddd",
+    alignItems: "center",
+    justifyContent: "center",
   },
-  nextBadge: {
-    position: "absolute",
-    top: -8,
-    right: -8,
-    backgroundColor: T.blue,
-    borderRadius: 12,
-    paddingHorizontal: 7,
-    paddingVertical: 3,
-    borderWidth: 2,
-    borderColor: "#111",
-  },
-  nextBadgeText: { color: "white", fontSize: 10, fontWeight: "700" },
+  nextText: { color: T.ink, fontSize: 12, fontWeight: "800" },
   libraryButton: {
     alignItems: "center",
     width: 60,

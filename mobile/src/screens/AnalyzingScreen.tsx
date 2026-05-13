@@ -1,10 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 import { Animated, Easing, StyleSheet, Text, View } from "react-native";
 import { MockStreetPhoto } from "../components/MockStreetPhoto";
+import { SampleIssueImage } from "../components/SampleIssueImage";
+import { SampleIssueImage as SampleIssueImageType } from "../types";
 import { T } from "../theme";
 
 type AnalyzingScreenProps = {
   onDone: () => void;
+  image?: SampleIssueImageType | null;
 };
 
 const PHASES = [
@@ -13,7 +16,7 @@ const PHASES = [
   "Finding the right agency…",
 ];
 
-export const AnalyzingScreen = ({ onDone }: AnalyzingScreenProps) => {
+export const AnalyzingScreen = ({ onDone, image }: AnalyzingScreenProps) => {
   const [phase, setPhase] = useState(0);
   const [progress, setProgress] = useState(0);
   const spinAnim = useRef(new Animated.Value(0)).current;
@@ -72,7 +75,14 @@ export const AnalyzingScreen = ({ onDone }: AnalyzingScreenProps) => {
   return (
     <View style={styles.page}>
       {/* Dimmed photo background */}
-      <MockStreetPhoto style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }} />
+      {image ? (
+        <SampleIssueImage
+          image={image}
+          style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
+        />
+      ) : (
+        <MockStreetPhoto style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }} />
+      )}
       <View style={styles.overlay} />
 
       {/* Content */}

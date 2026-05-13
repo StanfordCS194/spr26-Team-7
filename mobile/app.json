@@ -7,6 +7,16 @@
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
+    "plugins": [
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Allow GovChat to access your photos so you can attach issue images.",
+          "cameraPermission": "Allow GovChat to use your camera so you can take issue photos."
+        }
+      ],
+      "expo-document-picker"
+    ],
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",

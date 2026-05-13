@@ -11,6 +11,10 @@ export const SampleIssueImage = ({ image, style }: SampleIssueImageProps) => {
     return <Image source={image.source} style={style} resizeMode="cover" accessibilityLabel={image.alt} />
   }
 
+  if (image.kind === 'uri') {
+    return <Image source={{ uri: image.uri }} style={style} resizeMode="cover" accessibilityLabel={image.alt} />
+  }
+
   return (
     <View style={[styles.placeholder, { backgroundColor: image.backgroundColor, borderColor: image.accent }, style]}>
       <View style={[styles.iconBubble, { backgroundColor: image.accent }]}>

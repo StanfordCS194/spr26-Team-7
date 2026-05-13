@@ -9,7 +9,7 @@ import { AnalyzingScreen } from './src/screens/AnalyzingScreen';
 import { ClassificationScreen, Classification } from './src/screens/ClassificationScreen';
 import { DuplicateScreen } from './src/screens/DuplicateScreen';
 import { ReportConfirmationScreen } from './src/screens/ReportConfirmationScreen';
-import { AppTab, ReportRecord, SampleIssueRecord } from './src/types';
+import { AppTab, ReportRecord, SampleIssueImage, SampleIssueRecord } from './src/types';
 import { AuthScreen } from './src/screens/AuthScreen';
 import { IssueStatusScreen } from './src/screens/IssueStatusScreen';
 import { dashboardIssues } from './src/data/mockData';
@@ -46,6 +46,7 @@ export default function App() {
   const [issues, setIssues] = useState<ReportRecord[]>(dashboardIssues);
   const [selectedIssueId, setSelectedIssueId] = useState<string | null>(null);
   const [selectedSampleIssue, setSelectedSampleIssue] = useState<SampleIssueRecord | null>(null);
+  const [reportImages, setReportImages] = useState<SampleIssueImage[]>([]);
 
   const handleAuthenticate = () => {
     setIsSignedIn(true);
@@ -64,6 +65,7 @@ export default function App() {
     setClassification(null);
     setMerged(false);
     setSelectedSampleIssue(null);
+    setReportImages([]);
   };
 
   const selectedIssue = selectedIssueId
@@ -137,10 +139,22 @@ export default function App() {
       );
     }
     if (reportStep === 'camera') {
-      return <ReportCameraScreen onCapture={() => setReportStep('analyzing')} />;
+      return (
+        <ReportCameraScreen
+          photos={reportImages}
+          onChangePhotos={setReportImages}
+          onCapture={() => setReportStep('analyzing')}
+          onBack={handleResetFlow}
+        />
+      );
     }
     if (reportStep === 'analyzing') {
-      return <AnalyzingScreen onDone={() => setReportStep('classify')} />;
+      return (
+        <AnalyzingScreen
+          onDone={() => setReportStep('classify')}
+          image={reportImages[0] ?? null}
+        />
+      );
     }
     if (reportStep === 'classify') {
       return (
@@ -151,6 +165,7 @@ export default function App() {
             setReportStep('duplicate');
           }}
           selectedSampleIssue={selectedSampleIssue}
+          reportImage={reportImages[0] ?? null}
         />
       );
     }
@@ -176,6 +191,7 @@ export default function App() {
         classification={classification}
         onDone={handleResetFlow}
         selectedSampleIssue={selectedSampleIssue}
+        reportImage={reportImages[0] ?? null}
       />
     );
   };
