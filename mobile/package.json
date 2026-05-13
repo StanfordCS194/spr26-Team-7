@@ -3,17 +3,26 @@
   "version": "1.0.0",
   "main": "index.ts",
   "scripts": {
+    "setup": "bash ../scripts/setup-local-env.sh",
+    "postinstall": "bash ../scripts/setup-local-env.sh",
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web"
   },
   "dependencies": {
+    "@react-native-async-storage/async-storage": "2.2.0",
+    "@supabase/supabase-js": "^2.105.4",
     "expo": "~54.0.33",
+    "expo-auth-session": "~7.0.11",
+    "expo-crypto": "~15.0.9",
+    "expo-linking": "~8.0.12",
     "expo-status-bar": "~3.0.9",
+    "expo-web-browser": "~15.0.11",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "react-native": "0.81.5",
+    "react-native-url-polyfill": "^3.0.0",
     "react-native-web": "^0.21.0"
   },
   "devDependencies": {
