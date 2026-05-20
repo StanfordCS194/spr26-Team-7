@@ -1,6 +1,7 @@
 import { StatusBar } from 'expo-status-bar';
-import { SafeAreaView, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, SafeAreaView, StyleSheet, View } from 'react-native';
 import { useState } from 'react';
+import { useAuth } from './src/providers/AuthProvider';
 import { BottomNav } from './src/components/BottomNav';
 import { DashboardScreen } from './src/screens/DashboardScreen';
 import { ProfileScreen } from './src/screens/ProfileScreen';
@@ -99,23 +100,23 @@ function mapReportToRecord(r: MapReport): ReportRecord {
 type ReportStep = 'picker' | 'camera' | 'analyzing' | 'classify' | 'confirmation' | 'submitted-view';
 
 export default function App() {
+  const { session, isLoading, signOut } = useAuth();
+  const isSignedIn = Boolean(session);
   const [currentTab, setCurrentTab]                   = useState<AppTab>('report');
   const [reportStep, setReportStep]                   = useState<ReportStep>('camera');
   const [classification, setClassification]           = useState<Classification | null>(null);
-  const [isSignedIn, setIsSignedIn]                   = useState(false);
   const [mapReport, setMapReport]                     = useState<MapReport | null>(null);
   const [chronicSpot, setChronicSpot]                 = useState<ChronicSpot | null>(null);
   const [selectedSampleIssue, setSelectedSampleIssue] = useState<SampleIssueRecord | null>(null);
   const [userSubmissions, setUserSubmissions]         = useState<{ mapReport: MapReport; sampleIssue: SampleIssueRecord | null }[]>([]);
   const [focusReport, setFocusReport]                 = useState<MapReport | null>(null);
 
-  const handleAuthenticate = () => {
-    setIsSignedIn(true);
-    setCurrentTab('report');
-  };
-
-  const handleSignOut = () => {
-    setIsSignedIn(false);
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+    } catch {
+      // Still reset local state if sign-out fails.
+    }
     setCurrentTab('report');
     setUserSubmissions([]);
     setFocusReport(null);
@@ -273,6 +274,17 @@ export default function App() {
       currentTab === 'profile' ||
       (currentTab === 'report' && reportStep === 'camera'));
 
+  if (isLoading) {
+    return (
+      <SafeAreaView style={styles.safeArea}>
+        <StatusBar style="light" />
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#4F8EF7" />
+        </View>
+      </SafeAreaView>
+    );
+  }
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar style="light" />
@@ -280,7 +292,7 @@ export default function App() {
         {isSignedIn ? (
           renderCurrentTab()
         ) : (
-          <AuthScreen onAuthenticate={handleAuthenticate} />
+          <AuthScreen />
         )}
       </View>
       {showNav && (
@@ -296,4 +308,5 @@ export default function App() {
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: '#fff' },
   container: { flex: 1, backgroundColor: '#fff' },
+  loadingContainer: { flex: 1, alignItems: 'center', justifyContent: 'center' },
 });
