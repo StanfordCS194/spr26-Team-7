@@ -97,7 +97,8 @@ export type Classification = {
 
 type ClassificationScreenProps = {
   onBack: () => void;
-  onConfirm: (c: Classification) => void;
+  onConfirm: (c: Classification) => void | Promise<void>;
+  isSubmitting?: boolean;
   selectedSampleIssue?: SampleIssueRecord | null;
 };
 
@@ -126,6 +127,7 @@ const getInitialCategory = (selectedSampleIssue?: SampleIssueRecord | null): str
 export const ClassificationScreen = ({
   onBack,
   onConfirm,
+  isSubmitting = false,
   selectedSampleIssue,
 }: ClassificationScreenProps) => {
   const locationMainLine =
@@ -296,20 +298,31 @@ export const ClassificationScreen = ({
 
       <View style={styles.ctaBar}>
         <Pressable
-          onPress={() =>
-            onConfirm({
+          onPress={() => {
+            if (isSubmitting) {
+              return;
+            }
+            void onConfirm({
               category,
               tag,
               desc,
               locationMain: locationMainLine,
               locationSub: locationSubLine,
-            })
-          }
-          style={styles.submitButton}
+            });
+          }}
+          style={[styles.submitButton, isSubmitting ? styles.submitButtonDisabled : null]}
+          disabled={isSubmitting}
           accessibilityRole="button"
+          accessibilityState={{ disabled: isSubmitting, busy: isSubmitting }}
         >
-          <Text style={styles.submitCheck}>✓</Text>
-          <Text style={styles.submitText}>Confirm</Text>
+          {isSubmitting ? (
+            <Text style={styles.submitText}>Opening email…</Text>
+          ) : (
+            <>
+              <Text style={styles.submitCheck}>✓</Text>
+              <Text style={styles.submitText}>Confirm</Text>
+            </>
+          )}
         </Pressable>
       </View>
     </View>
@@ -507,6 +520,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     gap: 8,
   },
+  submitButtonDisabled: { opacity: 0.65 },
   submitCheck: { color: '#fff', fontSize: 16, fontWeight: "800" },
   submitText: { color: '#fff', fontSize: 16, fontWeight: "700" },
   header: {
