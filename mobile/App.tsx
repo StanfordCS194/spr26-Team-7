@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import { ActivityIndicator, SafeAreaView, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, Alert, SafeAreaView, StyleSheet, View } from 'react-native';
 import { useState } from 'react';
 import { useAuth } from './src/providers/AuthProvider';
 import { BottomNav } from './src/components/BottomNav';
@@ -17,6 +17,7 @@ import { AppTab, IssueCategory, ReportRecord, ReportStatus, SampleIssueRecord } 
 import { DISTRICT_CENTERS, MapReport, MapReportCategoryId } from './src/data/mockMapReports';
 import { ChronicSpot } from './src/data/dashboard311';
 import { sampleIssues } from './src/data/sampleIssues';
+import { sendReportEmail } from './src/lib/reportEmail';
 
 const CATEGORY_LABEL: Record<MapReportCategoryId, IssueCategory> = {
   pothole:     'Pothole',
@@ -95,12 +96,10 @@ function mapReportToRecord(r: MapReport): ReportRecord {
   };
 }
 
-
-
 type ReportStep = 'picker' | 'camera' | 'analyzing' | 'classify' | 'confirmation' | 'submitted-view';
 
 export default function App() {
-  const { session, isLoading, signOut } = useAuth();
+  const { session, user, isLoading, signOut } = useAuth();
   const isSignedIn = Boolean(session);
   const [currentTab, setCurrentTab]                   = useState<AppTab>('report');
   const [reportStep, setReportStep]                   = useState<ReportStep>('camera');
@@ -110,6 +109,52 @@ export default function App() {
   const [selectedSampleIssue, setSelectedSampleIssue] = useState<SampleIssueRecord | null>(null);
   const [userSubmissions, setUserSubmissions]         = useState<{ mapReport: MapReport; sampleIssue: SampleIssueRecord | null }[]>([]);
   const [focusReport, setFocusReport]                 = useState<MapReport | null>(null);
+  const [isSendingReport, setIsSendingReport]         = useState(false);
+
+  const confirmEmailWasSent = () =>
+    new Promise<boolean>((resolve) => {
+      Alert.alert(
+        'Confirm email sent',
+        'Tap Send in your email app to submit the report to the city, then confirm here.',
+        [
+          { text: 'Not yet', style: 'cancel', onPress: () => resolve(false) },
+          { text: 'I sent it', onPress: () => resolve(true) },
+        ],
+        { cancelable: true, onDismiss: () => resolve(false) },
+      );
+    });
+
+  const completeReportSubmission = (c: Classification) => {
+    const newMapReport = buildUserMapReport(c, selectedSampleIssue);
+    setUserSubmissions(prev => [...prev, { mapReport: newMapReport, sampleIssue: selectedSampleIssue }]);
+    setFocusReport(newMapReport);
+    setReportStep('confirmation');
+  };
+
+  const handleConfirmReport = async (c: Classification) => {
+    setClassification(c);
+    setIsSendingReport(true);
+
+    try {
+      const outcome = await sendReportEmail(c, user?.email);
+
+      if (outcome === 'cancelled') {
+        Alert.alert('Report not sent', 'Send the email to submit your report to the city.');
+        return;
+      }
+
+      if (outcome === 'needs_confirmation') {
+        const confirmed = await confirmEmailWasSent();
+        if (!confirmed) {
+          return;
+        }
+      }
+
+      completeReportSubmission(c);
+    } finally {
+      setIsSendingReport(false);
+    }
+  };
 
   const handleSignOut = async () => {
     try {
@@ -162,13 +207,8 @@ export default function App() {
       return (
         <ClassificationScreen
           onBack={() => setReportStep(selectedSampleIssue ? 'picker' : 'camera')}
-          onConfirm={(c) => {
-            setClassification(c);
-            const newMapReport = buildUserMapReport(c, selectedSampleIssue);
-            setUserSubmissions(prev => [...prev, { mapReport: newMapReport, sampleIssue: selectedSampleIssue }]);
-            setFocusReport(newMapReport);
-            setReportStep('confirmation');
-          }}
+          onConfirm={handleConfirmReport}
+          isSubmitting={isSendingReport}
           selectedSampleIssue={selectedSampleIssue}
         />
       );
