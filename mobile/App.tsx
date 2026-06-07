@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
-import { ActivityIndicator, SafeAreaView, StyleSheet, View } from 'react-native';
-import { useState } from 'react';
+import { ActivityIndicator, Alert, SafeAreaView, StyleSheet, View } from 'react-native';
+import { useEffect, useState } from 'react';
 import { useAuth } from './src/providers/AuthProvider';
 import { BottomNav } from './src/components/BottomNav';
 import { DashboardScreen } from './src/screens/DashboardScreen';
@@ -14,9 +14,11 @@ import { RecurringIssueDetailScreen } from './src/screens/RecurringIssueDetailSc
 import { AuthScreen } from './src/screens/AuthScreen';
 import { SampleIssuePickerScreen } from './src/screens/SampleIssuePickerScreen';
 import { AppTab, IssueCategory, ReportRecord, ReportStatus, SampleIssueRecord } from './src/types';
-import { DISTRICT_CENTERS, MapReport, MapReportCategoryId } from './src/data/mockMapReports';
+import { MapReport, MapReportCategoryId } from './src/data/mockMapReports';
 import { ChronicSpot } from './src/data/dashboard311';
 import { sampleIssues } from './src/data/sampleIssues';
+import { sendReportEmail } from './src/lib/reportEmail';
+import { createReport, fetchUserReports, getSampleIssueIdFromRow, reportRowToMapReport } from './src/lib/reports';
 
 const CATEGORY_LABEL: Record<MapReportCategoryId, IssueCategory> = {
   pothole:     'Pothole',
@@ -28,39 +30,6 @@ const CATEGORY_LABEL: Record<MapReportCategoryId, IssueCategory> = {
   encampment:  'Encampment Concerns',
   junk:        'Illegal Dumping',
 };
-
-const CATEGORY_TO_ID: Record<string, MapReportCategoryId> = {
-  'Pothole':             'pothole',
-  'Streetlight Outage':  'streetlight',
-  'Graffiti':            'graffiti',
-  'Illegal Dumping':     'dumping',
-  'Vehicle Concerns':    'vehicle',
-  'Encampment Concerns': 'encampment',
-};
-
-function buildUserMapReport(
-  c: Classification,
-  sampleIssue: SampleIssueRecord | null,
-): MapReport {
-  const categoryId = CATEGORY_TO_ID[c.category] ?? 'pothole';
-  const districtMatch = (sampleIssue?.district ?? '').match(/\d+/);
-  const district = districtMatch ? parseInt(districtMatch[0], 10) : 3;
-  const center = DISTRICT_CENTERS[district] ?? DISTRICT_CENTERS[3];
-  return {
-    id:          `user-${Date.now()}`,
-    categoryId,
-    title:       c.tag,
-    address:     `${c.locationMain}, ${c.locationSub}`,
-    district,
-    lat:         sampleIssue?.latitude  ?? center.latitude,
-    lon:         sampleIssue?.longitude ?? center.longitude,
-    status:      'Submitted',
-    createdAt:   new Date(),
-    description: c.desc,
-    assignedTo:  sampleIssue?.assignedTo ?? 'San Jose 311',
-    timeline:    [{ label: 'Submitted', dateText: 'Just now' }],
-  };
-}
 
 const STATUS_MAP: Record<string, ReportStatus> = {
   'Submitted':   'Submitted',
@@ -100,7 +69,7 @@ function mapReportToRecord(r: MapReport): ReportRecord {
 type ReportStep = 'picker' | 'camera' | 'analyzing' | 'classify' | 'confirmation' | 'submitted-view';
 
 export default function App() {
-  const { session, isLoading, signOut } = useAuth();
+  const { session, user, isLoading, signOut } = useAuth();
   const isSignedIn = Boolean(session);
   const [currentTab, setCurrentTab]                   = useState<AppTab>('report');
   const [reportStep, setReportStep]                   = useState<ReportStep>('camera');
@@ -110,6 +79,117 @@ export default function App() {
   const [selectedSampleIssue, setSelectedSampleIssue] = useState<SampleIssueRecord | null>(null);
   const [userSubmissions, setUserSubmissions]         = useState<{ mapReport: MapReport; sampleIssue: SampleIssueRecord | null }[]>([]);
   const [focusReport, setFocusReport]                 = useState<MapReport | null>(null);
+  const [isSendingReport, setIsSendingReport]         = useState(false);
+  const [isLoadingReports, setIsLoadingReports]       = useState(false);
+
+  useEffect(() => {
+    if (!user?.id) {
+      setUserSubmissions([]);
+      return;
+    }
+
+    let isMounted = true;
+
+    const loadReports = async () => {
+      setIsLoadingReports(true);
+      try {
+        const rows = await fetchUserReports(user.id);
+        if (!isMounted) {
+          return;
+        }
+
+        setUserSubmissions(
+          rows.map((row) => ({
+            mapReport: reportRowToMapReport(row),
+            sampleIssue: (() => {
+              const sampleIssueId = getSampleIssueIdFromRow(row)
+              return sampleIssueId
+                ? sampleIssues.find((issue) => issue.id === sampleIssueId) ?? null
+                : null
+            })(),
+          })),
+        );
+      } catch (error) {
+        console.error('[reports] load failed', error);
+        if (isMounted) {
+          Alert.alert('Could not load reports', 'Check your connection and try again.');
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoadingReports(false);
+        }
+      }
+    };
+
+    void loadReports();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [user?.id]);
+
+  const confirmEmailWasSent = () =>
+    new Promise<boolean>((resolve) => {
+      Alert.alert(
+        'Confirm email sent',
+        'Tap Send in your email app to submit the report to the city, then confirm here.',
+        [
+          { text: 'Not yet', style: 'cancel', onPress: () => resolve(false) },
+          { text: 'I sent it', onPress: () => resolve(true) },
+        ],
+        { cancelable: true, onDismiss: () => resolve(false) },
+      );
+    });
+
+  const completeReportSubmission = async (c: Classification) => {
+    if (!user?.id) {
+      Alert.alert('Sign in required', 'Sign in to save your report.');
+      return;
+    }
+
+    try {
+      const row = await createReport(user.id, c, selectedSampleIssue);
+      const mapReport = reportRowToMapReport(row);
+
+      setUserSubmissions((prev) => [
+        { mapReport, sampleIssue: selectedSampleIssue },
+        ...prev,
+      ]);
+      setFocusReport(mapReport);
+      setReportStep('confirmation');
+    } catch (error) {
+      console.error('[reports] create failed', error);
+      Alert.alert(
+        'Could not save report',
+        'Your email may have been sent, but the report was not saved to your account. Please try again.',
+      );
+    }
+  };
+
+  const handleConfirmReport = async (c: Classification) => {
+    setClassification(c);
+    setIsSendingReport(true);
+
+    try {
+      const outcome = await sendReportEmail(c, user?.email);
+
+      if (outcome === 'cancelled') {
+        Alert.alert('Report not sent', 'Send the email to submit your report to the city.');
+        return;
+      }
+
+      if (outcome === 'needs_confirmation') {
+        const confirmed = await confirmEmailWasSent();
+        if (!confirmed) {
+          return;
+        }
+      }
+
+      await completeReportSubmission(c);
+    } finally {
+      setIsSendingReport(false);
+    }
+  };
 
   const handleSignOut = async () => {
     try {
@@ -162,13 +242,8 @@ export default function App() {
       return (
         <ClassificationScreen
           onBack={() => setReportStep(selectedSampleIssue ? 'picker' : 'camera')}
-          onConfirm={(c) => {
-            setClassification(c);
-            const newMapReport = buildUserMapReport(c, selectedSampleIssue);
-            setUserSubmissions(prev => [...prev, { mapReport: newMapReport, sampleIssue: selectedSampleIssue }]);
-            setFocusReport(newMapReport);
-            setReportStep('confirmation');
-          }}
+          onConfirm={handleConfirmReport}
+          isSubmitting={isSendingReport}
           selectedSampleIssue={selectedSampleIssue}
         />
       );
@@ -256,10 +331,62 @@ export default function App() {
       );
     }
     if (currentTab === 'profile') {
+      if (mapReport) {
+        const userSub = userSubmissions.find((s) => s.mapReport.id === mapReport.id);
+        if (userSub?.sampleIssue) {
+          const submittedRecord: SampleIssueRecord = {
+            ...userSub.sampleIssue,
+            status: STATUS_MAP[mapReport.status] ?? 'Submitted',
+            title: mapReport.title,
+            timeline: mapReport.timeline.map((entry, i) => ({
+              label: (STATUS_MAP[entry.label] ?? entry.label) as ReportStatus,
+              dateText: entry.dateText,
+              reached: i === 0,
+            })),
+          };
+          return (
+            <IssueStatusScreen
+              report={submittedRecord}
+              onBack={() => setMapReport(null)}
+              onToggleFollow={() => {}}
+            />
+          );
+        }
+        return (
+          <IssueStatusScreen
+            report={mapReportToRecord(mapReport)}
+            onBack={() => setMapReport(null)}
+            onToggleFollow={() => {}}
+          />
+        );
+      }
+
+      const profileReports = userSubmissions.map(({ mapReport }) => ({
+        id: mapReport.id,
+        title: mapReport.title,
+        category: CATEGORY_LABEL[mapReport.categoryId],
+        status: mapReport.status,
+        submittedAt: mapReport.createdAt,
+      }));
+
       return (
         <ProfileScreen
           isSignedIn={isSignedIn}
           onToggleAuth={handleSignOut}
+          displayName={
+            typeof user?.user_metadata?.full_name === 'string'
+              ? user.user_metadata.full_name
+              : null
+          }
+          email={user?.email ?? null}
+          memberSince={user?.created_at ?? null}
+          reports={profileReports}
+          onViewReport={(reportId) => {
+            const match = userSubmissions.find((s) => s.mapReport.id === reportId);
+            if (match) {
+              setMapReport(match.mapReport);
+            }
+          }}
         />
       );
     }
@@ -274,7 +401,7 @@ export default function App() {
       currentTab === 'profile' ||
       (currentTab === 'report' && reportStep === 'camera'));
 
-  if (isLoading) {
+  if (isLoading || isLoadingReports) {
     return (
       <SafeAreaView style={styles.safeArea}>
         <StatusBar style="light" />
