@@ -18,7 +18,9 @@ import { MapReport, MapReportCategoryId } from './src/data/mockMapReports';
 import { ChronicSpot } from './src/data/dashboard311';
 import { sampleIssues } from './src/data/sampleIssues';
 import { sendReportEmail } from './src/lib/reportEmail';
-import { createReport, fetchUserReports, getSampleIssueIdFromRow, reportRowToMapReport } from './src/lib/reports';
+import { ProfileReport } from './src/lib/profileStats';
+import { createReport, fetchReportsByIds, fetchUserReports, getSampleIssueIdFromRow, ReportRow, reportRowToMapReport } from './src/lib/reports';
+import { fetchFollowedReportIds, followReport, unfollowReport } from './src/lib/reportFollows';
 
 const CATEGORY_LABEL: Record<MapReportCategoryId, IssueCategory> = {
   pothole:     'Pothole',
@@ -38,7 +40,7 @@ const STATUS_MAP: Record<string, ReportStatus> = {
   'Closed':      'Resolved',
 };
 
-function mapReportToRecord(r: MapReport): ReportRecord {
+function mapReportToRecord(r: MapReport, isFollowing = false): ReportRecord {
   const category = CATEGORY_LABEL[r.categoryId];
   return {
     id:                  r.id,
@@ -52,8 +54,8 @@ function mapReportToRecord(r: MapReport): ReportRecord {
     assignedTo:          r.assignedTo,
     estimatedResolution: '2–3 weeks',
     reportCount:         1,
-    isFollowing:         false,
-    isUserOwned:         false,
+    isFollowing,
+    isUserOwned:         true,
     photoCount:          0,
     pin:                 { top: 0, left: 0, color: '#5B9BF8' },
     timeline:            r.timeline.map((t, i) => ({
@@ -66,6 +68,26 @@ function mapReportToRecord(r: MapReport): ReportRecord {
 
 
 
+type ReportSubmission = { mapReport: MapReport; sampleIssue: SampleIssueRecord | null };
+
+const rowToSubmission = (row: ReportRow): ReportSubmission => ({
+  mapReport: reportRowToMapReport(row),
+  sampleIssue: (() => {
+    const sampleIssueId = getSampleIssueIdFromRow(row);
+    return sampleIssueId
+      ? sampleIssues.find((issue) => issue.id === sampleIssueId) ?? null
+      : null;
+  })(),
+});
+
+const toProfileReport = (mapReport: MapReport): ProfileReport => ({
+  id: mapReport.id,
+  title: mapReport.title,
+  category: CATEGORY_LABEL[mapReport.categoryId],
+  status: mapReport.status,
+  submittedAt: mapReport.createdAt,
+});
+
 type ReportStep = 'picker' | 'camera' | 'analyzing' | 'classify' | 'confirmation' | 'submitted-view';
 
 export default function App() {
@@ -77,38 +99,145 @@ export default function App() {
   const [mapReport, setMapReport]                     = useState<MapReport | null>(null);
   const [chronicSpot, setChronicSpot]                 = useState<ChronicSpot | null>(null);
   const [selectedSampleIssue, setSelectedSampleIssue] = useState<SampleIssueRecord | null>(null);
-  const [userSubmissions, setUserSubmissions]         = useState<{ mapReport: MapReport; sampleIssue: SampleIssueRecord | null }[]>([]);
+  const [userSubmissions, setUserSubmissions]         = useState<ReportSubmission[]>([]);
+  const [followedSubmissions, setFollowedSubmissions] = useState<ReportSubmission[]>([]);
   const [focusReport, setFocusReport]                 = useState<MapReport | null>(null);
   const [isSendingReport, setIsSendingReport]         = useState(false);
   const [isLoadingReports, setIsLoadingReports]       = useState(false);
+  const [followedReportIds, setFollowedReportIds]     = useState<Set<string>>(new Set());
+  const [followUpdatingId, setFollowUpdatingId]       = useState<string | null>(null);
+
+  const isFollowingReport = (reportId: string) => followedReportIds.has(reportId);
+
+  const findReportSubmission = (reportId: string) =>
+    userSubmissions.find((s) => s.mapReport.id === reportId)
+    ?? followedSubmissions.find((s) => s.mapReport.id === reportId);
+
+  const loadFollowedSubmissions = async (followIds: string[]) => {
+    const rows = await fetchReportsByIds(followIds);
+    return rows.map(rowToSubmission);
+  };
+
+  const handleToggleFollow = async (reportId: string) => {
+    if (!user?.id) {
+      Alert.alert('Sign in required', 'Sign in to follow reports.');
+      return;
+    }
+
+    const wasFollowing = isFollowingReport(reportId);
+    const submissionBeforeToggle = findReportSubmission(reportId);
+    setFollowUpdatingId(reportId);
+    setFollowedReportIds((prev) => {
+      const next = new Set(prev);
+      if (wasFollowing) {
+        next.delete(reportId);
+      } else {
+        next.add(reportId);
+      }
+      return next;
+    });
+    if (wasFollowing) {
+      setFollowedSubmissions((prev) => prev.filter((s) => s.mapReport.id !== reportId));
+    }
+
+    try {
+      if (wasFollowing) {
+        await unfollowReport(user.id, reportId);
+      } else {
+        await followReport(user.id, reportId);
+        if (submissionBeforeToggle) {
+          setFollowedSubmissions((prev) => {
+            if (prev.some((s) => s.mapReport.id === reportId)) {
+              return prev;
+            }
+            return [submissionBeforeToggle, ...prev];
+          });
+        } else {
+          const rows = await fetchReportsByIds([reportId]);
+          if (rows[0]) {
+            setFollowedSubmissions((prev) => [rowToSubmission(rows[0]), ...prev]);
+          }
+        }
+      }
+    } catch (error) {
+      console.error('[report_follows] update failed', error);
+      setFollowedReportIds(new Set(followedReportIds));
+      void loadFollowedSubmissions(Array.from(followedReportIds)).then(setFollowedSubmissions);
+      Alert.alert('Could not update follow', 'Please try again.');
+    } finally {
+      setFollowUpdatingId(null);
+    }
+  };
+
+  const renderIssueStatus = (
+    mapReport: MapReport,
+    userSub: ReportSubmission | undefined,
+    onBack: () => void,
+  ) => {
+    const reportId = mapReport.id;
+    const isFollowUpdating = followUpdatingId === reportId;
+
+    if (userSub?.sampleIssue) {
+      const submittedRecord: SampleIssueRecord = {
+        ...userSub.sampleIssue,
+        status: STATUS_MAP[mapReport.status] ?? 'Submitted',
+        title: mapReport.title,
+        isFollowing: isFollowingReport(reportId),
+        timeline: mapReport.timeline.map((entry, i) => ({
+          label: (STATUS_MAP[entry.label] ?? entry.label) as ReportStatus,
+          dateText: entry.dateText,
+          reached: i === 0,
+        })),
+      };
+
+      return (
+        <IssueStatusScreen
+          report={submittedRecord}
+          onBack={onBack}
+          onToggleFollow={() => void handleToggleFollow(reportId)}
+          isFollowUpdating={isFollowUpdating}
+        />
+      );
+    }
+
+    return (
+      <IssueStatusScreen
+        report={mapReportToRecord(mapReport, isFollowingReport(reportId))}
+        onBack={onBack}
+        onToggleFollow={() => void handleToggleFollow(reportId)}
+        isFollowUpdating={isFollowUpdating}
+      />
+    );
+  };
 
   useEffect(() => {
     if (!user?.id) {
       setUserSubmissions([]);
+      setFollowedSubmissions([]);
+      setFollowedReportIds(new Set());
       return;
     }
 
     let isMounted = true;
 
-    const loadReports = async () => {
+    const loadUserData = async () => {
       setIsLoadingReports(true);
       try {
-        const rows = await fetchUserReports(user.id);
+        const [rows, followIds] = await Promise.all([
+          fetchUserReports(user.id),
+          fetchFollowedReportIds(user.id),
+        ]);
         if (!isMounted) {
           return;
         }
 
-        setUserSubmissions(
-          rows.map((row) => ({
-            mapReport: reportRowToMapReport(row),
-            sampleIssue: (() => {
-              const sampleIssueId = getSampleIssueIdFromRow(row)
-              return sampleIssueId
-                ? sampleIssues.find((issue) => issue.id === sampleIssueId) ?? null
-                : null
-            })(),
-          })),
-        );
+        setFollowedReportIds(new Set(followIds));
+        setUserSubmissions(rows.map(rowToSubmission));
+        const followed = await loadFollowedSubmissions(followIds);
+        if (!isMounted) {
+          return;
+        }
+        setFollowedSubmissions(followed);
       } catch (error) {
         console.error('[reports] load failed', error);
         if (isMounted) {
@@ -121,7 +250,7 @@ export default function App() {
       }
     };
 
-    void loadReports();
+    void loadUserData();
 
     return () => {
       isMounted = false;
@@ -199,6 +328,8 @@ export default function App() {
     }
     setCurrentTab('report');
     setUserSubmissions([]);
+    setFollowedSubmissions([]);
+    setFollowedReportIds(new Set());
     setFocusReport(null);
     setMapReport(null);
     setChronicSpot(null);
@@ -249,22 +380,14 @@ export default function App() {
       );
     }
     if (reportStep === 'submitted-view' && selectedSampleIssue) {
-      const submittedRecord: SampleIssueRecord = {
-        ...selectedSampleIssue,
-        status: 'Submitted',
-        timeline: selectedSampleIssue.timeline.map((entry, i) => ({
-          ...entry,
-          reached: i === 0,
-          dateText: i === 0 ? 'Just submitted' : entry.dateText,
-        })),
-      };
-      return (
-        <IssueStatusScreen
-          report={submittedRecord}
-          onBack={() => setReportStep('confirmation')}
-          onToggleFollow={() => {}}
-        />
-      );
+      const submission = userSubmissions.find((s) => s.sampleIssue?.id === selectedSampleIssue.id);
+      if (submission) {
+        return renderIssueStatus(
+          submission.mapReport,
+          submission,
+          () => setReportStep('confirmation'),
+        );
+      }
     }
     return (
       <ReportConfirmationScreen
@@ -288,32 +411,8 @@ export default function App() {
         );
       }
       if (mapReport) {
-        const userSub = userSubmissions.find(s => s.mapReport.id === mapReport.id);
-        if (userSub?.sampleIssue) {
-          const submittedRecord: SampleIssueRecord = {
-            ...userSub.sampleIssue,
-            status: 'Submitted',
-            timeline: userSub.sampleIssue.timeline.map((entry, i) => ({
-              ...entry,
-              reached: i === 0,
-              dateText: i === 0 ? 'Just submitted' : entry.dateText,
-            })),
-          };
-          return (
-            <IssueStatusScreen
-              report={submittedRecord}
-              onBack={() => setMapReport(null)}
-              onToggleFollow={() => {}}
-            />
-          );
-        }
-        return (
-          <IssueStatusScreen
-            report={mapReportToRecord(mapReport)}
-            onBack={() => setMapReport(null)}
-            onToggleFollow={() => {}}
-          />
-        );
+        const userSub = findReportSubmission(mapReport.id);
+        return renderIssueStatus(mapReport, userSub, () => setMapReport(null));
       }
       return (
         <DashboardScreen
@@ -332,42 +431,12 @@ export default function App() {
     }
     if (currentTab === 'profile') {
       if (mapReport) {
-        const userSub = userSubmissions.find((s) => s.mapReport.id === mapReport.id);
-        if (userSub?.sampleIssue) {
-          const submittedRecord: SampleIssueRecord = {
-            ...userSub.sampleIssue,
-            status: STATUS_MAP[mapReport.status] ?? 'Submitted',
-            title: mapReport.title,
-            timeline: mapReport.timeline.map((entry, i) => ({
-              label: (STATUS_MAP[entry.label] ?? entry.label) as ReportStatus,
-              dateText: entry.dateText,
-              reached: i === 0,
-            })),
-          };
-          return (
-            <IssueStatusScreen
-              report={submittedRecord}
-              onBack={() => setMapReport(null)}
-              onToggleFollow={() => {}}
-            />
-          );
-        }
-        return (
-          <IssueStatusScreen
-            report={mapReportToRecord(mapReport)}
-            onBack={() => setMapReport(null)}
-            onToggleFollow={() => {}}
-          />
-        );
+        const userSub = findReportSubmission(mapReport.id);
+        return renderIssueStatus(mapReport, userSub, () => setMapReport(null));
       }
 
-      const profileReports = userSubmissions.map(({ mapReport }) => ({
-        id: mapReport.id,
-        title: mapReport.title,
-        category: CATEGORY_LABEL[mapReport.categoryId],
-        status: mapReport.status,
-        submittedAt: mapReport.createdAt,
-      }));
+      const profileReports = userSubmissions.map(({ mapReport }) => toProfileReport(mapReport));
+      const followingReports = followedSubmissions.map(({ mapReport }) => toProfileReport(mapReport));
 
       return (
         <ProfileScreen
@@ -381,8 +450,9 @@ export default function App() {
           email={user?.email ?? null}
           memberSince={user?.created_at ?? null}
           reports={profileReports}
+          followingReports={followingReports}
           onViewReport={(reportId) => {
-            const match = userSubmissions.find((s) => s.mapReport.id === reportId);
+            const match = findReportSubmission(reportId);
             if (match) {
               setMapReport(match.mapReport);
             }

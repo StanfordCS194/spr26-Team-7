@@ -27,6 +27,7 @@ type IssueStatusScreenProps = {
   report: ReportRecord | SampleIssueRecord
   onBack: () => void
   onToggleFollow: () => void
+  isFollowUpdating?: boolean
   primaryActionLabel?: string
   onPrimaryAction?: () => void
 }
@@ -35,6 +36,7 @@ export const IssueStatusScreen = ({
   report,
   onBack,
   onToggleFollow,
+  isFollowUpdating = false,
   primaryActionLabel,
   onPrimaryAction,
 }: IssueStatusScreenProps) => {
@@ -146,12 +148,22 @@ export const IssueStatusScreen = ({
             </Pressable>
           ) : (
             <Pressable
-              style={[styles.followButton, report.isFollowing ? styles.followButtonActive : null]}
+              style={[
+                styles.followButton,
+                report.isFollowing ? styles.followButtonActive : null,
+                isFollowUpdating ? styles.followButtonDisabled : null,
+              ]}
               onPress={onToggleFollow}
+              disabled={isFollowUpdating}
               accessibilityRole="button"
+              accessibilityState={{ disabled: isFollowUpdating, selected: report.isFollowing }}
             >
               <Text style={[styles.followButtonText, report.isFollowing ? styles.followButtonTextActive : null]}>
-                {report.isFollowing ? 'Following for updates' : 'Follow this issue'}
+                {isFollowUpdating
+                  ? 'Updating…'
+                  : report.isFollowing
+                    ? 'Following for updates'
+                    : 'Follow this issue'}
               </Text>
             </Pressable>
           )}
@@ -268,6 +280,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#35373D',
   },
+  followButtonDisabled: { opacity: 0.6 },
   followButtonText: { color: '#fff', fontWeight: '800', fontSize: 16 },
   followButtonTextActive: { color: '#F2F3F5' },
   header: {

@@ -16,7 +16,44 @@ type ProfileScreenProps = {
   email?: string | null
   memberSince?: string | null
   reports: ProfileReport[]
+  followingReports: ProfileReport[]
   onViewReport: (reportId: string) => void
+}
+
+const ReportList = ({
+  reports,
+  emptyMessage,
+  onViewReport,
+}: {
+  reports: ProfileReport[]
+  emptyMessage: string
+  onViewReport: (reportId: string) => void
+}) => {
+  const sortedReports = [...reports].sort(
+    (a, b) => b.submittedAt.getTime() - a.submittedAt.getTime(),
+  )
+
+  if (sortedReports.length === 0) {
+    return <Text style={styles.mutedText}>{emptyMessage}</Text>
+  }
+
+  return sortedReports.map((report) => (
+    <Pressable
+      key={report.id}
+      onPress={() => onViewReport(report.id)}
+      style={styles.reportRow}
+      accessibilityRole="button"
+      accessibilityLabel={`View report: ${report.title}`}
+    >
+      <View style={styles.reportCopy}>
+        <Text style={styles.reportTitle}>{report.title}</Text>
+        <Text style={styles.reportMeta}>
+          {`${report.category} · ${formatReportStatus(report.status)} · ${formatReportDate(report.submittedAt)}`}
+        </Text>
+      </View>
+      <Text style={styles.reportChevron}>›</Text>
+    </Pressable>
+  ))
 }
 
 export const ProfileScreen = ({
@@ -26,13 +63,11 @@ export const ProfileScreen = ({
   email,
   memberSince,
   reports,
+  followingReports,
   onViewReport,
 }: ProfileScreenProps) => {
   const { totalSubmitted, resolved } = getProfileImpactStats(reports)
   const accountAge = memberSince ? formatAccountAge(memberSince) : 'Unknown'
-  const sortedReports = [...reports].sort(
-    (a, b) => b.submittedAt.getTime() - a.submittedAt.getTime(),
-  )
 
   return (
     <View style={styles.page}>
@@ -67,27 +102,19 @@ export const ProfileScreen = ({
             </View>
             <View style={styles.card}>
               <Text style={styles.cardTitle}>My Reports</Text>
-              {sortedReports.length === 0 ? (
-                <Text style={styles.mutedText}>No reports yet. File one from the Report tab.</Text>
-              ) : (
-                sortedReports.map((report) => (
-                  <Pressable
-                    key={report.id}
-                    onPress={() => onViewReport(report.id)}
-                    style={styles.reportRow}
-                    accessibilityRole="button"
-                    accessibilityLabel={`View report: ${report.title}`}
-                  >
-                    <View style={styles.reportCopy}>
-                      <Text style={styles.reportTitle}>{report.title}</Text>
-                      <Text style={styles.reportMeta}>
-                        {`${report.category} · ${formatReportStatus(report.status)} · ${formatReportDate(report.submittedAt)}`}
-                      </Text>
-                    </View>
-                    <Text style={styles.reportChevron}>›</Text>
-                  </Pressable>
-                ))
-              )}
+              <ReportList
+                reports={reports}
+                emptyMessage="No reports yet. File one from the Report tab."
+                onViewReport={onViewReport}
+              />
+            </View>
+            <View style={styles.card}>
+              <Text style={styles.cardTitle}>Following</Text>
+              <ReportList
+                reports={followingReports}
+                emptyMessage="You are not following any reports yet."
+                onViewReport={onViewReport}
+              />
             </View>
             <Pressable style={styles.secondaryButton} onPress={onToggleAuth} accessibilityRole="button">
               <Text style={styles.secondaryButtonText}>Log Out</Text>

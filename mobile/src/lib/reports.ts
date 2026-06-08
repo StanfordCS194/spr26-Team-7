@@ -125,6 +125,24 @@ export const fetchUserReports = async (userId: string): Promise<ReportRow[]> => 
   return (data ?? []) as ReportRow[]
 }
 
+export const fetchReportsByIds = async (reportIds: string[]): Promise<ReportRow[]> => {
+  if (reportIds.length === 0) {
+    return []
+  }
+
+  const { data, error } = await supabase
+    .from('reports')
+    .select('*')
+    .in('id', reportIds)
+    .order('created_at', { ascending: false })
+
+  if (error) {
+    throw error
+  }
+
+  return (data ?? []) as ReportRow[]
+}
+
 export const createReport = async (
   userId: string,
   classification: Classification,
