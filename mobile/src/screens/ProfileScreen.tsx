@@ -1,13 +1,74 @@
 import { Pressable, ScrollView, StyleSheet, Switch, Text, View } from 'react-native'
 import { useState } from 'react'
 import { WireframeHeader } from '../components/WireframeHeader'
+import {
+  formatAccountAge,
+  formatReportDate,
+  formatReportStatus,
+  getProfileImpactStats,
+  ProfileReport,
+} from '../lib/profileStats'
 
 type ProfileScreenProps = {
   isSignedIn: boolean
   onToggleAuth: () => void
+  displayName?: string | null
+  email?: string | null
+  memberSince?: string | null
+  reports: ProfileReport[]
+  followingReports: ProfileReport[]
+  onViewReport: (reportId: string) => void
 }
 
-export const ProfileScreen = ({ isSignedIn, onToggleAuth }: ProfileScreenProps) => {
+const ReportList = ({
+  reports,
+  emptyMessage,
+  onViewReport,
+}: {
+  reports: ProfileReport[]
+  emptyMessage: string
+  onViewReport: (reportId: string) => void
+}) => {
+  const sortedReports = [...reports].sort(
+    (a, b) => b.submittedAt.getTime() - a.submittedAt.getTime(),
+  )
+
+  if (sortedReports.length === 0) {
+    return <Text style={styles.mutedText}>{emptyMessage}</Text>
+  }
+
+  return sortedReports.map((report) => (
+    <Pressable
+      key={report.id}
+      onPress={() => onViewReport(report.id)}
+      style={styles.reportRow}
+      accessibilityRole="button"
+      accessibilityLabel={`View report: ${report.title}`}
+    >
+      <View style={styles.reportCopy}>
+        <Text style={styles.reportTitle}>{report.title}</Text>
+        <Text style={styles.reportMeta}>
+          {`${report.category} · ${formatReportStatus(report.status)} · ${formatReportDate(report.submittedAt)}`}
+        </Text>
+      </View>
+      <Text style={styles.reportChevron}>›</Text>
+    </Pressable>
+  ))
+}
+
+export const ProfileScreen = ({
+  isSignedIn,
+  onToggleAuth,
+  displayName,
+  email,
+  memberSince,
+  reports,
+  followingReports,
+  onViewReport,
+}: ProfileScreenProps) => {
+  const { totalSubmitted, resolved } = getProfileImpactStats(reports)
+  const accountAge = memberSince ? formatAccountAge(memberSince) : 'Unknown'
+
   return (
     <View style={styles.page}>
       <WireframeHeader title="Profile" />
@@ -23,6 +84,11 @@ export const ProfileScreen = ({ isSignedIn, onToggleAuth }: ProfileScreenProps) 
         ) : (
           <>
             <View style={styles.card}>
+              <Text style={styles.cardTitle}>Account</Text>
+              {displayName ? <Text style={styles.bodyText}>{displayName}</Text> : null}
+              {email ? <Text style={styles.mutedText}>{email}</Text> : null}
+            </View>
+            <View style={styles.card}>
               <Text style={styles.cardTitle}>Notification Preferences</Text>
               <PreferenceRow label="Status changes on my reports" />
               <PreferenceRow label="Updates on followed reports" />
@@ -30,15 +96,25 @@ export const ProfileScreen = ({ isSignedIn, onToggleAuth }: ProfileScreenProps) 
             </View>
             <View style={styles.card}>
               <Text style={styles.cardTitle}>Personal Impact</Text>
-              <Text style={styles.bodyText}>Total submitted: 18</Text>
-              <Text style={styles.bodyText}>Resolved: 11</Text>
-              <Text style={styles.bodyText}>Using app for: 7 months</Text>
+              <Text style={styles.bodyText}>Total submitted: {totalSubmitted}</Text>
+              <Text style={styles.bodyText}>Resolved: {resolved}</Text>
+              <Text style={styles.bodyText}>Using app for: {accountAge}</Text>
             </View>
             <View style={styles.card}>
               <Text style={styles.cardTitle}>My Reports</Text>
-              <Text style={styles.bodyText}>• Pothole · In Review · Apr 19, 2026</Text>
-              <Text style={styles.bodyText}>• Streetlight Outage · Submitted · Apr 16, 2026</Text>
-              <Text style={styles.bodyText}>• Graffiti · Resolved · Apr 10, 2026</Text>
+              <ReportList
+                reports={reports}
+                emptyMessage="No reports yet. File one from the Report tab."
+                onViewReport={onViewReport}
+              />
+            </View>
+            <View style={styles.card}>
+              <Text style={styles.cardTitle}>Following</Text>
+              <ReportList
+                reports={followingReports}
+                emptyMessage="You are not following any reports yet."
+                onViewReport={onViewReport}
+              />
             </View>
             <Pressable style={styles.secondaryButton} onPress={onToggleAuth} accessibilityRole="button">
               <Text style={styles.secondaryButtonText}>Log Out</Text>
@@ -74,4 +150,17 @@ const styles = StyleSheet.create({
   preferenceRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   preferenceLabel: { flex: 1, color: '#304057', fontWeight: '500', marginRight: 10 },
   bodyText: { color: '#304057', fontWeight: '500' },
+  mutedText: { color: '#737E91', fontWeight: '500' },
+  reportRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: '#EEF2F7',
+  },
+  reportCopy: { flex: 1, gap: 2 },
+  reportTitle: { color: '#304057', fontWeight: '700', fontSize: 15 },
+  reportMeta: { color: '#737E91', fontWeight: '500', fontSize: 13 },
+  reportChevron: { color: '#737E91', fontSize: 22, lineHeight: 24 },
 })
