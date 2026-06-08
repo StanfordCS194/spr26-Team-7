@@ -108,6 +108,8 @@ type ClassificationScreenProps = {
   isSubmitting?: boolean;
   selectedSampleIssue?: SampleIssueRecord | null;
   variant?: "photo" | "manual";
+  locationEnabled?: boolean;
+  homeDistrict?: number;
 };
 
 const ALL_ISSUE_TAGS = Object.entries(TAGS_BY_CATEGORY).flatMap(([issueCategory, tags]) =>
@@ -142,6 +144,8 @@ export const ClassificationScreen = ({
   isSubmitting = false,
   selectedSampleIssue,
   variant = "photo",
+  locationEnabled = true,
+  homeDistrict = 3,
 }: ClassificationScreenProps) => {
   const isManual = variant === "manual";
 
@@ -181,7 +185,7 @@ export const ClassificationScreen = ({
 
     const loadLocation = async () => {
       setIsDetectingLocation(true);
-      const detected = await detectReportLocation();
+      const detected = await detectReportLocation({ locationEnabled, homeDistrict });
       if (!isMounted) {
         return;
       }
@@ -197,7 +201,7 @@ export const ClassificationScreen = ({
     return () => {
       isMounted = false;
     };
-  }, [isManual]);
+  }, [isManual, locationEnabled, homeDistrict]);
 
   const pinAnim = useRef(new Animated.ValueXY({ x: 0, y: 0 })).current;
   const panResponder = useRef(

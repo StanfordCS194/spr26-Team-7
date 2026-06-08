@@ -5,6 +5,7 @@ import { useAuth } from './src/providers/AuthProvider';
 import { BottomNav } from './src/components/BottomNav';
 import { DashboardScreen } from './src/screens/DashboardScreen';
 import { ProfileScreen } from './src/screens/ProfileScreen';
+import { ProfileSettingsScreen } from './src/screens/ProfileSettingsScreen';
 import { ReportCameraScreen } from './src/screens/ReportCameraScreen';
 import { AnalyzingScreen } from './src/screens/AnalyzingScreen';
 import { ClassificationScreen, Classification } from './src/screens/ClassificationScreen';
@@ -21,6 +22,12 @@ import { sendReportEmail } from './src/lib/reportEmail';
 import { ProfileReport } from './src/lib/profileStats';
 import { createReport, fetchReportsByIds, fetchUserReports, getSampleIssueIdFromRow, ReportRow, reportRowToMapReport } from './src/lib/reports';
 import { fetchFollowedReportIds, followReport, unfollowReport } from './src/lib/reportFollows';
+import {
+  DEFAULT_USER_SETTINGS,
+  loadUserSettings,
+  saveUserSettings,
+  UserSettings,
+} from './src/lib/userSettings';
 
 const CATEGORY_LABEL: Record<MapReportCategoryId, IssueCategory> = {
   pothole:     'Pothole',
@@ -100,6 +107,8 @@ export default function App() {
   const [chronicSpot, setChronicSpot]                 = useState<ChronicSpot | null>(null);
   const [selectedSampleIssue, setSelectedSampleIssue] = useState<SampleIssueRecord | null>(null);
   const [isManualReport, setIsManualReport]           = useState(false);
+  const [showProfileSettings, setShowProfileSettings] = useState(false);
+  const [userSettings, setUserSettings]               = useState<UserSettings>(DEFAULT_USER_SETTINGS);
   const [userSubmissions, setUserSubmissions]         = useState<ReportSubmission[]>([]);
   const [followedSubmissions, setFollowedSubmissions] = useState<ReportSubmission[]>([]);
   const [focusReport, setFocusReport]                 = useState<MapReport | null>(null);
@@ -109,6 +118,31 @@ export default function App() {
   const [followUpdatingId, setFollowUpdatingId]       = useState<string | null>(null);
 
   const isFollowingReport = (reportId: string) => followedReportIds.has(reportId);
+
+  const updateUserSettings = (patch: Partial<UserSettings>) => {
+    setUserSettings((prev) => {
+      const next = { ...prev, ...patch };
+      void saveUserSettings(next);
+      return next;
+    });
+  };
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadSettings = async () => {
+      const settings = await loadUserSettings();
+      if (isMounted) {
+        setUserSettings(settings);
+      }
+    };
+
+    void loadSettings();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const findReportSubmission = (reportId: string) =>
     userSubmissions.find((s) => s.mapReport.id === reportId)
@@ -334,6 +368,7 @@ export default function App() {
     setFocusReport(null);
     setMapReport(null);
     setChronicSpot(null);
+    setShowProfileSettings(false);
     handleResetFlow();
   };
 
@@ -408,6 +443,8 @@ export default function App() {
           isSubmitting={isSendingReport}
           selectedSampleIssue={isManualReport ? null : selectedSampleIssue}
           variant={isManualReport ? 'manual' : 'photo'}
+          locationEnabled={userSettings.locationEnabled}
+          homeDistrict={userSettings.homeDistrict}
         />
       );
     }
@@ -448,6 +485,8 @@ export default function App() {
       }
       return (
         <DashboardScreen
+          homeDistrict={userSettings.homeDistrict}
+          onHomeDistrictChange={(homeDistrict) => updateUserSettings({ homeDistrict })}
           onViewReport={(r) => setMapReport(r)}
           onViewChronicSpot={(spot) => setChronicSpot(spot)}
           extraReports={userSubmissions.map(s => s.mapReport)}
@@ -467,6 +506,18 @@ export default function App() {
         return renderIssueStatus(mapReport, userSub, () => setMapReport(null));
       }
 
+      if (showProfileSettings) {
+        return (
+          <ProfileSettingsScreen
+            onBack={() => setShowProfileSettings(false)}
+            locationEnabled={userSettings.locationEnabled}
+            homeDistrict={userSettings.homeDistrict}
+            onLocationEnabledChange={(locationEnabled) => updateUserSettings({ locationEnabled })}
+            onHomeDistrictChange={(homeDistrict) => updateUserSettings({ homeDistrict })}
+          />
+        );
+      }
+
       const profileReports = userSubmissions.map(({ mapReport }) => toProfileReport(mapReport));
       const followingReports = followedSubmissions.map(({ mapReport }) => toProfileReport(mapReport));
 
@@ -474,6 +525,7 @@ export default function App() {
         <ProfileScreen
           isSignedIn={isSignedIn}
           onToggleAuth={handleSignOut}
+          onOpenSettings={() => setShowProfileSettings(true)}
           displayName={
             typeof user?.user_metadata?.full_name === 'string'
               ? user.user_metadata.full_name
@@ -499,6 +551,7 @@ export default function App() {
     isSignedIn &&
     !chronicSpot &&
     !mapReport &&
+    !showProfileSettings &&
     (currentTab === 'dashboard' ||
       currentTab === 'profile' ||
       (currentTab === 'report' && reportStep === 'camera'));
@@ -527,7 +580,10 @@ export default function App() {
       {showNav && (
         <BottomNav
           currentTab={currentTab}
-          onChangeTab={(tab) => setCurrentTab(tab)}
+          onChangeTab={(tab) => {
+            setShowProfileSettings(false);
+            setCurrentTab(tab);
+          }}
         />
       )}
     </SafeAreaView>

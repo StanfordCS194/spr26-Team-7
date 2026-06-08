@@ -1,4 +1,6 @@
 import * as Location from 'expo-location'
+import { DISTRICT_NEIGHBORHOODS } from '../data/dashboardMockData'
+import { DISTRICT_CENTERS } from '../data/mockMapReports'
 
 export type DetectedReportLocation = {
   locationMain: string
@@ -7,11 +9,17 @@ export type DetectedReportLocation = {
   longitude: number
 }
 
-const FALLBACK_LOCATION: DetectedReportLocation = {
-  locationMain: 'San Jose City Hall',
-  locationSub: 'San Jose, CA 95110',
-  latitude: 37.3371,
-  longitude: -121.8863,
+const homeDistrictFallback = (homeDistrict: number): DetectedReportLocation => {
+  const district = homeDistrict >= 1 && homeDistrict <= 10 ? homeDistrict : 3
+  const center = DISTRICT_CENTERS[district] ?? DISTRICT_CENTERS[3]
+  const neighborhoods = DISTRICT_NEIGHBORHOODS[district] ?? DISTRICT_NEIGHBORHOODS[3]
+
+  return {
+    locationMain: `District ${district}`,
+    locationSub: `${neighborhoods} · San Jose, CA`,
+    latitude: center.latitude,
+    longitude: center.longitude,
+  }
 }
 
 export const formatReportDateTime = (date: Date) =>
@@ -24,11 +32,19 @@ export const formatReportDateTime = (date: Date) =>
     minute: '2-digit',
   })
 
-export const detectReportLocation = async (): Promise<DetectedReportLocation> => {
+export const detectReportLocation = async (
+  options: { locationEnabled?: boolean; homeDistrict?: number } = {},
+): Promise<DetectedReportLocation> => {
+  const homeDistrict = options.homeDistrict ?? 3
+
+  if (options.locationEnabled === false) {
+    return homeDistrictFallback(homeDistrict)
+  }
+
   try {
     const { status } = await Location.requestForegroundPermissionsAsync()
     if (status !== 'granted') {
-      return FALLBACK_LOCATION
+      return homeDistrictFallback(homeDistrict)
     }
 
     const position = await Location.getCurrentPositionAsync({
@@ -62,6 +78,6 @@ export const detectReportLocation = async (): Promise<DetectedReportLocation> =>
       longitude: position.coords.longitude,
     }
   } catch {
-    return FALLBACK_LOCATION
+    return homeDistrictFallback(homeDistrict)
   }
 }

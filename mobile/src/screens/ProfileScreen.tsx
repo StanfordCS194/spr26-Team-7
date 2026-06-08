@@ -1,5 +1,5 @@
-import { Pressable, ScrollView, StyleSheet, Switch, Text, View } from 'react-native'
-import { useState } from 'react'
+import { MaterialCommunityIcons } from '@expo/vector-icons'
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
 import { WireframeHeader } from '../components/WireframeHeader'
 import {
   formatAccountAge,
@@ -12,6 +12,7 @@ import {
 type ProfileScreenProps = {
   isSignedIn: boolean
   onToggleAuth: () => void
+  onOpenSettings: () => void
   displayName?: string | null
   email?: string | null
   memberSince?: string | null
@@ -19,6 +20,21 @@ type ProfileScreenProps = {
   followingReports: ProfileReport[]
   onViewReport: (reportId: string) => void
 }
+
+const SectionTitle = ({
+  icon,
+  title,
+}: {
+  icon: keyof typeof MaterialCommunityIcons.glyphMap
+  title: string
+}) => (
+  <View style={styles.sectionTitleRow}>
+    <View style={styles.sectionIconBox}>
+      <MaterialCommunityIcons name={icon} size={18} color="#4F8EF7" />
+    </View>
+    <Text style={styles.cardTitle}>{title}</Text>
+  </View>
+)
 
 const ReportList = ({
   reports,
@@ -59,6 +75,7 @@ const ReportList = ({
 export const ProfileScreen = ({
   isSignedIn,
   onToggleAuth,
+  onOpenSettings,
   displayName,
   email,
   memberSince,
@@ -73,7 +90,6 @@ export const ProfileScreen = ({
     <View style={styles.page}>
       <WireframeHeader title="Profile" />
       <ScrollView contentContainerStyle={styles.content}>
-        <Text style={styles.title}>My Profile</Text>
         {!isSignedIn ? (
           <View style={styles.card}>
             <Text style={styles.promptTitle}>Use app without login, or sign in for history and follows.</Text>
@@ -84,24 +100,34 @@ export const ProfileScreen = ({
         ) : (
           <>
             <View style={styles.card}>
-              <Text style={styles.cardTitle}>Account</Text>
+              <SectionTitle icon="account-outline" title="Account" />
               {displayName ? <Text style={styles.bodyText}>{displayName}</Text> : null}
               {email ? <Text style={styles.mutedText}>{email}</Text> : null}
             </View>
+
+            <Pressable
+              style={styles.settingsButton}
+              onPress={onOpenSettings}
+              accessibilityRole="button"
+              accessibilityLabel="Open settings"
+            >
+              <View style={styles.settingsLeft}>
+                <View style={styles.sectionIconBox}>
+                  <MaterialCommunityIcons name="cog-outline" size={18} color="#4F8EF7" />
+                </View>
+                <Text style={styles.settingsLabel}>Settings</Text>
+              </View>
+              <Text style={styles.reportChevron}>›</Text>
+            </Pressable>
+
             <View style={styles.card}>
-              <Text style={styles.cardTitle}>Notification Preferences</Text>
-              <PreferenceRow label="Status changes on my reports" />
-              <PreferenceRow label="Updates on followed reports" />
-              <PreferenceRow label="Resolved issue notifications" />
-            </View>
-            <View style={styles.card}>
-              <Text style={styles.cardTitle}>Personal Impact</Text>
+              <SectionTitle icon="chart-line" title="Personal Impact" />
               <Text style={styles.bodyText}>Total submitted: {totalSubmitted}</Text>
               <Text style={styles.bodyText}>Resolved: {resolved}</Text>
               <Text style={styles.bodyText}>Using app for: {accountAge}</Text>
             </View>
             <View style={styles.card}>
-              <Text style={styles.cardTitle}>My Reports</Text>
+              <SectionTitle icon="clipboard-text-outline" title="My Reports" />
               <ReportList
                 reports={reports}
                 emptyMessage="No reports yet. File one from the Report tab."
@@ -109,7 +135,7 @@ export const ProfileScreen = ({
               />
             </View>
             <View style={styles.card}>
-              <Text style={styles.cardTitle}>Following</Text>
+              <SectionTitle icon="bookmark-outline" title="Following" />
               <ReportList
                 reports={followingReports}
                 emptyMessage="You are not following any reports yet."
@@ -126,41 +152,70 @@ export const ProfileScreen = ({
   )
 }
 
-const PreferenceRow = ({ label }: { label: string }) => {
-  const [enabled, setEnabled] = useState(true)
-  return (
-    <View style={styles.preferenceRow}>
-      <Text style={styles.preferenceLabel}>{label}</Text>
-      <Switch value={enabled} onValueChange={setEnabled} />
-    </View>
-  )
-}
-
 const styles = StyleSheet.create({
-  page: { flex: 1, backgroundColor: '#fff' },
+  page: { flex: 1, backgroundColor: '#18191C' },
   content: { padding: 14, gap: 14, paddingBottom: 24 },
-  title: { fontSize: 22, fontWeight: '800' },
-  card: { borderColor: '#E2EAF2', borderWidth: 1, borderRadius: 14, padding: 12, gap: 10 },
-  promptTitle: { color: '#324159', lineHeight: 22, fontSize: 16, fontWeight: '500' },
-  cardTitle: { fontWeight: '800', fontSize: 17 },
-  primaryButton: { marginTop: 4, backgroundColor: '#1565FF', borderRadius: 10, paddingVertical: 12, alignItems: 'center' },
+  card: {
+    backgroundColor: '#222428',
+    borderColor: '#35373D',
+    borderWidth: 1,
+    borderRadius: 14,
+    padding: 12,
+    gap: 10,
+  },
+  sectionTitleRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  sectionIconBox: {
+    width: 32,
+    height: 32,
+    borderRadius: 10,
+    backgroundColor: '#4F8EF728',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  promptTitle: { color: '#8D939E', lineHeight: 22, fontSize: 16, fontWeight: '500' },
+  cardTitle: { fontWeight: '800', fontSize: 17, color: '#F2F3F5' },
+  settingsButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#222428',
+    borderColor: '#35373D',
+    borderWidth: 1,
+    borderRadius: 14,
+    paddingHorizontal: 12,
+    paddingVertical: 14,
+  },
+  settingsLeft: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  settingsLabel: { fontWeight: '700', fontSize: 16, color: '#F2F3F5' },
+  primaryButton: {
+    marginTop: 4,
+    backgroundColor: '#4F8EF7',
+    borderRadius: 10,
+    paddingVertical: 12,
+    alignItems: 'center',
+  },
   primaryButtonText: { color: '#fff', fontWeight: '700', fontSize: 16 },
-  secondaryButton: { borderColor: '#D5DEE9', borderWidth: 2, borderRadius: 10, paddingVertical: 12, alignItems: 'center' },
-  secondaryButtonText: { fontWeight: '700', fontSize: 16 },
-  preferenceRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  preferenceLabel: { flex: 1, color: '#304057', fontWeight: '500', marginRight: 10 },
-  bodyText: { color: '#304057', fontWeight: '500' },
-  mutedText: { color: '#737E91', fontWeight: '500' },
+  secondaryButton: {
+    borderColor: '#35373D',
+    borderWidth: 1,
+    borderRadius: 10,
+    paddingVertical: 12,
+    alignItems: 'center',
+    backgroundColor: '#222428',
+  },
+  secondaryButtonText: { fontWeight: '700', fontSize: 16, color: '#F2F3F5' },
+  bodyText: { color: '#F2F3F5', fontWeight: '500' },
+  mutedText: { color: '#8D939E', fontWeight: '500' },
   reportRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
     paddingVertical: 8,
     borderBottomWidth: 1,
-    borderBottomColor: '#EEF2F7',
+    borderBottomColor: '#35373D',
   },
   reportCopy: { flex: 1, gap: 2 },
-  reportTitle: { color: '#304057', fontWeight: '700', fontSize: 15 },
-  reportMeta: { color: '#737E91', fontWeight: '500', fontSize: 13 },
-  reportChevron: { color: '#737E91', fontSize: 22, lineHeight: 24 },
+  reportTitle: { color: '#F2F3F5', fontWeight: '700', fontSize: 15 },
+  reportMeta: { color: '#8D939E', fontWeight: '500', fontSize: 13 },
+  reportChevron: { color: '#8D939E', fontSize: 22, lineHeight: 24 },
 })

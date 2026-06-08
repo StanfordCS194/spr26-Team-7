@@ -1,9 +1,9 @@
 import { useRef, useState } from 'react'
-import { Modal, Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions } from 'react-native'
+import { Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions } from 'react-native'
+import { DistrictPickerModal } from '../components/DistrictPickerModal'
 import { DashboardMap } from './DashboardMap'
 import { MapReport } from '../data/mockMapReports'
 import {
-  DISTRICT_NEIGHBORHOODS,
   Period,
   formatCount,
   periodCountLabel,
@@ -51,41 +51,6 @@ const Sparkline = ({ data, color, width = 88, height = 36 }: SparklineProps) => 
   )
 }
 
-// ─── District picker modal ────────────────────────────────────────────────────
-type PickerProps = {
-  visible:   boolean
-  current:   number
-  onSelect:  (d: number) => void
-  onClose:   () => void
-}
-
-const DistrictPicker = ({ visible, current, onSelect, onClose }: PickerProps) => (
-  <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
-    <Pressable style={s.modalOverlay} onPress={onClose}>
-      <View style={s.modalSheet}>
-        <View style={s.modalHandle} />
-        <Text style={s.modalTitle}>Select District</Text>
-        <ScrollView bounces={false}>
-          {Array.from({ length: 10 }, (_, i) => i + 1).map(d => (
-            <Pressable
-              key={d}
-              style={[s.districtRow, d === current && s.districtRowActive]}
-              onPress={() => { onSelect(d); onClose() }}
-              accessibilityRole="button"
-            >
-              <View style={{ flex: 1 }}>
-                <Text style={[s.districtRowNum, d === current && { color: D.text1 }]}>District {d}</Text>
-                <Text style={s.districtRowSub}>{DISTRICT_NEIGHBORHOODS[d]}</Text>
-              </View>
-              {d === current && <Text style={s.districtCheck}>✓</Text>}
-            </Pressable>
-          ))}
-        </ScrollView>
-      </View>
-    </Pressable>
-  </Modal>
-)
-
 // ─── Avg time label helpers ───────────────────────────────────────────────────
 const AVG_EXPLANATIONS = new Set(['Auto-closed by city', 'Not enough data'])
 function isAvgExplanation(label: string) { return AVG_EXPLANATIONS.has(label) }
@@ -110,6 +75,8 @@ function fmtReports(n: number): string {
 
 // ─── Dashboard screen ─────────────────────────────────────────────────────────
 type DashboardScreenProps = {
+  homeDistrict:        number
+  onHomeDistrictChange: (district: number) => void
   onViewReport?:       (report: MapReport)  => void
   onViewChronicSpot?:  (spot: ChronicSpot)  => void
   extraReports?:       MapReport[]
@@ -118,8 +85,16 @@ type DashboardScreenProps = {
   reportImages?:       Record<string, import('../types').SampleIssueImage>
 }
 
-export const DashboardScreen = ({ onViewReport, onViewChronicSpot, extraReports, focusReport, onFocusConsumed, reportImages }: DashboardScreenProps) => {
-  const [district,      setDistrict]      = useState(3)
+export const DashboardScreen = ({
+  homeDistrict,
+  onHomeDistrictChange,
+  onViewReport,
+  onViewChronicSpot,
+  extraReports,
+  focusReport,
+  onFocusConsumed,
+  reportImages,
+}: DashboardScreenProps) => {
   const [period,        setPeriod]        = useState<Period>('month')
   const [trendWindow,   setTrendWindow]   = useState<TrendWindow>('month')
   const [showAllIssues, setShowAllIssues] = useState(false)
@@ -129,7 +104,7 @@ export const DashboardScreen = ({ onViewReport, onViewChronicSpot, extraReports,
   const { width: screenWidth } = useWindowDimensions()
   const pagerRef = useRef<ScrollView>(null)
 
-  const districtData = dashboard311.districts[String(district)]
+  const districtData = dashboard311.districts[String(homeDistrict)]
   const { summary }  = districtData.byPeriod[period]
   const {
     issueTypes,
@@ -154,7 +129,7 @@ export const DashboardScreen = ({ onViewReport, onViewChronicSpot, extraReports,
   }
 
   const handleDistrictChange = (d: number) => {
-    setDistrict(d)
+    onHomeDistrictChange(d)
     setPeriod('month')
     setShowAllIssues(false)
   }
@@ -176,14 +151,14 @@ export const DashboardScreen = ({ onViewReport, onViewChronicSpot, extraReports,
     d: i + 1,
     rate: dashboard311.districts[String(i + 1)].byPeriod.year.summary.resolutionRate,
   })).sort((a, b) => a.rate - b.rate)
-  const distYTDRate  = compRatesAsc.find(x => x.d === district)?.rate ?? 0
-  const distRank     = 10 - compRatesAsc.findIndex(x => x.d === district)
+  const distYTDRate  = compRatesAsc.find(x => x.d === homeDistrict)?.rate ?? 0
+  const distRank     = 10 - compRatesAsc.findIndex(x => x.d === homeDistrict)
 
   return (
     <View style={s.page}>
-      <DistrictPicker
+      <DistrictPickerModal
         visible={pickerVisible}
-        current={district}
+        current={homeDistrict}
         onSelect={handleDistrictChange}
         onClose={() => setPickerVisible(false)}
       />
@@ -198,7 +173,7 @@ export const DashboardScreen = ({ onViewReport, onViewChronicSpot, extraReports,
             accessibilityRole="button"
             accessibilityLabel="Change district"
           >
-            <Text style={s.headerNeighborhood}>District {district}</Text>
+            <Text style={s.headerNeighborhood}>District {homeDistrict}</Text>
             <Text style={s.headerChevron}>  ▾</Text>
           </Pressable>
         </View>
@@ -239,7 +214,7 @@ export const DashboardScreen = ({ onViewReport, onViewChronicSpot, extraReports,
         {/* ── Tab 1: Map ── */}
         <View style={{ width: screenWidth, flex: 1 }}>
           <DashboardMap
-            district={district}
+            district={homeDistrict}
             onViewReport={onViewReport ?? (() => {})}
             extraReports={extraReports}
             focusReport={focusReport}
@@ -275,7 +250,7 @@ export const DashboardScreen = ({ onViewReport, onViewChronicSpot, extraReports,
             </View>
 
             {/* ── 2. District heading ── */}
-            <Text style={[s.sectionTitle, { marginBottom: 12, marginTop: 24 }]}>District {district} Insights</Text>
+            <Text style={[s.sectionTitle, { marginBottom: 12, marginTop: 24 }]}>District {homeDistrict} Insights</Text>
 
             {/* ── 3. District comparison (static — YTD, not affected by toggle) ── */}
             <View style={s.distCompCard}>
@@ -285,7 +260,7 @@ export const DashboardScreen = ({ onViewReport, onViewChronicSpot, extraReports,
               </View>
               <View style={s.dotScaleRow}>
                 {compRatesAsc.map(item => {
-                  const isCurrent = item.d === district
+                  const isCurrent = item.d === homeDistrict
                   return (
                     <View key={item.d} style={s.dotCell}>
                       <Text style={s.dotCellLabel}>{isCurrent ? `D${item.d}` : ''}</Text>
@@ -299,7 +274,7 @@ export const DashboardScreen = ({ onViewReport, onViewChronicSpot, extraReports,
                 <Text style={s.dotEndText}>{compRatesAsc[9].rate}%</Text>
               </View>
               <Text style={s.distRankText}>
-                District {district} ranks{' '}
+                District {homeDistrict} ranks{' '}
                 <Text style={s.distRankHighlight}>#{distRank} of 10</Text>
                 {' '}({distYTDRate}%)
               </Text>
@@ -646,15 +621,4 @@ const s = StyleSheet.create({
   trendArrow:          { fontSize: 16, fontWeight: '800', width: 18 },
   trendName:           { flex: 1, color: D.text1, fontSize: 14, fontWeight: '600' },
   trendPct:            { fontSize: 14, fontWeight: '800' },
-
-  // ── District picker modal
-  modalOverlay:       { flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'flex-end' },
-  modalSheet:         { backgroundColor: D.surface, borderTopLeftRadius: 20, borderTopRightRadius: 20, paddingBottom: 32, maxHeight: '72%' },
-  modalHandle:        { width: 36, height: 4, borderRadius: 2, backgroundColor: D.border, alignSelf: 'center', marginTop: 10, marginBottom: 4 },
-  modalTitle:         { color: D.text2, fontSize: 12, fontWeight: '700', letterSpacing: 1, textAlign: 'center', paddingVertical: 12 },
-  districtRow:        { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 20, paddingVertical: 14, borderTopWidth: 1, borderTopColor: D.border },
-  districtRowActive:  { backgroundColor: D.surfaceHigh },
-  districtRowNum:     { color: D.text2, fontSize: 15, fontWeight: '700' },
-  districtRowSub:     { color: D.text3, fontSize: 12, marginTop: 1 },
-  districtCheck:      { color: D.green, fontSize: 16, fontWeight: '700' },
 })
