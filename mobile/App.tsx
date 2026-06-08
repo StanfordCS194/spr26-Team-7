@@ -99,6 +99,7 @@ export default function App() {
   const [mapReport, setMapReport]                     = useState<MapReport | null>(null);
   const [chronicSpot, setChronicSpot]                 = useState<ChronicSpot | null>(null);
   const [selectedSampleIssue, setSelectedSampleIssue] = useState<SampleIssueRecord | null>(null);
+  const [isManualReport, setIsManualReport]           = useState(false);
   const [userSubmissions, setUserSubmissions]         = useState<ReportSubmission[]>([]);
   const [followedSubmissions, setFollowedSubmissions] = useState<ReportSubmission[]>([]);
   const [focusReport, setFocusReport]                 = useState<MapReport | null>(null);
@@ -340,6 +341,13 @@ export default function App() {
     setReportStep('camera');
     setClassification(null);
     setSelectedSampleIssue(null);
+    setIsManualReport(false);
+  };
+
+  const handleStartManualReport = () => {
+    setSelectedSampleIssue(null);
+    setIsManualReport(true);
+    setReportStep('classify');
   };
 
   const renderReportFlow = () => {
@@ -349,10 +357,12 @@ export default function App() {
           onSelectIssue={(issueId) => {
             const nextIssue = sampleIssues.find((issue) => issue.id === issueId) ?? null;
             setSelectedSampleIssue(nextIssue);
+            setIsManualReport(false);
             setReportStep('classify');
           }}
           onOpenCamera={() => {
             setSelectedSampleIssue(null);
+            setIsManualReport(false);
             setReportStep('camera');
           }}
         />
@@ -361,21 +371,43 @@ export default function App() {
     if (reportStep === 'camera') {
       return (
         <ReportCameraScreen
-          onCapture={() => setReportStep('analyzing')}
-          onOpenLibrary={() => setReportStep('picker')}
+          onCapture={() => {
+            setIsManualReport(false);
+            setReportStep('analyzing');
+          }}
+          onOpenLibrary={() => {
+            setIsManualReport(false);
+            setReportStep('picker');
+          }}
+          onReportWithoutPhoto={handleStartManualReport}
         />
       );
     }
     if (reportStep === 'analyzing') {
-      return <AnalyzingScreen onDone={() => setReportStep('classify')} />;
+      return (
+        <AnalyzingScreen
+          onDone={() => {
+            setIsManualReport(false);
+            setReportStep('classify');
+          }}
+        />
+      );
     }
     if (reportStep === 'classify') {
       return (
         <ClassificationScreen
-          onBack={() => setReportStep(selectedSampleIssue ? 'picker' : 'camera')}
+          onBack={() => {
+            if (isManualReport) {
+              setIsManualReport(false);
+              setReportStep('camera');
+              return;
+            }
+            setReportStep(selectedSampleIssue ? 'picker' : 'camera');
+          }}
           onConfirm={handleConfirmReport}
           isSubmitting={isSendingReport}
-          selectedSampleIssue={selectedSampleIssue}
+          selectedSampleIssue={isManualReport ? null : selectedSampleIssue}
+          variant={isManualReport ? 'manual' : 'photo'}
         />
       );
     }

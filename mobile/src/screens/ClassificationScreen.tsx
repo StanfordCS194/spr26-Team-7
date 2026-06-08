@@ -1,5 +1,7 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
+  ActivityIndicator,
+  Alert,
   Animated,
   Dimensions,
   PanResponder,
@@ -13,6 +15,7 @@ import {
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { SampleIssueImage } from "../components/SampleIssueImage";
 import { MiniMapView } from "../components/MiniMapView";
+import { detectReportLocation, formatReportDateTime } from "../lib/reportLocation";
 import { SampleIssueRecord } from "../types";
 
 const SCREEN_HEIGHT = Dimensions.get('window').height;
@@ -93,6 +96,10 @@ export type Classification = {
   desc: string;
   locationMain: string;
   locationSub: string;
+  reportedAt?: string;
+  latitude?: number;
+  longitude?: number;
+  hasPhoto?: boolean;
 };
 
 type ClassificationScreenProps = {
@@ -100,7 +107,12 @@ type ClassificationScreenProps = {
   onConfirm: (c: Classification) => void | Promise<void>;
   isSubmitting?: boolean;
   selectedSampleIssue?: SampleIssueRecord | null;
+  variant?: "photo" | "manual";
 };
+
+const ALL_ISSUE_TAGS = Object.entries(TAGS_BY_CATEGORY).flatMap(([issueCategory, tags]) =>
+  tags.map((issueTag) => ({ issueCategory, issueTag })),
+);
 
 const CATEGORY_COLOR: Record<string, string> = {
   'Pothole':             '#E8514A',
@@ -129,19 +141,63 @@ export const ClassificationScreen = ({
   onConfirm,
   isSubmitting = false,
   selectedSampleIssue,
+  variant = "photo",
 }: ClassificationScreenProps) => {
-  const locationMainLine =
-    selectedSampleIssue?.locationName ?? LOCATION_MAIN_LINE;
-  const locationSubLine =
-    selectedSampleIssue?.address ?? LOCATION_SUB_LINE;
+  const isManual = variant === "manual";
 
-  const [category, setCategory] = useState(getInitialCategory(selectedSampleIssue));
-  const [tag, setTag] = useState(selectedSampleIssue?.tag ?? "Pothole");
-  const [desc, setDesc] = useState(
-    selectedSampleIssue?.description ??
-      "Significant pothole on Glen Eyrie Ave near Carolyn Ave causing road hazard. Approximately 2ft wide with visible asphalt damage.",
+  const [category, setCategory] = useState(
+    isManual ? "" : getInitialCategory(selectedSampleIssue),
   );
+  const [tag, setTag] = useState(isManual ? "" : (selectedSampleIssue?.tag ?? "Pothole"));
+  const [desc, setDesc] = useState(
+    isManual
+      ? ""
+      : (selectedSampleIssue?.description ??
+        "Significant pothole on Glen Eyrie Ave near Carolyn Ave causing road hazard. Approximately 2ft wide with visible asphalt damage."),
+  );
+  const [locationMainLine, setLocationMainLine] = useState(
+    isManual ? "Detecting location…" : (selectedSampleIssue?.locationName ?? LOCATION_MAIN_LINE),
+  );
+  const [locationSubLine, setLocationSubLine] = useState(
+    isManual ? "" : (selectedSampleIssue?.address ?? LOCATION_SUB_LINE),
+  );
+  const [reportedAt, setReportedAt] = useState(formatReportDateTime(new Date()));
+  const [latitude, setLatitude] = useState<number | undefined>(
+    isManual ? undefined : selectedSampleIssue?.latitude,
+  );
+  const [longitude, setLongitude] = useState<number | undefined>(
+    isManual ? undefined : selectedSampleIssue?.longitude,
+  );
+  const [isDetectingLocation, setIsDetectingLocation] = useState(isManual);
+  const [isEditingLocation, setIsEditingLocation] = useState(false);
   const [showTagMenu, setShowTagMenu] = useState(false);
+
+  useEffect(() => {
+    if (!isManual) {
+      return;
+    }
+
+    let isMounted = true;
+
+    const loadLocation = async () => {
+      setIsDetectingLocation(true);
+      const detected = await detectReportLocation();
+      if (!isMounted) {
+        return;
+      }
+      setLocationMainLine(detected.locationMain);
+      setLocationSubLine(detected.locationSub);
+      setLatitude(detected.latitude);
+      setLongitude(detected.longitude);
+      setIsDetectingLocation(false);
+    };
+
+    void loadLocation();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [isManual]);
 
   const pinAnim = useRef(new Animated.ValueXY({ x: 0, y: 0 })).current;
   const panResponder = useRef(
@@ -154,19 +210,61 @@ export const ClassificationScreen = ({
     }),
   ).current;
 
-  const handleTagSelect = (nextTag: string) => {
+  const handleTagSelect = (nextTag: string, nextCategory?: string) => {
     setTag(nextTag);
-    for (const [nextCategory, tags] of Object.entries(TAGS_BY_CATEGORY)) {
+    if (nextCategory) {
+      setCategory(nextCategory);
+      setShowTagMenu(false);
+      return;
+    }
+    for (const [issueCategory, tags] of Object.entries(TAGS_BY_CATEGORY)) {
       if (tags.includes(nextTag)) {
-        setCategory(nextCategory);
+        setCategory(issueCategory);
         break;
       }
     }
     setShowTagMenu(false);
   };
 
+  const handleConfirmPress = () => {
+    if (isSubmitting) {
+      return;
+    }
+    if (!tag.trim()) {
+      Alert.alert("Select an issue type", "Choose what kind of issue you are reporting.");
+      return;
+    }
+    if (!desc.trim()) {
+      Alert.alert("Add a description", "Describe the issue so the city can respond.");
+      return;
+    }
+    if (!locationMainLine.trim() || !locationSubLine.trim()) {
+      Alert.alert("Add a location", "Enter where the issue is located.");
+      return;
+    }
+
+    void onConfirm({
+      category: category || "Pothole",
+      tag,
+      desc: desc.trim(),
+      locationMain: locationMainLine.trim(),
+      locationSub: locationSubLine.trim(),
+      reportedAt,
+      latitude,
+      longitude,
+      hasPhoto: !isManual,
+    });
+  };
+
   const dept =
-    DEPT_BY_CATEGORY[category] ?? DEPT_BY_CATEGORY["Roads & Infrastructure"];
+    DEPT_BY_CATEGORY[category] ?? DEPT_BY_CATEGORY.Pothole;
+  const displayCategory = category || "Issue";
+  const tagOptions = isManual
+    ? ALL_ISSUE_TAGS
+    : (TAGS_BY_CATEGORY[category] ?? []).map((issueTag) => ({
+        issueCategory: category,
+        issueTag,
+      }));
 
   return (
     <View style={styles.page}>
@@ -180,26 +278,44 @@ export const ClassificationScreen = ({
         contentContainerStyle={styles.scroll}
         keyboardShouldPersistTaps="handled"
       >
-        <View style={styles.photoStrip}>
-          <SampleIssueImage
-            image={
-              selectedSampleIssue?.image ?? {
-                kind: "asset",
-                source: require("../../assets/pothole.jpg"),
-                alt: "Captured pothole preview",
-              }
-            }
-            style={{ width: "100%", height: "100%" }}
-          />
-          <View style={styles.categoryChip}>
-            <MaterialCommunityIcons
-              name={(CATEGORY_ICON[category] ?? 'alert-circle-outline') as any}
-              size={13}
-              color={CATEGORY_COLOR[category] ?? '#8D939E'}
-            />
-            <Text style={styles.categoryChipText}>{category}</Text>
+        {isManual ? (
+          <View style={styles.manualHeader}>
+            <View style={styles.manualIconCircle}>
+              <MaterialCommunityIcons
+                name={(CATEGORY_ICON[displayCategory] ?? "clipboard-text-outline") as any}
+                size={28}
+                color={CATEGORY_COLOR[displayCategory] ?? "#8D939E"}
+              />
+            </View>
+            <View style={styles.manualHeaderCopy}>
+              <Text style={styles.manualTitle}>Report without photo</Text>
+              <Text style={styles.manualSubtitle}>
+                Fill in the details below. Location and time are detected automatically.
+              </Text>
+            </View>
           </View>
-        </View>
+        ) : (
+          <View style={styles.photoStrip}>
+            <SampleIssueImage
+              image={
+                selectedSampleIssue?.image ?? {
+                  kind: "asset",
+                  source: require("../../assets/pothole.jpg"),
+                  alt: "Captured pothole preview",
+                }
+              }
+              style={{ width: "100%", height: "100%" }}
+            />
+            <View style={styles.categoryChip}>
+              <MaterialCommunityIcons
+                name={(CATEGORY_ICON[category] ?? "alert-circle-outline") as any}
+                size={13}
+                color={CATEGORY_COLOR[category] ?? "#8D939E"}
+              />
+              <Text style={styles.categoryChipText}>{category}</Text>
+            </View>
+          </View>
+        )}
 
         <View style={styles.card}>
           <View style={[styles.row, styles.rowBorder]}>
@@ -209,28 +325,30 @@ export const ClassificationScreen = ({
               style={styles.selector}
               accessibilityRole="button"
             >
-              <Text style={styles.selectorText}>{tag}</Text>
+              <Text style={[styles.selectorText, !tag && styles.selectorPlaceholder]}>
+                {tag || "Select issue type"}
+              </Text>
               <Text style={styles.selectorChevron}>⌄</Text>
             </Pressable>
             {showTagMenu && (
               <View style={styles.dropdown}>
-                {(TAGS_BY_CATEGORY[category] ?? []).map((nextTag) => (
+                {tagOptions.map(({ issueCategory, issueTag }) => (
                   <Pressable
-                    key={nextTag}
-                    onPress={() => handleTagSelect(nextTag)}
+                    key={`${issueCategory}-${issueTag}`}
+                    onPress={() => handleTagSelect(issueTag, issueCategory)}
                     style={[
                       styles.dropdownItem,
-                      nextTag === tag && styles.dropdownItemActive,
+                      issueTag === tag && styles.dropdownItemActive,
                     ]}
                     accessibilityRole="button"
                   >
                     <Text
                       style={[
                         styles.dropdownItemText,
-                        nextTag === tag && styles.dropdownItemTextActive,
+                        issueTag === tag && styles.dropdownItemTextActive,
                       ]}
                     >
-                      {nextTag}
+                      {isManual ? `${issueCategory} · ${issueTag}` : issueTag}
                     </Text>
                   </Pressable>
                 ))}
@@ -246,16 +364,35 @@ export const ClassificationScreen = ({
               onChangeText={setDesc}
               style={styles.descInput}
               textAlignVertical="top"
+              placeholder={isManual ? "Describe what you observed…" : undefined}
               placeholderTextColor="#55595F"
             />
           </View>
         </View>
 
+        {isManual && (
+          <View style={styles.card}>
+            <View style={styles.row}>
+              <Text style={styles.rowLabel}>REPORTED AT</Text>
+              <TextInput
+                value={reportedAt}
+                onChangeText={setReportedAt}
+                style={styles.inlineInput}
+                placeholderTextColor="#55595F"
+              />
+            </View>
+          </View>
+        )}
+
         <View style={styles.card}>
           <View style={[styles.locationHeader, styles.rowBorder]}>
             <Text style={styles.rowLabel}>LOCATION</Text>
             <View style={styles.gpsBadge}>
-              <Text style={styles.gpsBadgeText}>📍 GPS</Text>
+              {isDetectingLocation ? (
+                <ActivityIndicator size="small" color="#4F8EF7" />
+              ) : (
+                <Text style={styles.gpsBadgeText}>📍 GPS</Text>
+              )}
             </View>
           </View>
 
@@ -275,18 +412,49 @@ export const ClassificationScreen = ({
             </View>
           </View>
 
-          <View style={styles.addressRow}>
-            <View style={styles.addressIcon}>
-              <Text>📍</Text>
+          {isManual && isEditingLocation ? (
+            <View style={styles.row}>
+              <Text style={styles.rowLabel}>STREET / LANDMARK</Text>
+              <TextInput
+                value={locationMainLine}
+                onChangeText={setLocationMainLine}
+                style={styles.inlineInput}
+                placeholderTextColor="#55595F"
+              />
+              <Text style={[styles.rowLabel, { marginTop: 8 }]}>CITY / ZIP</Text>
+              <TextInput
+                value={locationSubLine}
+                onChangeText={setLocationSubLine}
+                style={styles.inlineInput}
+                placeholderTextColor="#55595F"
+              />
+              <Pressable
+                onPress={() => setIsEditingLocation(false)}
+                style={styles.doneEditButton}
+                accessibilityRole="button"
+              >
+                <Text style={styles.doneEditText}>Done editing</Text>
+              </Pressable>
             </View>
-            <View style={{ flex: 1 }}>
-              <Text style={styles.addressMain}>{locationMainLine}</Text>
-              <Text style={styles.addressSub}>{locationSubLine}</Text>
+          ) : (
+            <View style={styles.addressRow}>
+              <View style={styles.addressIcon}>
+                <Text>📍</Text>
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.addressMain}>{locationMainLine}</Text>
+                <Text style={styles.addressSub}>{locationSubLine}</Text>
+              </View>
+              {isManual ? (
+                <Pressable
+                  onPress={() => setIsEditingLocation(true)}
+                  accessibilityRole="button"
+                >
+                  <Text style={styles.editLink}>Edit</Text>
+                </Pressable>
+              ) : null}
             </View>
-            <Pressable accessibilityRole="button">
-              <Text style={styles.editLink}>Edit</Text>
-            </Pressable>
-          </View>
+          )}
         </View>
 
         <View style={styles.routingCard}>
@@ -298,18 +466,7 @@ export const ClassificationScreen = ({
 
       <View style={styles.ctaBar}>
         <Pressable
-          onPress={() => {
-            if (isSubmitting) {
-              return;
-            }
-            void onConfirm({
-              category,
-              tag,
-              desc,
-              locationMain: locationMainLine,
-              locationSub: locationSubLine,
-            });
-          }}
+          onPress={handleConfirmPress}
           style={[styles.submitButton, isSubmitting ? styles.submitButtonDisabled : null]}
           disabled={isSubmitting}
           accessibilityRole="button"
@@ -390,7 +547,44 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   selectorText: { fontSize: 14, fontWeight: "600", color: '#F2F3F5' },
+  selectorPlaceholder: { color: '#8D939E', fontWeight: '500' },
   selectorChevron: { fontSize: 14, color: '#8D939E' },
+  manualHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    backgroundColor: '#222428',
+    borderRadius: 14,
+    padding: 14,
+  },
+  manualIconCircle: {
+    width: 52,
+    height: 52,
+    borderRadius: 26,
+    backgroundColor: '#2C2D32',
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  manualHeaderCopy: { flex: 1, gap: 4 },
+  manualTitle: { color: '#F2F3F5', fontSize: 16, fontWeight: '800' },
+  manualSubtitle: { color: '#8D939E', fontSize: 13, lineHeight: 18, fontWeight: '500' },
+  inlineInput: {
+    backgroundColor: '#2C2D32',
+    borderWidth: 1,
+    borderColor: '#35373D',
+    borderRadius: 9,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    color: '#F2F3F5',
+    fontSize: 14,
+    fontWeight: '500',
+    marginTop: 2,
+  },
+  doneEditButton: {
+    marginTop: 10,
+    alignSelf: 'flex-start',
+  },
+  doneEditText: { color: '#4F8EF7', fontWeight: '700', fontSize: 14 },
 
   dropdown: {
     marginTop: 4,

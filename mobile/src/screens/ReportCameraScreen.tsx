@@ -1,28 +1,29 @@
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 type ReportCameraScreenProps = {
   onCapture: () => void;
   onOpenLibrary: () => void;
+  onReportWithoutPhoto: () => void;
 };
 
-export const ReportCameraScreen = ({ onOpenLibrary }: ReportCameraScreenProps) => {
+export const ReportCameraScreen = ({
+  onOpenLibrary,
+  onReportWithoutPhoto,
+}: ReportCameraScreenProps) => {
   return (
     <View style={styles.page}>
-      {/* Viewfinder */}
       <View style={styles.viewfinder}>
-        {/* Rule-of-thirds grid */}
         <View style={[styles.gridLine, styles.gridV1]} />
         <View style={[styles.gridLine, styles.gridV2]} />
         <View style={[styles.gridLine, styles.gridH1]} />
         <View style={[styles.gridLine, styles.gridH2]} />
 
-        {/* Corner guides */}
         <View style={[styles.corner, styles.cornerTL]} />
         <View style={[styles.corner, styles.cornerTR]} />
         <View style={[styles.corner, styles.cornerBL]} />
         <View style={[styles.corner, styles.cornerBR]} />
 
-        {/* Top bar */}
         <View style={styles.topBar}>
           <Pressable style={styles.iconButton} accessibilityRole="button">
             <Text style={styles.iconText}>✕</Text>
@@ -34,9 +35,18 @@ export const ReportCameraScreen = ({ onOpenLibrary }: ReportCameraScreenProps) =
         </View>
       </View>
 
-      {/* Camera controls */}
       <View style={styles.controls}>
-        <View style={{ width: 60 }} />
+        <Pressable
+          onPress={onReportWithoutPhoto}
+          style={styles.sideButton}
+          accessibilityRole="button"
+          accessibilityLabel="Report without photo"
+        >
+          <View style={styles.sideIconBox}>
+            <MaterialCommunityIcons name="pencil-outline" size={26} color="#F2F3F5" />
+          </View>
+          <Text style={styles.sideLabel}>Report{'\n'}(no photo)</Text>
+        </Pressable>
 
         <Pressable
           style={[styles.shutter, styles.shutterDisabled]}
@@ -49,20 +59,14 @@ export const ReportCameraScreen = ({ onOpenLibrary }: ReportCameraScreenProps) =
 
         <Pressable
           onPress={onOpenLibrary}
-          style={styles.libraryButton}
+          style={styles.sideButton}
           accessibilityRole="button"
           accessibilityLabel="Photo library"
         >
-          <View style={styles.libraryIconBox}>
-            <View style={styles.libFrame}>
-              <View style={styles.libSun} />
-              <View style={styles.libMountainRow}>
-                <View style={styles.libMtnSmall} />
-                <View style={styles.libMtnLarge} />
-              </View>
-            </View>
+          <View style={styles.sideIconBox}>
+            <MaterialCommunityIcons name="image-multiple-outline" size={26} color="#F2F3F5" />
           </View>
-          <Text style={styles.libraryLabel}>Library</Text>
+          <Text style={styles.sideLabel}>Library</Text>
         </Pressable>
       </View>
     </View>
@@ -153,55 +157,22 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: "#ddd",
   },
-  libraryButton: {
+  sideButton: {
     alignItems: "center",
-    width: 60,
+    width: 72,
     gap: 6,
   },
-  libraryIconBox: {
+  sideIconBox: {
     width: 52, height: 52,
     borderRadius: 14,
     backgroundColor: '#2C2D32',
     alignItems: "center", justifyContent: "center",
   },
-  libFrame: {
-    width: 26, height: 22,
-    borderRadius: 3,
-    borderWidth: 1.5,
-    borderColor: "rgba(255,255,255,0.9)",
-    overflow: "hidden",
-    position: "relative",
-  },
-  libSun: {
-    position: "absolute",
-    top: 4, left: 4,
-    width: 5, height: 5,
-    borderRadius: 2.5,
-    backgroundColor: "rgba(255,255,255,0.9)",
-  },
-  libMountainRow: {
-    position: "absolute",
-    bottom: 0, left: 0, right: 0,
-    flexDirection: "row",
-    alignItems: "flex-end",
-    paddingLeft: 2,
-  },
-  libMtnSmall: {
-    width: 0, height: 0,
-    borderLeftWidth: 7, borderRightWidth: 7, borderBottomWidth: 9,
-    borderLeftColor: "transparent", borderRightColor: "transparent",
-    borderBottomColor: "rgba(255,255,255,0.9)",
-  },
-  libMtnLarge: {
-    width: 0, height: 0,
-    borderLeftWidth: 9, borderRightWidth: 9, borderBottomWidth: 12,
-    borderLeftColor: "transparent", borderRightColor: "transparent",
-    borderBottomColor: "rgba(255,255,255,0.9)",
-    marginLeft: 1,
-  },
-  libraryLabel: {
+  sideLabel: {
     color: '#8D939E',
     fontSize: 10,
     fontWeight: "500",
+    textAlign: "center",
+    lineHeight: 13,
   },
 });

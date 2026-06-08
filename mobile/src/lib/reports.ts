@@ -151,8 +151,10 @@ export const createReport = async (
   const district = sampleIssue?.district ?? 'San Jose District 3'
   const districtNumber = parseDistrictNumber(district)
   const center = DISTRICT_CENTERS[districtNumber] ?? DISTRICT_CENTERS[3]
-  const lat = sampleIssue?.latitude ?? center.latitude
-  const lon = sampleIssue?.longitude ?? center.longitude
+  const lat = classification.latitude ?? sampleIssue?.latitude ?? center.latitude
+  const lon = classification.longitude ?? sampleIssue?.longitude ?? center.longitude
+  const hasPhoto = classification.hasPhoto !== false
+  const reportedLabel = classification.reportedAt ?? 'Just now'
 
   const { data, error } = await supabase
     .from('reports')
@@ -169,7 +171,7 @@ export const createReport = async (
       assigned_to: sampleIssue?.assignedTo ?? 'Dept. of Public Works',
       estimated_resolution: sampleIssue?.estimatedResolution ?? 'Pending review',
       report_count: 1,
-      photo_count: 1,
+      photo_count: hasPhoto ? 1 : 0,
       location_main: classification.locationMain,
       location_sub: classification.locationSub,
       merged: false,
@@ -178,7 +180,7 @@ export const createReport = async (
         lon,
         sampleIssueId: sampleIssue?.id ?? null,
       },
-      timeline: [{ label: 'Submitted', dateText: 'Just now', reached: true }],
+      timeline: [{ label: 'Submitted', dateText: reportedLabel, reached: true }],
     })
     .select('*')
     .single()

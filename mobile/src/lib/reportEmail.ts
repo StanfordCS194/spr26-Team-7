@@ -19,6 +19,10 @@ const buildReportEmailBody = (c: Classification, reporterEmail?: string | null) 
     c.locationSub,
   ]
 
+  if (c.reportedAt) {
+    lines.push('', `Reported at: ${c.reportedAt}`)
+  }
+
   if (reporterEmail) {
     lines.push('', `Reporter: ${reporterEmail}`)
   }
