@@ -49,6 +49,7 @@ export type ReportRecord = {
   isFollowing: boolean
   isUserOwned: boolean
   photoCount: number
+  photoUrl?: string
   pin: {
     top: number
     left: number
@@ -61,6 +62,11 @@ export type SampleIssueImage =
   | {
       kind: 'asset'
       source: ImageSourcePropType
+      alt: string
+    }
+  | {
+      kind: 'uri'
+      uri: string
       alt: string
     }
   | {

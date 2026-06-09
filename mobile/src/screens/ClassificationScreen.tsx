@@ -15,7 +15,7 @@ import {
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { SampleIssueImage } from "../components/SampleIssueImage";
 import { MiniMapView } from "../components/MiniMapView";
-import { detectReportLocation, formatReportDateTime } from "../lib/reportLocation";
+import { detectReportLocation, formatReportDateTime, SOFA_MARKET_LOCATION } from "../lib/reportLocation";
 import { SampleIssueRecord } from "../types";
 
 const SCREEN_HEIGHT = Dimensions.get('window').height;
@@ -60,8 +60,8 @@ const TAGS_BY_CATEGORY: Record<string, string[]> = {
   ],
 };
 
-const LOCATION_MAIN_LINE = "Glen Eyrie Ave & Carolyn Ave";
-const LOCATION_SUB_LINE = "San Jose, CA 95125";
+const LOCATION_MAIN_LINE = SOFA_MARKET_LOCATION.locationMain;
+const LOCATION_SUB_LINE = SOFA_MARKET_LOCATION.locationSub;
 
 const DEPT_BY_CATEGORY: Record<string, { name: string; division: string }> = {
   Pothole: {
@@ -160,19 +160,27 @@ export const ClassificationScreen = ({
         "Significant pothole on Glen Eyrie Ave near Carolyn Ave causing road hazard. Approximately 2ft wide with visible asphalt damage."),
   );
   const [locationMainLine, setLocationMainLine] = useState(
-    isManual ? "Detecting location…" : (selectedSampleIssue?.locationName ?? LOCATION_MAIN_LINE),
+    isManual
+      ? (locationEnabled ? "Detecting location…" : SOFA_MARKET_LOCATION.locationMain)
+      : (selectedSampleIssue?.locationName ?? LOCATION_MAIN_LINE),
   );
   const [locationSubLine, setLocationSubLine] = useState(
-    isManual ? "" : (selectedSampleIssue?.address ?? LOCATION_SUB_LINE),
+    isManual
+      ? (locationEnabled ? "" : SOFA_MARKET_LOCATION.locationSub)
+      : (selectedSampleIssue?.address ?? LOCATION_SUB_LINE),
   );
   const [reportedAt, setReportedAt] = useState(formatReportDateTime(new Date()));
   const [latitude, setLatitude] = useState<number | undefined>(
-    isManual ? undefined : selectedSampleIssue?.latitude,
+    isManual
+      ? (locationEnabled ? undefined : SOFA_MARKET_LOCATION.latitude)
+      : (selectedSampleIssue?.latitude ?? SOFA_MARKET_LOCATION.latitude),
   );
   const [longitude, setLongitude] = useState<number | undefined>(
-    isManual ? undefined : selectedSampleIssue?.longitude,
+    isManual
+      ? (locationEnabled ? undefined : SOFA_MARKET_LOCATION.longitude)
+      : (selectedSampleIssue?.longitude ?? SOFA_MARKET_LOCATION.longitude),
   );
-  const [isDetectingLocation, setIsDetectingLocation] = useState(isManual);
+  const [isDetectingLocation, setIsDetectingLocation] = useState(isManual && locationEnabled);
   const [isEditingLocation, setIsEditingLocation] = useState(false);
   const [showTagMenu, setShowTagMenu] = useState(false);
 
@@ -184,8 +192,17 @@ export const ClassificationScreen = ({
     let isMounted = true;
 
     const loadLocation = async () => {
+      if (!locationEnabled) {
+        setLocationMainLine(SOFA_MARKET_LOCATION.locationMain);
+        setLocationSubLine(SOFA_MARKET_LOCATION.locationSub);
+        setLatitude(SOFA_MARKET_LOCATION.latitude);
+        setLongitude(SOFA_MARKET_LOCATION.longitude);
+        setIsDetectingLocation(false);
+        return;
+      }
+
       setIsDetectingLocation(true);
-      const detected = await detectReportLocation({ locationEnabled, homeDistrict });
+      const detected = await detectReportLocation({ locationEnabled });
       if (!isMounted) {
         return;
       }
@@ -201,7 +218,7 @@ export const ClassificationScreen = ({
     return () => {
       isMounted = false;
     };
-  }, [isManual, locationEnabled, homeDistrict]);
+  }, [isManual, locationEnabled]);
 
   const pinAnim = useRef(new Animated.ValueXY({ x: 0, y: 0 })).current;
   const panResponder = useRef(

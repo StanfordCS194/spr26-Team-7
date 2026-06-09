@@ -1,6 +1,4 @@
 import * as Location from 'expo-location'
-import { DISTRICT_NEIGHBORHOODS } from '../data/dashboardMockData'
-import { DISTRICT_CENTERS } from '../data/mockMapReports'
 
 export type DetectedReportLocation = {
   locationMain: string
@@ -9,17 +7,11 @@ export type DetectedReportLocation = {
   longitude: number
 }
 
-const homeDistrictFallback = (homeDistrict: number): DetectedReportLocation => {
-  const district = homeDistrict >= 1 && homeDistrict <= 10 ? homeDistrict : 3
-  const center = DISTRICT_CENTERS[district] ?? DISTRICT_CENTERS[3]
-  const neighborhoods = DISTRICT_NEIGHBORHOODS[district] ?? DISTRICT_NEIGHBORHOODS[3]
-
-  return {
-    locationMain: `District ${district}`,
-    locationSub: `${neighborhoods} · San Jose, CA`,
-    latitude: center.latitude,
-    longitude: center.longitude,
-  }
+export const SOFA_MARKET_LOCATION: DetectedReportLocation = {
+  locationMain: 'SoFA Market',
+  locationSub: '387 S 1st St, San Jose, CA 95113',
+  latitude: 37.32977,
+  longitude: -121.88556,
 }
 
 export const formatReportDateTime = (date: Date) =>
@@ -33,18 +25,16 @@ export const formatReportDateTime = (date: Date) =>
   })
 
 export const detectReportLocation = async (
-  options: { locationEnabled?: boolean; homeDistrict?: number } = {},
+  options: { locationEnabled?: boolean } = {},
 ): Promise<DetectedReportLocation> => {
-  const homeDistrict = options.homeDistrict ?? 3
-
   if (options.locationEnabled === false) {
-    return homeDistrictFallback(homeDistrict)
+    return SOFA_MARKET_LOCATION
   }
 
   try {
     const { status } = await Location.requestForegroundPermissionsAsync()
     if (status !== 'granted') {
-      return homeDistrictFallback(homeDistrict)
+      return SOFA_MARKET_LOCATION
     }
 
     const position = await Location.getCurrentPositionAsync({
@@ -78,6 +68,6 @@ export const detectReportLocation = async (
       longitude: position.coords.longitude,
     }
   } catch {
-    return homeDistrictFallback(homeDistrict)
+    return SOFA_MARKET_LOCATION
   }
 }

@@ -20,7 +20,9 @@ import { ChronicSpot } from './src/data/dashboard311';
 import { sampleIssues } from './src/data/sampleIssues';
 import { sendReportEmail } from './src/lib/reportEmail';
 import { ProfileReport } from './src/lib/profileStats';
-import { createReport, fetchReportsByIds, fetchUserReports, getSampleIssueIdFromRow, ReportRow, reportRowToMapReport } from './src/lib/reports';
+import { createReport, fetchReportsByIds, fetchUserReports, getSampleIssueIdFromRow, ReportRow, reportRowToMapReport, updateReportPhotoUrl } from './src/lib/reports';
+import { uploadSampleIssuePhoto } from './src/lib/reportPhotos';
+import { SampleIssueImage } from './src/types';
 import { fetchFollowedReportIds, followReport, unfollowReport } from './src/lib/reportFollows';
 import {
   DEFAULT_USER_SETTINGS,
@@ -63,7 +65,8 @@ function mapReportToRecord(r: MapReport, isFollowing = false): ReportRecord {
     reportCount:         1,
     isFollowing,
     isUserOwned:         true,
-    photoCount:          0,
+    photoCount:          r.photoUrl ? 1 : 0,
+    photoUrl:            r.photoUrl,
     pin:                 { top: 0, left: 0, color: '#5B9BF8' },
     timeline:            r.timeline.map((t, i) => ({
       label:    (STATUS_MAP[t.label] ?? t.label) as ReportStatus,
@@ -76,6 +79,20 @@ function mapReportToRecord(r: MapReport, isFollowing = false): ReportRecord {
 
 
 type ReportSubmission = { mapReport: MapReport; sampleIssue: SampleIssueRecord | null };
+
+const submissionReportImage = (submission: ReportSubmission): SampleIssueImage | null => {
+  if (submission.mapReport.photoUrl) {
+    return {
+      kind: 'uri',
+      uri: submission.mapReport.photoUrl,
+      alt: submission.mapReport.title,
+    };
+  }
+  if (submission.sampleIssue?.image) {
+    return submission.sampleIssue.image;
+  }
+  return null;
+};
 
 const rowToSubmission = (row: ReportRow): ReportSubmission => ({
   mapReport: reportRowToMapReport(row),
@@ -312,7 +329,23 @@ export default function App() {
     }
 
     try {
-      const row = await createReport(user.id, c, selectedSampleIssue);
+      let row = await createReport(user.id, c, selectedSampleIssue);
+
+      if (selectedSampleIssue?.image) {
+        try {
+          const photoUrl = await uploadSampleIssuePhoto(user.id, row.id, selectedSampleIssue.image);
+          if (photoUrl) {
+            row = await updateReportPhotoUrl(row.id, photoUrl);
+          }
+        } catch (uploadError) {
+          console.error('[reports] photo upload failed', uploadError);
+          Alert.alert(
+            'Photo not saved',
+            'Your report was saved, but the photo could not be uploaded. Check your connection and try again.',
+          );
+        }
+      }
+
       const mapReport = reportRowToMapReport(row);
 
       setUserSubmissions((prev) => [
@@ -494,8 +527,11 @@ export default function App() {
           onFocusConsumed={() => setFocusReport(null)}
           reportImages={Object.fromEntries(
             userSubmissions
-              .filter(s => s.sampleIssue?.image)
-              .map(s => [s.mapReport.id, s.sampleIssue!.image])
+              .map((submission) => {
+                const image = submissionReportImage(submission);
+                return image ? [submission.mapReport.id, image] as const : null;
+              })
+              .filter((entry): entry is [string, SampleIssueImage] => entry !== null),
           )}
         />
       );

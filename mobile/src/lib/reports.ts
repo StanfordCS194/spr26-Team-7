@@ -44,6 +44,7 @@ export type ReportRow = {
   estimated_resolution: string
   report_count: number
   photo_count: number
+  photo_url: string | null
   location_main: string | null
   location_sub: string | null
   merged: boolean
@@ -106,6 +107,7 @@ export const reportRowToMapReport = (row: ReportRow): MapReport => {
     description: row.description,
     assignedTo: row.assigned_to,
     timeline: parseTimeline(row),
+    photoUrl: row.photo_url ?? undefined,
   }
 }
 
@@ -182,6 +184,27 @@ export const createReport = async (
       },
       timeline: [{ label: 'Submitted', dateText: reportedLabel, reached: true }],
     })
+    .select('*')
+    .single()
+
+  if (error) {
+    throw error
+  }
+
+  return data as ReportRow
+}
+
+export const updateReportPhotoUrl = async (
+  reportId: string,
+  photoUrl: string,
+): Promise<ReportRow> => {
+  const { data, error } = await supabase
+    .from('reports')
+    .update({
+      photo_url: photoUrl,
+      photo_count: 1,
+    })
+    .eq('id', reportId)
     .select('*')
     .single()
 

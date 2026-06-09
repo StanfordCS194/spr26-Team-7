@@ -26,6 +26,7 @@ export type MapReport = {
   description: string
   assignedTo:  string
   timeline:    { label: string; dateText: string }[]
+  photoUrl?:   string
 }
 
 // Category display config — icon names from @expo/vector-icons MaterialCommunityIcons
