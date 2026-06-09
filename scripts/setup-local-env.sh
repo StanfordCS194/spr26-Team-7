@@ -97,8 +97,8 @@ For report email, fill in server/.env from server/.env.example and run the serve
 Google sign-in (one-time Supabase setup for the whole team):
   Authentication -> URL Configuration -> Redirect URLs:
     exp://**
-    govchat://auth/callback
-  Set Site URL to govchat://auth/callback.
+    cityfix://auth/callback
+  Set Site URL to cityfix://auth/callback.
   Google Cloud redirect URI stays https://<project-ref>.supabase.co/auth/v1/callback only.
   If Google sign-in still fails, run the app once and copy the Metro line
   [auth] Google redirect URL: ... into Redirect URLs, or set EXPO_PUBLIC_AUTH_REDIRECT_URI in mobile/.env.

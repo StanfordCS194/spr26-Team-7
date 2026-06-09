@@ -22,7 +22,7 @@ export const getAuthRedirectUri = () => {
   }
 
   return makeRedirectUri({
-    scheme: 'govchat',
+    scheme: 'cityfix',
     path: 'auth/callback',
   })
 }

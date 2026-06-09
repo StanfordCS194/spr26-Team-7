@@ -149,7 +149,7 @@ export const AuthScreen = () => {
   return (
     <ScrollView contentContainerStyle={styles.content} style={styles.page}>
       <View style={styles.hero}>
-        <Text style={styles.eyebrow}>GovChat</Text>
+        <Text style={styles.eyebrow}>CityFix</Text>
         <Text style={styles.title}>Report city issues faster.</Text>
         <Text style={styles.subtitle}>
           Sign in to track reports, follow updates, and keep your civic history in one place.
