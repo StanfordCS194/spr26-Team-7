@@ -14,6 +14,7 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { SampleIssueImage } from "../components/SampleIssueImage";
 import { MiniMapView } from "../components/MiniMapView";
 import { SampleIssueRecord } from "../types";
+import { MlClassification } from "../ml/types";
 
 const SCREEN_HEIGHT = Dimensions.get('window').height;
 
@@ -100,6 +101,7 @@ type ClassificationScreenProps = {
   onConfirm: (c: Classification) => void | Promise<void>;
   isSubmitting?: boolean;
   selectedSampleIssue?: SampleIssueRecord | null;
+  mlResult?: MlClassification | null;
 };
 
 const CATEGORY_COLOR: Record<string, string> = {
@@ -129,16 +131,22 @@ export const ClassificationScreen = ({
   onConfirm,
   isSubmitting = false,
   selectedSampleIssue,
+  mlResult,
 }: ClassificationScreenProps) => {
   const locationMainLine =
     selectedSampleIssue?.locationName ?? LOCATION_MAIN_LINE;
   const locationSubLine =
     selectedSampleIssue?.address ?? LOCATION_SUB_LINE;
 
-  const [category, setCategory] = useState(getInitialCategory(selectedSampleIssue));
-  const [tag, setTag] = useState(selectedSampleIssue?.tag ?? "Pothole");
+  const [category, setCategory] = useState(
+    mlResult?.category ?? getInitialCategory(selectedSampleIssue),
+  );
+  const [tag, setTag] = useState(
+    mlResult?.tag ?? selectedSampleIssue?.tag ?? "Pothole",
+  );
   const [desc, setDesc] = useState(
-    selectedSampleIssue?.description ??
+    mlResult?.desc ??
+      selectedSampleIssue?.description ??
       "Significant pothole on Glen Eyrie Ave near Carolyn Ave causing road hazard. Approximately 2ft wide with visible asphalt damage.",
   );
   const [showTagMenu, setShowTagMenu] = useState(false);

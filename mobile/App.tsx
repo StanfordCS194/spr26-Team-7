@@ -21,6 +21,7 @@ import { sendReportEmail } from './src/lib/reportEmail';
 import { ProfileReport } from './src/lib/profileStats';
 import { createReport, fetchReportsByIds, fetchUserReports, getSampleIssueIdFromRow, ReportRow, reportRowToMapReport } from './src/lib/reports';
 import { fetchFollowedReportIds, followReport, unfollowReport } from './src/lib/reportFollows';
+import { MlClassification } from './src/ml/types';
 
 const CATEGORY_LABEL: Record<MapReportCategoryId, IssueCategory> = {
   pothole:     'Pothole',
@@ -99,6 +100,7 @@ export default function App() {
   const [mapReport, setMapReport]                     = useState<MapReport | null>(null);
   const [chronicSpot, setChronicSpot]                 = useState<ChronicSpot | null>(null);
   const [selectedSampleIssue, setSelectedSampleIssue] = useState<SampleIssueRecord | null>(null);
+  const [mlResult, setMlResult]                       = useState<MlClassification | null>(null);
   const [userSubmissions, setUserSubmissions]         = useState<ReportSubmission[]>([]);
   const [followedSubmissions, setFollowedSubmissions] = useState<ReportSubmission[]>([]);
   const [focusReport, setFocusReport]                 = useState<MapReport | null>(null);
@@ -340,6 +342,7 @@ export default function App() {
     setReportStep('camera');
     setClassification(null);
     setSelectedSampleIssue(null);
+    setMlResult(null);
   };
 
   const renderReportFlow = () => {
@@ -349,7 +352,8 @@ export default function App() {
           onSelectIssue={(issueId) => {
             const nextIssue = sampleIssues.find((issue) => issue.id === issueId) ?? null;
             setSelectedSampleIssue(nextIssue);
-            setReportStep('classify');
+            setMlResult(null);
+            setReportStep('analyzing');
           }}
           onOpenCamera={() => {
             setSelectedSampleIssue(null);
@@ -367,7 +371,15 @@ export default function App() {
       );
     }
     if (reportStep === 'analyzing') {
-      return <AnalyzingScreen onDone={() => setReportStep('classify')} />;
+      return (
+        <AnalyzingScreen
+          image={selectedSampleIssue?.image ?? null}
+          onDone={(result) => {
+            setMlResult(result);
+            setReportStep('classify');
+          }}
+        />
+      );
     }
     if (reportStep === 'classify') {
       return (
@@ -376,6 +388,7 @@ export default function App() {
           onConfirm={handleConfirmReport}
           isSubmitting={isSendingReport}
           selectedSampleIssue={selectedSampleIssue}
+          mlResult={mlResult}
         />
       );
     }
