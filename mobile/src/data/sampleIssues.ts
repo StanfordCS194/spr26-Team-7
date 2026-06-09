@@ -7,7 +7,7 @@ export const sampleIssues: SampleIssueRecord[] = [
     title: 'Pothole near San Pedro Square Market',
     image: {
       kind: 'asset',
-      source: require('../../assets/sj_pothole.png'),
+      source: require('../../assets/sj_pothole.jpg'),
       alt: 'Sample pothole photo near San Pedro Square Market',
     },
     locationName: 'San Pedro Square Market',
@@ -45,7 +45,7 @@ export const sampleIssues: SampleIssueRecord[] = [
     title: 'Cracked pavement near Plaza de Cesar Chavez',
     image: {
       kind: 'asset',
-      source: require('../../assets/sj_cracked_road.png'),
+      source: require('../../assets/sj_cracked_road.jpg'),
       alt: 'Sample cracked road photo near Plaza de Cesar Chavez',
     },
     locationName: 'Plaza de Cesar Chavez',
@@ -121,7 +121,7 @@ export const sampleIssues: SampleIssueRecord[] = [
     title: 'Graffiti near Roosevelt Park',
     image: {
       kind: 'asset',
-      source: require('../../assets/sj_graffiti.png'),
+      source: require('../../assets/sj_graffiti.jpg'),
       alt: 'Sample graffiti photo near Roosevelt Park',
     },
     locationName: 'Roosevelt Park',
@@ -159,7 +159,7 @@ export const sampleIssues: SampleIssueRecord[] = [
     title: 'Illegal dumping near St. James Park',
     image: {
       kind: 'asset',
-      source: require('../../assets/sj_illegal_dumping.png'),
+      source: require('../../assets/sj_illegal_dumping.jpg'),
       alt: 'Sample illegal dumping photo near St. James Park',
     },
     locationName: 'St. James Park',

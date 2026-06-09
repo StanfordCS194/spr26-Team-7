@@ -1,6 +1,8 @@
+import { useEffect } from 'react'
 import { Dimensions, FlatList, Pressable, StyleSheet, Text, View } from 'react-native'
 import { SampleIssueImage } from '../components/SampleIssueImage'
 import { sampleIssues } from '../data/sampleIssues'
+import { preloadSampleIssueAssets } from '../lib/preloadSampleAssets'
 
 // Pothole, streetlight, graffiti, illegal dumping, sidewalk — 5 photos
 const GALLERY_ISSUES = sampleIssues.filter((i) => i.id !== 'SJ-D3-DEMO-004')
@@ -18,6 +20,10 @@ export const SampleIssuePickerScreen = ({
   onSelectIssue,
   onOpenCamera,
 }: SampleIssuePickerScreenProps) => {
+  useEffect(() => {
+    void preloadSampleIssueAssets()
+  }, [])
+
   return (
     <View style={styles.page}>
       <View style={styles.header}>
@@ -37,6 +43,10 @@ export const SampleIssuePickerScreen = ({
         keyExtractor={(item) => item.id}
         numColumns={COLS}
         columnWrapperStyle={styles.row}
+        initialNumToRender={6}
+        maxToRenderPerBatch={6}
+        windowSize={3}
+        removeClippedSubviews
         renderItem={({ item }) => (
           <Pressable
             onPress={() => onSelectIssue(item.id)}

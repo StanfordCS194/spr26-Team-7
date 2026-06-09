@@ -30,6 +30,7 @@ import {
   saveUserSettings,
   UserSettings,
 } from './src/lib/userSettings';
+import { preloadSampleIssueAssets } from './src/lib/preloadSampleAssets';
 
 const CATEGORY_LABEL: Record<MapReportCategoryId, IssueCategory> = {
   pothole:     'Pothole',
@@ -81,15 +82,15 @@ function mapReportToRecord(r: MapReport, isFollowing = false): ReportRecord {
 type ReportSubmission = { mapReport: MapReport; sampleIssue: SampleIssueRecord | null };
 
 const submissionReportImage = (submission: ReportSubmission): SampleIssueImage | null => {
+  if (submission.sampleIssue?.image) {
+    return submission.sampleIssue.image;
+  }
   if (submission.mapReport.photoUrl) {
     return {
       kind: 'uri',
       uri: submission.mapReport.photoUrl,
       alt: submission.mapReport.title,
     };
-  }
-  if (submission.sampleIssue?.image) {
-    return submission.sampleIssue.image;
   }
   return null;
 };
@@ -261,6 +262,12 @@ export default function App() {
       />
     );
   };
+
+  useEffect(() => {
+    if (isSignedIn) {
+      void preloadSampleIssueAssets();
+    }
+  }, [isSignedIn]);
 
   useEffect(() => {
     if (!user?.id) {

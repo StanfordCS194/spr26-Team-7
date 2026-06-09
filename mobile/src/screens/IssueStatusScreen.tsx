@@ -64,10 +64,13 @@ export const IssueStatusScreen = ({
         </View>
 
         <View style={styles.photoCard}>
-          {'photoUrl' in report && report.photoUrl ? (
-            <Image source={{ uri: report.photoUrl }} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
-          ) : 'image' in report ? (
+          {'image' in report ? (
             <SampleIssueImage image={report.image} style={{ width: '100%', height: '100%' }} />
+          ) : 'photoUrl' in report && report.photoUrl ? (
+            <SampleIssueImage
+              image={{ kind: 'uri', uri: report.photoUrl, alt: report.title }}
+              style={{ width: '100%', height: '100%' }}
+            />
           ) : (
             <View style={styles.photoPlaceholder}>
               <MaterialCommunityIcons

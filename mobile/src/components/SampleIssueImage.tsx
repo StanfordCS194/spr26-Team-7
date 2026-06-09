@@ -1,4 +1,5 @@
-import { Image, ImageStyle, StyleProp, StyleSheet, Text, View, ViewStyle } from 'react-native'
+import { Image } from 'expo-image'
+import { ImageStyle, StyleProp, StyleSheet, Text, View, ViewStyle } from 'react-native'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
 import { SampleIssueImage as SampleIssueImageType } from '../types'
 
@@ -9,11 +10,28 @@ type SampleIssueImageProps = {
 
 export const SampleIssueImage = ({ image, style }: SampleIssueImageProps) => {
   if (image.kind === 'asset') {
-    return <Image source={image.source} style={style} resizeMode="cover" accessibilityLabel={image.alt} />
+    return (
+      <Image
+        source={image.source}
+        style={style}
+        contentFit="cover"
+        transition={150}
+        accessibilityLabel={image.alt}
+      />
+    )
   }
 
   if (image.kind === 'uri') {
-    return <Image source={{ uri: image.uri }} style={style} resizeMode="cover" accessibilityLabel={image.alt} />
+    return (
+      <Image
+        source={{ uri: image.uri }}
+        style={style}
+        contentFit="cover"
+        cachePolicy="memory-disk"
+        transition={150}
+        accessibilityLabel={image.alt}
+      />
+    )
   }
 
   return (
