@@ -1,12 +1,11 @@
 import { useRef, useState } from "react";
 import { ActivityIndicator, Alert, Pressable, StyleSheet, Text, View } from "react-native";
 import { CameraView, useCameraPermissions } from "expo-camera";
-import * as ImagePicker from "expo-image-picker";
 import { SampleIssueImage } from "../types";
 
 type ReportCameraScreenProps = {
   onCapture: (image: SampleIssueImage) => void;
-  onOpenLibrary: (image: SampleIssueImage) => void;
+  onOpenLibrary: () => void;
 };
 
 export const ReportCameraScreen = ({ onCapture, onOpenLibrary }: ReportCameraScreenProps) => {
@@ -14,33 +13,6 @@ export const ReportCameraScreen = ({ onCapture, onOpenLibrary }: ReportCameraScr
   const [cameraPermission, requestCameraPermission] = useCameraPermissions();
   const [isCameraReady, setIsCameraReady] = useState(false);
   const [isOpeningPicker, setIsOpeningPicker] = useState(false);
-
-  const handleImageResult = (
-    result: ImagePicker.ImagePickerResult,
-    source: "camera" | "library",
-  ) => {
-    if (result.canceled) {
-      return;
-    }
-
-    const asset = result.assets[0];
-    if (!asset?.uri) {
-      Alert.alert("No photo selected", "Please try again.");
-      return;
-    }
-
-    const image: SampleIssueImage = {
-      kind: "uri",
-      uri: asset.uri,
-      alt: source === "camera" ? "Captured report photo" : "Selected report photo",
-    };
-
-    if (source === "camera") {
-      onCapture(image);
-    } else {
-      onOpenLibrary(image);
-    }
-  };
 
   const takePhoto = async () => {
     if (isOpeningPicker) {
@@ -83,25 +55,8 @@ export const ReportCameraScreen = ({ onCapture, onOpenLibrary }: ReportCameraScr
     }
   };
 
-  const chooseFromLibrary = async () => {
-    if (isOpeningPicker) {
-      return;
-    }
-
-    setIsOpeningPicker(true);
-    try {
-      const result = await ImagePicker.launchImageLibraryAsync({
-        allowsEditing: false,
-        mediaTypes: ["images"],
-        quality: 0.85,
-      });
-      handleImageResult(result, "library");
-    } catch (error) {
-      console.error("[image_picker] library failed", error);
-      Alert.alert("Could not open photo library", "Please try again.");
-    } finally {
-      setIsOpeningPicker(false);
-    }
+  const chooseFromLibrary = () => {
+    onOpenLibrary();
   };
 
   return (

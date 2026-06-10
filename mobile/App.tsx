@@ -81,7 +81,7 @@ function mapReportToRecord(r: MapReport, isFollowing = false): ReportRecord {
     timeline:            r.timeline.map((t, i) => ({
       label:    (STATUS_MAP[t.label] ?? t.label) as ReportStatus,
       dateText: t.dateText,
-      reached:  i === 0,
+      reached:  t.reached ?? i === 0,
     })),
   };
 }
@@ -603,9 +603,9 @@ export default function App() {
         description: mapReport.description,
         isFollowing: isFollowingReport(reportId),
         timeline: mapReport.timeline.map((entry, i) => ({
-          label: (STATUS_MAP[entry.label] ?? entry.label) as ReportStatus,
+          label:    (STATUS_MAP[entry.label] ?? entry.label) as ReportStatus,
           dateText: entry.dateText,
-          reached: i === 0,
+          reached:  entry.reached ?? i === 0,
         })),
       };
 
@@ -896,10 +896,8 @@ export default function App() {
             setReportImage(image);
             setReportStep('analyzing');
           }}
-          onOpenLibrary={(image) => {
-            setSelectedSampleIssue(null);
-            setReportImage(image);
-            setReportStep('analyzing');
+          onOpenLibrary={() => {
+            setReportStep('picker');
           }}
         />
       );

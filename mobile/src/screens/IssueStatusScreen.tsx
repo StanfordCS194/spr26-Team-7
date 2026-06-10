@@ -1,10 +1,11 @@
-import { useEffect, useState } from 'react'
+import { Fragment, useEffect, useState } from 'react'
 import { Image, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
 import { SampleIssueImage } from '../components/SampleIssueImage'
 
 import { dashboard311 } from '../data/dashboard311'
-import { ReportRecord, SampleIssueImage as SampleIssueImageData, SampleIssueRecord } from '../types'
+import { dashboardV2 } from '../data/dashboard311v2'
+import { ReportRecord, ReportStatus, SampleIssueImage as SampleIssueImageData, SampleIssueRecord, TimelineEntry } from '../types'
 import { fetchSubmissionStatus } from '../api/serverApi'
 
 const CATEGORY_ICON: Record<string, string> = {
@@ -23,6 +24,63 @@ const CATEGORY_COLOR: Record<string, string> = {
   'Illegal Dumping':     '#F0A030',
   'Vehicle Concerns':    '#E8514A',
   'Encampment Concerns': '#A78BFA',
+}
+
+const TIMELINE_STAGES: ReportStatus[] = ['Submitted', 'Received', 'In Progress', 'Resolved']
+
+function fmtFixTime(hours: number): string {
+  const h = Math.round(hours)
+  return h < 48 ? `${h} hrs` : `${Math.round(hours / 24)} days`
+}
+
+const HorizontalTimeline = ({ timeline }: { timeline: TimelineEntry[] }) => {
+  const stageMap = new Map(timeline.map(e => [e.label as string, e]))
+  const stages = TIMELINE_STAGES.map(stage => ({
+    stage,
+    reached: stageMap.get(stage)?.reached ?? false,
+    dateText: stageMap.get(stage)?.dateText ?? null,
+  }))
+  const lastReachedIdx = stages.reduce((acc, s, i) => (s.reached ? i : acc), -1)
+
+  return (
+    <View style={tl.container}>
+      <View style={{ flexDirection: 'row' }}>
+        {stages.map(({ stage, reached, dateText }, i) => {
+          const isActive      = i === lastReachedIdx
+          const leftReached   = i > 0 && reached
+          const rightReached  = i < stages.length - 1 && stages[i + 1].reached
+          const dotSize       = isActive ? 14 : 10
+
+          return (
+            <Fragment key={stage}>
+              <View style={{ flex: 1, alignItems: 'center' }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', width: '100%', marginBottom: 8 }}>
+                  <View style={{
+                    flex: 1, height: 2,
+                    backgroundColor: i === 0 ? 'transparent' : (leftReached ? '#4F8EF7' : '#35373D'),
+                  }} />
+                  <View style={{
+                    width: dotSize, height: dotSize, borderRadius: dotSize / 2,
+                    backgroundColor: reached ? '#4F8EF7' : 'transparent',
+                    borderWidth: reached ? 0 : 1.5,
+                    borderColor: '#35373D',
+                  }} />
+                  <View style={{
+                    flex: 1, height: 2,
+                    backgroundColor: i === stages.length - 1 ? 'transparent' : (rightReached ? '#4F8EF7' : '#35373D'),
+                  }} />
+                </View>
+                <Text style={[tl.stageLabel, reached ? tl.stageLabelReached : tl.stageLabelUnreached]} numberOfLines={1}>
+                  {stage}
+                </Text>
+                {dateText ? <Text style={tl.dateText}>{dateText}</Text> : null}
+              </View>
+            </Fragment>
+          )
+        })}
+      </View>
+    </View>
+  )
 }
 
 type IssueStatusScreenProps = {
@@ -96,6 +154,11 @@ export const IssueStatusScreen = ({
 
   const d3IssueTypes = dashboard311.districts['3']?.issueTypes ?? []
   const issueMetrics = d3IssueTypes.find(t => t.name === report.category)
+
+  const districtKey = report.district.match(/\d+/)?.[0] ?? '3'
+  const catItems = dashboardV2.districts[districtKey]?.categoryComparison.year ?? []
+  const fixTimeHours = catItems.find(c => c.type === report.category)?.fixTimeHours ?? null
+  const estResolutionText = fixTimeHours != null ? fmtFixTime(fixTimeHours) : 'Not available'
 
   useEffect(() => {
     setDraftTitle(report.title)
@@ -278,15 +341,16 @@ export const IssueStatusScreen = ({
 
         <View style={styles.card}>
           <Text style={styles.sectionTitle}>Status Timeline</Text>
-          {report.timeline.map((entry, index) => (
-            <View key={`${entry.label}-${index}`} style={styles.timelineRow}>
-              <View style={[styles.dot, entry.reached ? styles.dotReached : styles.dotPending]} />
-              <View style={styles.timelineTextWrap}>
-                <Text style={styles.timelineLabel}>{entry.label}</Text>
-                <Text style={styles.timelineDate}>{entry.dateText}</Text>
-              </View>
-            </View>
-          ))}
+          <HorizontalTimeline timeline={report.timeline} />
+          {displayStatus === 'Submitted' && (
+            <Text style={styles.pendingNote}>
+              Pending city confirmation — we'll update the status when the city processes your report
+            </Text>
+          )}
+          <View style={styles.estResolutionRow}>
+            <Text style={styles.estResolutionLabel}>Estimated resolution</Text>
+            <Text style={styles.estResolutionValue}>{estResolutionText}</Text>
+          </View>
         </View>
 
         <View style={styles.card}>
@@ -356,6 +420,14 @@ const InfoPill = ({ label }: { label: string }) => {
     </View>
   )
 }
+
+const tl = StyleSheet.create({
+  container: { gap: 0 },
+  stageLabel: { fontSize: 10, textAlign: 'center', fontWeight: '700' },
+  stageLabelReached: { color: '#F2F3F5' },
+  stageLabelUnreached: { color: '#55595F' },
+  dateText: { fontSize: 9, color: '#8D939E', textAlign: 'center', marginTop: 2 },
+})
 
 const styles = StyleSheet.create({
   page: { flex: 1, backgroundColor: '#18191C' },
@@ -523,6 +595,22 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   closeIcon: { color: '#8D939E', fontSize: 14, fontWeight: '600' },
+  pendingNote: {
+    fontSize: 12,
+    color: '#8D939E',
+    lineHeight: 18,
+    fontStyle: 'italic',
+  },
+  estResolutionRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingTop: 10,
+    borderTopWidth: 1,
+    borderTopColor: '#35373D',
+  },
+  estResolutionLabel: { fontSize: 13, fontWeight: '700', color: '#8D939E', textTransform: 'uppercase' },
+  estResolutionValue: { fontSize: 14, fontWeight: '700', color: '#F2F3F5' },
   photoPlaceholder: {
     flex: 1,
     backgroundColor: '#2C2D32',
