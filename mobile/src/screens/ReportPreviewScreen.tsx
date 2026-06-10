@@ -41,7 +41,7 @@ export const ReportPreviewScreen = ({ onBack, onContinue }: ReportPreviewScreenP
 }
 
 const styles = StyleSheet.create({
-  page: { flex: 1, backgroundColor: '#fff' },
+  page: { flex: 1, backgroundColor: '#18191C' },
   previewArea: {
     flex: 1,
     backgroundColor: '#2E3D52',
@@ -63,7 +63,7 @@ const styles = StyleSheet.create({
   thumbnailStrip: {
     flexDirection: 'row',
     gap: 10,
-    backgroundColor: '#132030',
+    backgroundColor: '#18191C',
     paddingVertical: 14,
     paddingHorizontal: 12,
   },
@@ -88,17 +88,16 @@ const styles = StyleSheet.create({
   },
   ghostButton: {
     flex: 1,
-    borderColor: '#CED6E0',
-    borderWidth: 2,
+    backgroundColor: '#2C2D32',
     borderRadius: 14,
     paddingVertical: 16,
     alignItems: 'center',
   },
-  ghostButtonText: { fontSize: 30 / 2, fontWeight: '700' },
+  ghostButtonText: { color: '#F2F3F5', fontSize: 30 / 2, fontWeight: '700' },
   primaryButton: {
     margin: 14,
     borderRadius: 14,
-    backgroundColor: '#1565FF',
+    backgroundColor: '#4F8EF7',
     paddingVertical: 16,
     alignItems: 'center',
   },

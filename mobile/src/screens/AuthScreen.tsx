@@ -68,7 +68,11 @@ const LabeledInput = ({
   )
 }
 
-export const AuthScreen = () => {
+type AuthScreenProps = {
+  onContinueAsGuest?: () => void
+}
+
+export const AuthScreen = ({ onContinueAsGuest }: AuthScreenProps) => {
   const [mode, setMode] = useState<AuthMode>('signin')
   const [fullName, setFullName] = useState('')
   const [email, setEmail] = useState('')
@@ -228,7 +232,7 @@ export const AuthScreen = () => {
             <ActivityIndicator color={D.white} />
           ) : (
             <Text style={styles.primaryButtonText}>
-              {mode === 'signin' ? 'Enter App' : 'Create Account'}
+              {mode === 'signin' ? 'Sign In' : 'Create Account'}
             </Text>
           )}
         </Pressable>
@@ -251,6 +255,17 @@ export const AuthScreen = () => {
             <Text style={styles.googleButtonText}>Continue with Google</Text>
           )}
         </Pressable>
+
+        {onContinueAsGuest ? (
+          <Pressable
+            style={styles.guestButton}
+            onPress={onContinueAsGuest}
+            disabled={isBusy}
+            accessibilityRole="button"
+          >
+            <Text style={styles.guestButtonText}>Continue as Guest</Text>
+          </Pressable>
+        ) : null}
 
         {mode === 'signup' ? (
           <Text style={styles.footnote}>
@@ -367,6 +382,15 @@ const styles = StyleSheet.create({
   googleButtonText: {
     color: D.text,
     fontSize: 16,
+    fontWeight: '700',
+  },
+  guestButton: {
+    alignItems: 'center',
+    paddingVertical: 8,
+  },
+  guestButtonText: {
+    color: D.textMuted,
+    fontSize: 15,
     fontWeight: '700',
   },
   buttonDisabled: {

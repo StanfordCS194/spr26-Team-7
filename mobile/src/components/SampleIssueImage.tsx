@@ -12,6 +12,10 @@ export const SampleIssueImage = ({ image, style }: SampleIssueImageProps) => {
     return <Image source={image.source} style={style} resizeMode="cover" accessibilityLabel={image.alt} />
   }
 
+  if (image.kind === 'uri') {
+    return <Image source={{ uri: image.uri }} style={style} resizeMode="cover" accessibilityLabel={image.alt} />
+  }
+
   return (
     <View style={[styles.placeholder, { backgroundColor: image.backgroundColor }, style]}>
       <MaterialCommunityIcons name={image.icon as any} size={44} color={image.accent} />

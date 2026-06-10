@@ -17,6 +17,7 @@ type ProfileScreenProps = {
   memberSince?: string | null
   reports: ProfileReport[]
   followingReports: ProfileReport[]
+  onReplayOnboarding: () => void
   onViewReport: (reportId: string) => void
 }
 
@@ -64,10 +65,21 @@ export const ProfileScreen = ({
   memberSince,
   reports,
   followingReports,
+  onReplayOnboarding,
   onViewReport,
 }: ProfileScreenProps) => {
+  const [statusFilter, setStatusFilter] = useState<'active' | 'resolved'>('active')
   const { totalSubmitted, resolved } = getProfileImpactStats(reports)
   const accountAge = memberSince ? formatAccountAge(memberSince) : 'Unknown'
+  const filterReports = (items: ProfileReport[]) =>
+    items.filter((report) =>
+      statusFilter === 'resolved'
+        ? formatReportStatus(report.status) === 'Resolved'
+        : formatReportStatus(report.status) !== 'Resolved',
+    )
+  const filteredReports = filterReports(reports)
+  const filteredFollowingReports = filterReports(followingReports)
+  const emptySuffix = statusFilter === 'resolved' ? 'resolved reports' : 'active reports'
 
   return (
     <View style={styles.page}>
@@ -75,12 +87,20 @@ export const ProfileScreen = ({
       <ScrollView contentContainerStyle={styles.content}>
         <Text style={styles.title}>My Profile</Text>
         {!isSignedIn ? (
-          <View style={styles.card}>
-            <Text style={styles.promptTitle}>Use app without login, or sign in for history and follows.</Text>
-            <Pressable style={styles.primaryButton} onPress={onToggleAuth} accessibilityRole="button">
-              <Text style={styles.primaryButtonText}>Log In</Text>
-            </Pressable>
-          </View>
+          <>
+            <View style={styles.card}>
+              <Text style={styles.promptTitle}>Use app without login, or sign in for history and follows.</Text>
+              <Pressable style={styles.primaryButton} onPress={onToggleAuth} accessibilityRole="button">
+                <Text style={styles.primaryButtonText}>Log In</Text>
+              </Pressable>
+            </View>
+            <View style={styles.card}>
+              <Text style={styles.cardTitle}>Help</Text>
+              <Pressable style={styles.secondaryButton} onPress={onReplayOnboarding} accessibilityRole="button">
+                <Text style={styles.secondaryButtonText}>How CityFix Works</Text>
+              </Pressable>
+            </View>
+          </>
         ) : (
           <>
             <View style={styles.card}>
@@ -100,21 +120,49 @@ export const ProfileScreen = ({
               <Text style={styles.bodyText}>Resolved: {resolved}</Text>
               <Text style={styles.bodyText}>Using app for: {accountAge}</Text>
             </View>
+            <View style={styles.filterRow}>
+              <Pressable
+                style={[styles.filterTab, statusFilter === 'active' ? styles.filterTabActive : null]}
+                onPress={() => setStatusFilter('active')}
+                accessibilityRole="button"
+                accessibilityState={{ selected: statusFilter === 'active' }}
+              >
+                <Text style={[styles.filterTabText, statusFilter === 'active' ? styles.filterTabTextActive : null]}>
+                  Active
+                </Text>
+              </Pressable>
+              <Pressable
+                style={[styles.filterTab, statusFilter === 'resolved' ? styles.filterTabActive : null]}
+                onPress={() => setStatusFilter('resolved')}
+                accessibilityRole="button"
+                accessibilityState={{ selected: statusFilter === 'resolved' }}
+              >
+                <Text style={[styles.filterTabText, statusFilter === 'resolved' ? styles.filterTabTextActive : null]}>
+                  Resolved
+                </Text>
+              </Pressable>
+            </View>
             <View style={styles.card}>
               <Text style={styles.cardTitle}>My Reports</Text>
               <ReportList
-                reports={reports}
-                emptyMessage="No reports yet. File one from the Report tab."
+                reports={filteredReports}
+                emptyMessage={`No ${emptySuffix} yet.`}
                 onViewReport={onViewReport}
               />
             </View>
             <View style={styles.card}>
               <Text style={styles.cardTitle}>Following</Text>
               <ReportList
-                reports={followingReports}
-                emptyMessage="You are not following any reports yet."
+                reports={filteredFollowingReports}
+                emptyMessage={`No followed ${emptySuffix}.`}
                 onViewReport={onViewReport}
               />
+            </View>
+            <View style={styles.card}>
+              <Text style={styles.cardTitle}>Help</Text>
+              <Pressable style={styles.secondaryButton} onPress={onReplayOnboarding} accessibilityRole="button">
+                <Text style={styles.secondaryButtonText}>How CityFix Works</Text>
+              </Pressable>
             </View>
             <Pressable style={styles.secondaryButton} onPress={onToggleAuth} accessibilityRole="button">
               <Text style={styles.secondaryButtonText}>Log Out</Text>
@@ -137,30 +185,53 @@ const PreferenceRow = ({ label }: { label: string }) => {
 }
 
 const styles = StyleSheet.create({
-  page: { flex: 1, backgroundColor: '#fff' },
+  page: { flex: 1, backgroundColor: '#18191C' },
   content: { padding: 14, gap: 14, paddingBottom: 24 },
-  title: { fontSize: 22, fontWeight: '800' },
-  card: { borderColor: '#E2EAF2', borderWidth: 1, borderRadius: 14, padding: 12, gap: 10 },
-  promptTitle: { color: '#324159', lineHeight: 22, fontSize: 16, fontWeight: '500' },
-  cardTitle: { fontWeight: '800', fontSize: 17 },
-  primaryButton: { marginTop: 4, backgroundColor: '#1565FF', borderRadius: 10, paddingVertical: 12, alignItems: 'center' },
+  title: { color: '#F2F3F5', fontSize: 22, fontWeight: '800' },
+  card: { backgroundColor: '#222428', borderRadius: 14, padding: 12, gap: 10 },
+  filterRow: {
+    flexDirection: 'row',
+    backgroundColor: '#222428',
+    borderRadius: 12,
+    padding: 4,
+    gap: 4,
+  },
+  filterTab: {
+    flex: 1,
+    borderRadius: 9,
+    paddingVertical: 10,
+    alignItems: 'center',
+  },
+  filterTabActive: {
+    backgroundColor: '#F2F3F5',
+  },
+  filterTabText: {
+    color: '#8D939E',
+    fontWeight: '800',
+  },
+  filterTabTextActive: {
+    color: '#18191C',
+  },
+  promptTitle: { color: '#F2F3F5', lineHeight: 22, fontSize: 16, fontWeight: '600' },
+  cardTitle: { color: '#F2F3F5', fontWeight: '800', fontSize: 17 },
+  primaryButton: { marginTop: 4, backgroundColor: '#4F8EF7', borderRadius: 10, paddingVertical: 12, alignItems: 'center' },
   primaryButtonText: { color: '#fff', fontWeight: '700', fontSize: 16 },
-  secondaryButton: { borderColor: '#D5DEE9', borderWidth: 2, borderRadius: 10, paddingVertical: 12, alignItems: 'center' },
-  secondaryButtonText: { fontWeight: '700', fontSize: 16 },
+  secondaryButton: { backgroundColor: '#2C2D32', borderRadius: 10, paddingVertical: 12, alignItems: 'center' },
+  secondaryButtonText: { color: '#F2F3F5', fontWeight: '700', fontSize: 16 },
   preferenceRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  preferenceLabel: { flex: 1, color: '#304057', fontWeight: '500', marginRight: 10 },
-  bodyText: { color: '#304057', fontWeight: '500' },
-  mutedText: { color: '#737E91', fontWeight: '500' },
+  preferenceLabel: { flex: 1, color: '#F2F3F5', fontWeight: '500', marginRight: 10 },
+  bodyText: { color: '#F2F3F5', fontWeight: '500' },
+  mutedText: { color: '#8D939E', fontWeight: '500' },
   reportRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
     paddingVertical: 8,
     borderBottomWidth: 1,
-    borderBottomColor: '#EEF2F7',
+    borderBottomColor: '#35373D',
   },
   reportCopy: { flex: 1, gap: 2 },
-  reportTitle: { color: '#304057', fontWeight: '700', fontSize: 15 },
-  reportMeta: { color: '#737E91', fontWeight: '500', fontSize: 13 },
-  reportChevron: { color: '#737E91', fontSize: 22, lineHeight: 24 },
+  reportTitle: { color: '#F2F3F5', fontWeight: '700', fontSize: 15 },
+  reportMeta: { color: '#8D939E', fontWeight: '500', fontSize: 13 },
+  reportChevron: { color: '#8D939E', fontSize: 22, lineHeight: 24 },
 })

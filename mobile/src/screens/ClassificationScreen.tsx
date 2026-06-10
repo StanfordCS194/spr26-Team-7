@@ -15,7 +15,7 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { SampleIssueImage } from "../components/SampleIssueImage";
 import { MiniMapView } from "../components/MiniMapView";
 import { useDeviceLocation } from "../hooks/useDeviceLocation";
-import { SampleIssueRecord } from "../types";
+import { SampleIssueImage as SampleIssueImageData, SampleIssueRecord } from "../types";
 
 const SCREEN_HEIGHT = Dimensions.get('window').height;
 
@@ -104,6 +104,7 @@ type ClassificationScreenProps = {
   onConfirm: (c: Classification) => void | Promise<void>;
   isSubmitting?: boolean;
   selectedSampleIssue?: SampleIssueRecord | null;
+  reportImage?: SampleIssueImageData | null;
 };
 
 const CATEGORY_COLOR: Record<string, string> = {
@@ -133,6 +134,7 @@ export const ClassificationScreen = ({
   onConfirm,
   isSubmitting = false,
   selectedSampleIssue,
+  reportImage,
 }: ClassificationScreenProps) => {
   const deviceLocation = useDeviceLocation();
 
@@ -180,6 +182,14 @@ export const ClassificationScreen = ({
     setShowTagMenu(false);
   };
 
+  const displayImage =
+    reportImage ??
+    selectedSampleIssue?.image ?? {
+      kind: "asset" as const,
+      source: require("../../assets/pothole.jpg"),
+      alt: "Captured pothole preview",
+    };
+
   const dept =
     DEPT_BY_CATEGORY[category] ?? DEPT_BY_CATEGORY["Roads & Infrastructure"];
 
@@ -197,13 +207,7 @@ export const ClassificationScreen = ({
       >
         <View style={styles.photoStrip}>
           <SampleIssueImage
-            image={
-              selectedSampleIssue?.image ?? {
-                kind: "asset",
-                source: require("../../assets/pothole.jpg"),
-                alt: "Captured pothole preview",
-              }
-            }
+            image={displayImage}
             style={{ width: "100%", height: "100%" }}
           />
           <View style={styles.categoryChip}>

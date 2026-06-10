@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react'
-import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { Image, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
 import { SampleIssueImage } from '../components/SampleIssueImage'
 
 import { dashboard311 } from '../data/dashboard311'
-import { ReportRecord, SampleIssueRecord } from '../types'
+import { ReportRecord, SampleIssueImage as SampleIssueImageData, SampleIssueRecord } from '../types'
 import { fetchSubmissionStatus } from '../api/serverApi'
 
 const CATEGORY_ICON: Record<string, string> = {
@@ -31,6 +31,14 @@ type IssueStatusScreenProps = {
   onBack: () => void
   onToggleFollow: () => void
   isFollowUpdating?: boolean
+  reportImage?: SampleIssueImageData | null
+  onEditPhoto?: () => void
+  onSaveEdits?: (edits: {
+    title: string
+    description: string
+    locationMain: string
+    locationSub: string
+  }) => void
   primaryActionLabel?: string
   onPrimaryAction?: () => void
 }
@@ -41,6 +49,9 @@ export const IssueStatusScreen = ({
   onBack,
   onToggleFollow,
   isFollowUpdating = false,
+  reportImage,
+  onEditPhoto,
+  onSaveEdits,
   primaryActionLabel,
   onPrimaryAction,
 }: IssueStatusScreenProps) => {
@@ -70,12 +81,46 @@ export const IssueStatusScreen = ({
 
   const isSampleIssue = 'image' in report
   const displayStatus = liveStatus ?? report.status
+  const canEdit = Boolean(onEditPhoto || onSaveEdits)
+  const locationMainValue = isSampleIssue ? report.locationName : report.address
+  const [isEditingText, setIsEditingText] = useState(false)
+  const [draftTitle, setDraftTitle] = useState(report.title)
+  const [draftDescription, setDraftDescription] = useState(report.description)
+  const [draftLocationMain, setDraftLocationMain] = useState(locationMainValue)
+  const [draftLocationSub, setDraftLocationSub] = useState(report.address)
+  const displayImage = reportImage !== undefined ? reportImage : isSampleIssue ? report.image : null
+  const showPhotoCount = report.photoCount > 0 && Boolean(displayImage)
   const coordinatesText = isSampleIssue
     ? `${report.latitude.toFixed(6)}, ${report.longitude.toFixed(6)}`
     : null
 
   const d3IssueTypes = dashboard311.districts['3']?.issueTypes ?? []
   const issueMetrics = d3IssueTypes.find(t => t.name === report.category)
+
+  useEffect(() => {
+    setDraftTitle(report.title)
+    setDraftDescription(report.description)
+    setDraftLocationMain(locationMainValue)
+    setDraftLocationSub(report.address)
+  }, [locationMainValue, report.address, report.description, report.title])
+
+  const handleCancelEdits = () => {
+    setDraftTitle(report.title)
+    setDraftDescription(report.description)
+    setDraftLocationMain(locationMainValue)
+    setDraftLocationSub(report.address)
+    setIsEditingText(false)
+  }
+
+  const handleSaveEdits = () => {
+    onSaveEdits?.({
+      title: draftTitle.trim() || report.title,
+      description: draftDescription.trim() || report.description,
+      locationMain: draftLocationMain.trim() || locationMainValue,
+      locationSub: draftLocationSub.trim() || report.address,
+    })
+    setIsEditingText(false)
+  }
 
   return (
     <View style={styles.page}>
@@ -88,18 +133,42 @@ export const IssueStatusScreen = ({
         <View style={styles.headingRow}>
           <View style={styles.headingCopy}>
             <Text style={styles.issueId}>{report.id}</Text>
-            <Text style={styles.issueTitle}>{report.title}</Text>
+            {isEditingText ? (
+              <TextInput
+                value={draftTitle}
+                onChangeText={setDraftTitle}
+                style={styles.titleInput}
+                placeholderTextColor="#55595F"
+              />
+            ) : (
+              <Text style={styles.issueTitle}>{report.title}</Text>
+            )}
           </View>
           <View style={[styles.badge, displayStatus === 'Resolved' ? styles.badgeResolved : null]}>
             <Text style={[styles.badgeText, displayStatus === 'Resolved' ? styles.badgeTextResolved : null]}>
               {displayStatus}
             </Text>
           </View>
+          {canEdit ? (
+            <Pressable
+              style={styles.editTextButton}
+              onPress={() => (isEditingText ? handleCancelEdits() : setIsEditingText(true))}
+              accessibilityRole="button"
+            >
+              <Text style={styles.editTextButtonText}>{isEditingText ? 'Cancel' : 'Edit'}</Text>
+            </Pressable>
+          ) : null}
         </View>
 
-        <View style={styles.photoCard}>
-          {'image' in report ? (
-            <SampleIssueImage image={report.image} style={{ width: '100%', height: '100%' }} />
+        <Pressable
+          style={styles.photoCard}
+          onPress={onEditPhoto}
+          disabled={!onEditPhoto}
+          accessibilityRole="button"
+          accessibilityLabel={onEditPhoto ? 'Edit report photo' : 'Report photo'}
+        >
+          {displayImage ? (
+            <SampleIssueImage image={displayImage} style={{ width: '100%', height: '100%' }} />
           ) : (
             <View style={styles.photoPlaceholder}>
               <MaterialCommunityIcons
@@ -110,10 +179,17 @@ export const IssueStatusScreen = ({
               <Text style={styles.photoPlaceholderLabel}>{report.category}</Text>
             </View>
           )}
-          <View style={styles.photoOverlay}>
-            <Text style={styles.photoOverlayText}>{report.photoCount} photo{report.photoCount === 1 ? '' : 's'}</Text>
-          </View>
-        </View>
+          {showPhotoCount ? (
+            <View style={styles.photoOverlay}>
+              <Text style={styles.photoOverlayText}>{report.photoCount} photo{report.photoCount === 1 ? '' : 's'}</Text>
+            </View>
+          ) : null}
+          {onEditPhoto ? (
+            <View style={styles.photoEditBadge}>
+              <MaterialCommunityIcons name="pencil" size={15} color="#F2F3F5" />
+            </View>
+          ) : null}
+        </Pressable>
 
         <View style={styles.card}>
           <Text style={styles.sectionTitle}>Location</Text>
@@ -130,8 +206,29 @@ export const IssueStatusScreen = ({
               ]}
             />
           </View>
-          <Text style={styles.value}>{isSampleIssue ? report.locationName : report.address}</Text>
-          <Text style={styles.secondaryValue}>{report.address}</Text>
+          {isEditingText ? (
+            <>
+              <TextInput
+                value={draftLocationMain}
+                onChangeText={setDraftLocationMain}
+                style={styles.input}
+                placeholder="Location"
+                placeholderTextColor="#55595F"
+              />
+              <TextInput
+                value={draftLocationSub}
+                onChangeText={setDraftLocationSub}
+                style={styles.input}
+                placeholder="Address"
+                placeholderTextColor="#55595F"
+              />
+            </>
+          ) : (
+            <>
+              <Text style={styles.value}>{locationMainValue}</Text>
+              <Text style={styles.secondaryValue}>{report.address}</Text>
+            </>
+          )}
           {coordinatesText ? <Text style={styles.metaValue}>Coordinates: {coordinatesText}</Text> : null}
           <View style={styles.tagRow}>
             <InfoPill label={report.district} />
@@ -140,7 +237,18 @@ export const IssueStatusScreen = ({
 
         <View style={styles.card}>
           <Text style={styles.sectionTitle}>Description</Text>
-          <Text style={styles.bodyText}>{report.description}</Text>
+          {isEditingText ? (
+            <TextInput
+              multiline
+              value={draftDescription}
+              onChangeText={setDraftDescription}
+              style={[styles.input, styles.descriptionInput]}
+              placeholderTextColor="#55595F"
+              textAlignVertical="top"
+            />
+          ) : (
+            <Text style={styles.bodyText}>{report.description}</Text>
+          )}
         </View>
 
         {submissionId && (
@@ -160,6 +268,13 @@ export const IssueStatusScreen = ({
             <Text style={styles.trackingNote}>Updates every 30 seconds via city 311 data</Text>
           </View>
         )}
+        {isEditingText ? (
+          <View style={styles.editActionRow}>
+            <Pressable style={styles.saveEditButton} onPress={handleSaveEdits} accessibilityRole="button">
+              <Text style={styles.saveEditButtonText}>Save Changes</Text>
+            </Pressable>
+          </View>
+        ) : null}
 
         <View style={styles.card}>
           <Text style={styles.sectionTitle}>Status Timeline</Text>
@@ -249,6 +364,25 @@ const styles = StyleSheet.create({
   headingCopy: { gap: 6 },
   issueId: { fontSize: 13, fontWeight: '700', color: '#8D939E', letterSpacing: 0.4 },
   issueTitle: { fontSize: 24, fontWeight: '900', color: '#F2F3F5', lineHeight: 30 },
+  titleInput: {
+    borderWidth: 1,
+    borderColor: '#35373D',
+    borderRadius: 12,
+    backgroundColor: '#222428',
+    color: '#F2F3F5',
+    fontSize: 20,
+    fontWeight: '800',
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+  },
+  editTextButton: {
+    alignSelf: 'flex-start',
+    borderRadius: 999,
+    backgroundColor: '#2C2D32',
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+  },
+  editTextButtonText: { color: '#F2F3F5', fontWeight: '800', fontSize: 13 },
   badge: {
     backgroundColor: '#F0A03028',
     alignSelf: 'flex-start',
@@ -281,6 +415,17 @@ const styles = StyleSheet.create({
     color: '#F2F3F5',
     fontWeight: '700',
     fontSize: 12,
+  },
+  photoEditBadge: {
+    position: 'absolute',
+    top: 12,
+    right: 12,
+    width: 34,
+    height: 34,
+    borderRadius: 999,
+    backgroundColor: 'rgba(17,24,39,0.8)',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   card: { borderRadius: 16, backgroundColor: '#222428', padding: 14, gap: 10 },
   sectionTitle: { color: '#F2F3F5', fontWeight: '800', fontSize: 18 },
@@ -326,6 +471,25 @@ const styles = StyleSheet.create({
   trackingStatus:     { fontSize: 14, fontWeight: '600', color: '#B3D4F8' },
   trackingRef:        { fontSize: 12, color: '#5B9BF8', fontWeight: '500' },
   trackingNote:       { fontSize: 11, color: '#636870', marginTop: 2 },
+  input: {
+    borderWidth: 1,
+    borderColor: '#35373D',
+    borderRadius: 12,
+    backgroundColor: '#2C2D32',
+    color: '#F2F3F5',
+    paddingHorizontal: 12,
+    paddingVertical: 11,
+    fontWeight: '600',
+  },
+  descriptionInput: { minHeight: 110, lineHeight: 22 },
+  editActionRow: { gap: 10 },
+  saveEditButton: {
+    borderRadius: 14,
+    backgroundColor: '#4F8EF7',
+    paddingVertical: 15,
+    alignItems: 'center',
+  },
+  saveEditButtonText: { color: '#fff', fontWeight: '800', fontSize: 16 },
   insightRow: { gap: 4 },
   insightLabel: { color: '#8D939E', fontWeight: '700', fontSize: 13, textTransform: 'uppercase' },
   insightValue: { color: '#F2F3F5', fontWeight: '600', lineHeight: 22 },
