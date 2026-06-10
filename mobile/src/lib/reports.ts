@@ -151,8 +151,8 @@ export const createReport = async (
   const district = sampleIssue?.district ?? 'San Jose District 3'
   const districtNumber = parseDistrictNumber(district)
   const center = DISTRICT_CENTERS[districtNumber] ?? DISTRICT_CENTERS[3]
-  const lat = sampleIssue?.latitude ?? center.latitude
-  const lon = sampleIssue?.longitude ?? center.longitude
+  const lat = classification.latitude ?? sampleIssue?.latitude ?? center.latitude
+  const lon = classification.longitude ?? sampleIssue?.longitude ?? center.longitude
 
   const { data, error } = await supabase
     .from('reports')
