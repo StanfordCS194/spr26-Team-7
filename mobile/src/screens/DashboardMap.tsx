@@ -5,9 +5,10 @@ import {
 import MapView, { Marker, Region } from 'react-native-maps'
 import Svg, { Defs, Path, Pattern, Rect } from 'react-native-svg'
 import {
-  ALL_CATEGORY_IDS, CATEGORY_CONFIG, DISTRICT_CENTERS, MOCK_MAP_REPORTS,
+  ALL_CATEGORY_IDS, CATEGORY_CONFIG, DISTRICT_CENTERS,
   MapReport, MapReportCategoryId, MapReportStatus,
 } from '../data/mockMapReports'
+import { fetchAllMapReports } from '../lib/mapReports'
 
 // ── Palette ────────────────────────────────────────────────────────────────────
 const D = {
@@ -344,6 +345,7 @@ export const DashboardMap = ({ district, onViewReport, extraReports, focusReport
   })
   const containerSize = useRef({ width: 390, height: 700 })
 
+  const [dbReports,     setDbReports]     = useState<MapReport[]>([])
   const [latDelta,      setLatDelta]      = useState(0.04)
   const [catFilter,     setCatFilter]     = useState<MapReportCategoryId | 'all'>('all')
   const [timeFilter,    setTimeFilter]    = useState<TimeFilterId>('alltime')
@@ -356,6 +358,12 @@ export const DashboardMap = ({ district, onViewReport, extraReports, focusReport
   const center = DISTRICT_CENTERS[district] ?? DISTRICT_CENTERS[3]
 
   useEffect(() => {
+    fetchAllMapReports()
+      .then(setDbReports)
+      .catch(err => console.error('[map] fetch failed', err))
+  }, [])
+
+  useEffect(() => {
     if (!focusReport) return
     mapRef.current?.animateToRegion({
       latitude: focusReport.lat,
@@ -366,10 +374,11 @@ export const DashboardMap = ({ district, onViewReport, extraReports, focusReport
     onFocusConsumed?.()
   }, [focusReport])
 
-  const allReports = useMemo(
-    () => [...MOCK_MAP_REPORTS, ...(extraReports ?? [])],
-    [extraReports],
-  )
+  const allReports = useMemo(() => {
+    const dbIds = new Set(dbReports.map(r => r.id))
+    const deduped = (extraReports ?? []).filter(r => !dbIds.has(r.id))
+    return [...dbReports, ...deduped]
+  }, [dbReports, extraReports])
 
   const filtered = useMemo(() => {
     const now      = Date.now()

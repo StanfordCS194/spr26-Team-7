@@ -10,6 +10,8 @@ const https        = require('https')
 const { execFile } = require('child_process')
 const readline     = require('readline')
 const crypto       = require('crypto')
+const { createClient } = require('@supabase/supabase-js')
+const WebSocket    = require('ws')
 
 // ── Paths ─────────────────────────────────────────────────────────────────────
 const ROOT_DIR         = path.join(__dirname, '..')
@@ -27,6 +29,16 @@ const META_FILE        = path.join(DATA_DIR, 'meta.json')
 const PORT      = Number(process.env.PORT || 3001)
 const MAIL_FROM = 'zasemota@gmail.com'
 const MAIL_TO   = 'zasemota@gmail.com'
+
+// ── Supabase admin client (service role bypasses RLS) ─────────────────────────
+const SUPABASE_URL         = process.env.SUPABASE_URL || ''
+const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || ''
+const supabaseAdmin = SUPABASE_URL && SUPABASE_SERVICE_KEY
+  ? createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY, {
+      auth: { autoRefreshToken: false, persistSession: false },
+      realtime: { transport: WebSocket },
+    })
+  : null
 
 // ── Data directory ─────────────────────────────────────────────────────────────
 if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true })
@@ -118,8 +130,8 @@ const CAT_TO_311 = {
 
 function map311Status(status311) {
   if (status311 === 'In Progress') return 'In Progress'
-  if (status311 === 'Closed')      return 'Resolved'
-  return 'Received'   // 'Open' or anything else
+  if (status311 === 'Closed')      return 'Closed'
+  return 'Open'   // 'Open' or anything else
 }
 
 // ── Load 2026 CSV rows (for matching only — filtered to geolocated records) ───
@@ -155,64 +167,66 @@ function load2026CSVForMatching() {
 
 // ── Matching job ──────────────────────────────────────────────────────────────
 async function runMatchingJob() {
+  if (!supabaseAdmin) {
+    console.log('[matching] Skipping — SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY not set')
+    return
+  }
   console.log('[matching] Starting…')
-  if (submissions.length === 0) { console.log('[matching] No submissions'); return }
 
   const rows311 = await load2026CSVForMatching()
   if (rows311.length === 0) { console.log('[matching] No CSV rows'); return }
 
-  const now              = Date.now()
-  const FOURTEEN_DAYS    = 14 * 24 * 60 * 60 * 1000
-  const FORTY_EIGHT_HRS  = 48 * 60 * 60 * 1000
-  const DIST_THRESHOLD   = 150   // metres
+  const fourteenDaysAgo = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString()
+  const { data: reports, error } = await supabaseAdmin
+    .from('reports')
+    .select('id, category, status, pin, created_at')
+    .neq('status', 'Closed')
+    .gte('created_at', fourteenDaysAgo)
+
+  if (error) { console.error('[matching] Supabase fetch error:', error.message); return }
+  if (!reports?.length) { console.log('[matching] No active reports to match'); return }
+
+  const FORTY_EIGHT_HRS = 48 * 60 * 60 * 1000
+  const DIST_THRESHOLD  = 150   // metres
   let matched = 0, updated = 0
 
-  for (const sub of submissions) {
-    if (now - new Date(sub.submittedAt).getTime() > FOURTEEN_DAYS) continue
+  for (const report of reports) {
+    const lat = report.pin?.lat
+    const lon = report.pin?.lon
+    if (!lat || !lon) continue
 
-    if (!sub.matched311Id) {
-      // Fresh submission: attempt match
-      if (!sub.lat || !sub.lon) continue
-      const serviceTypes = CAT_TO_311[sub.category] ?? []
-      if (serviceTypes.length === 0) continue
+    const serviceTypes = CAT_TO_311[report.category] ?? []
+    if (serviceTypes.length === 0) continue
 
-      const subMs    = new Date(sub.submittedAt).getTime()
-      let bestRow    = null
-      let bestDist   = Infinity
+    const reportMs = new Date(report.created_at).getTime()
+    let bestRow = null, bestDist = Infinity
 
-      for (const row of rows311) {
-        if (!serviceTypes.includes(row.serviceType)) continue
-        if (Math.abs(row.created.getTime() - subMs) > FORTY_EIGHT_HRS) continue
-        const dist = haversineMeters(sub.lat, sub.lon, row.lat, row.lon)
-        if (dist <= DIST_THRESHOLD && dist < bestDist) {
-          bestDist = dist
-          bestRow  = row
+    for (const row of rows311) {
+      if (!serviceTypes.includes(row.serviceType)) continue
+      if (Math.abs(row.created.getTime() - reportMs) > FORTY_EIGHT_HRS) continue
+      const dist = haversineMeters(lat, lon, row.lat, row.lon)
+      if (dist <= DIST_THRESHOLD && dist < bestDist) {
+        bestDist = dist
+        bestRow  = row
+      }
+    }
+
+    if (bestRow) {
+      const newStatus = map311Status(bestRow.status)
+      if (newStatus !== report.status) {
+        const { error: updateErr } = await supabaseAdmin
+          .from('reports')
+          .update({ status: newStatus, updated_at: new Date().toISOString() })
+          .eq('id', report.id)
+        if (!updateErr) {
+          if (report.status === 'Submitted') matched++
+          else updated++
+          console.log(`[matching] ${report.id.slice(0, 8)} → ${newStatus} (~${Math.round(bestDist)}m)`)
         }
-      }
-
-      if (bestRow) {
-        sub.matched311Id     = bestRow.incidentId
-        sub.status           = map311Status(bestRow.status)
-        sub.lastStatusUpdate = new Date().toISOString()
-        matched++
-        console.log(`[matching] ${sub.id} → #${bestRow.incidentId} (${bestDist.toFixed(0)}m, ${bestRow.status})`)
-      }
-
-    } else {
-      // Already matched: check if 311 status changed
-      const row = rows311.find(r => r.incidentId === sub.matched311Id)
-      if (!row) continue
-      const newStatus = map311Status(row.status)
-      if (newStatus !== sub.status) {
-        console.log(`[matching] ${sub.id} status: ${sub.status} → ${newStatus}`)
-        sub.status           = newStatus
-        sub.lastStatusUpdate = new Date().toISOString()
-        updated++
       }
     }
   }
 
-  saveSubmissions()
   console.log(`[matching] Done: ${matched} new matches, ${updated} status updates (${rows311.length} rows scanned)`)
 }
 
@@ -466,6 +480,13 @@ app.post('/api/report-different-issue', async (req, res) => {
   }
 })
 
+// ── Manual refresh trigger ────────────────────────────────────────────────────
+app.post('/api/refresh', (req, res) => {
+  runDailyRefresh().catch(err => console.error('[refresh] Manual trigger error:', err.message))
+  res.json({ ok: true, message: 'Refresh started' })
+})
+
 app.listen(PORT, () => {
   console.log(`Report server listening on http://127.0.0.1:${PORT}`)
 })
+
