@@ -953,7 +953,7 @@ export default function App() {
 }
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: '#fff' },
-  container: { flex: 1, backgroundColor: '#fff' },
+  safeArea: { flex: 1, backgroundColor: '#18191C' },
+  container: { flex: 1, backgroundColor: '#18191C' },
   loadingContainer: { flex: 1, alignItems: 'center', justifyContent: 'center' },
 });

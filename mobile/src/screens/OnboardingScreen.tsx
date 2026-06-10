@@ -75,15 +75,15 @@ export const OnboardingScreen = ({ onDone }: OnboardingScreenProps) => {
 }
 
 const styles = StyleSheet.create({
-  page: { flex: 1, backgroundColor: '#fff', padding: 18 },
+  page: { flex: 1, backgroundColor: '#18191C', padding: 18 },
   topBar: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
   },
-  brand: { color: '#142033', fontSize: 18, fontWeight: '900' },
+  brand: { color: '#F2F3F5', fontSize: 18, fontWeight: '900' },
   skipButton: { paddingHorizontal: 12, paddingVertical: 8 },
-  skipText: { color: '#647187', fontWeight: '800' },
+  skipText: { color: '#8D939E', fontWeight: '800' },
   content: {
     flex: 1,
     alignItems: 'center',
@@ -94,20 +94,20 @@ const styles = StyleSheet.create({
     width: 140,
     height: 140,
     borderRadius: 70,
-    backgroundColor: '#EEF5FF',
+    backgroundColor: '#222428',
     alignItems: 'center',
     justifyContent: 'center',
   },
   copy: { gap: 12, alignItems: 'center', maxWidth: 330 },
   title: {
-    color: '#142033',
+    color: '#F2F3F5',
     fontSize: 28,
     lineHeight: 34,
     fontWeight: '900',
     textAlign: 'center',
   },
   body: {
-    color: '#56647A',
+    color: '#8D939E',
     fontSize: 16,
     lineHeight: 24,
     fontWeight: '600',
@@ -119,14 +119,14 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: '#CFD8E5',
+    backgroundColor: '#35373D',
   },
   dotActive: {
     width: 22,
-    backgroundColor: '#1565FF',
+    backgroundColor: '#4F8EF7',
   },
   primaryButton: {
-    backgroundColor: '#1565FF',
+    backgroundColor: '#4F8EF7',
     borderRadius: 12,
     paddingVertical: 15,
     alignItems: 'center',
