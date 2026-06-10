@@ -143,6 +143,51 @@ export const fetchReportsByIds = async (reportIds: string[]): Promise<ReportRow[
   return (data ?? []) as ReportRow[]
 }
 
+export const fetchReportByExternalId = async (externalId: string): Promise<ReportRow | null> => {
+  const { data, error } = await supabase
+    .from('reports')
+    .select('*')
+    .eq('external_id', externalId)
+    .maybeSingle()
+
+  if (error) {
+    throw error
+  }
+
+  return (data ?? null) as ReportRow | null
+}
+
+export const updateReportText = async (
+  reportId: string,
+  updates: {
+    title: string
+    description: string
+    locationMain: string
+    locationSub: string
+  },
+): Promise<ReportRow> => {
+  const { data, error } = await supabase
+    .from('reports')
+    .update({
+      title: updates.title,
+      tag: updates.title,
+      description: updates.description,
+      address: `${updates.locationMain}, ${updates.locationSub}`,
+      location_main: updates.locationMain,
+      location_sub: updates.locationSub,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', reportId)
+    .select('*')
+    .single()
+
+  if (error) {
+    throw error
+  }
+
+  return data as ReportRow
+}
+
 export const createReport = async (
   userId: string,
   classification: Classification,

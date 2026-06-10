@@ -3,13 +3,14 @@ import { Animated, Pressable, ScrollView, StyleSheet, Text, View } from 'react-n
 import { SampleIssueImage } from '../components/SampleIssueImage';
 import { dashboard311 } from '../data/dashboard311';
 import { Classification } from './ClassificationScreen';
-import { SampleIssueRecord } from '../types';
+import { SampleIssueImage as SampleIssueImageData, SampleIssueRecord } from '../types';
 
 type ReportConfirmationScreenProps = {
   merged: boolean;
   classification: Classification | null;
   onDone: () => void;
   selectedSampleIssue?: SampleIssueRecord | null;
+  reportImage?: SampleIssueImageData | null;
   onViewIssue?: () => void;
 };
 
@@ -18,6 +19,7 @@ export const ReportConfirmationScreen = ({
   classification,
   onDone,
   selectedSampleIssue,
+  reportImage,
   onViewIssue,
 }: ReportConfirmationScreenProps) => {
   const scaleAnim = useRef(new Animated.Value(0)).current;
@@ -60,6 +62,13 @@ export const ReportConfirmationScreen = ({
     : 'Glen Eyrie Ave & Carolyn Ave, San Jose';
   const circleColor = merged ? '#F0A03028' : '#4F8EF728';
   const checkColor = merged ? '#F0A030' : '#4F8EF7';
+  const displayImage =
+    reportImage ??
+    selectedSampleIssue?.image ?? {
+      kind: 'asset' as const,
+      source: require('../../assets/pothole.jpg'),
+      alt: 'Submitted report preview',
+    };
 
   return (
     <View style={styles.page}>
@@ -80,13 +89,7 @@ export const ReportConfirmationScreen = ({
           <Pressable onPress={onViewIssue} disabled={!onViewIssue} accessibilityRole="button">
             <View style={styles.summaryPhoto}>
               <SampleIssueImage
-                image={
-                  selectedSampleIssue?.image ?? {
-                    kind: 'asset',
-                    source: require('../../assets/pothole.jpg'),
-                    alt: 'Submitted report preview',
-                  }
-                }
+                image={displayImage}
                 style={{ width: '100%', height: '100%' }}
               />
               <View style={styles.summaryPhotoOverlay} />

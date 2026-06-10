@@ -1,5 +1,8 @@
 import { StatusBar } from 'expo-status-bar';
-import { ActivityIndicator, Alert, SafeAreaView, StyleSheet, View } from 'react-native';
+import * as ImagePicker from 'expo-image-picker';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { ActivityIndicator, Alert, StyleSheet, View } from 'react-native';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { useEffect, useState } from 'react';
 import { useAuth } from './src/providers/AuthProvider';
 import { BottomNav } from './src/components/BottomNav';
@@ -13,13 +16,14 @@ import { IssueStatusScreen } from './src/screens/IssueStatusScreen';
 import { RecurringIssueDetailScreen } from './src/screens/RecurringIssueDetailScreen';
 import { AuthScreen } from './src/screens/AuthScreen';
 import { SampleIssuePickerScreen } from './src/screens/SampleIssuePickerScreen';
-import { AppTab, IssueCategory, ReportRecord, ReportStatus, SampleIssueRecord } from './src/types';
-import { MapReport, MapReportCategoryId } from './src/data/mockMapReports';
+import { OnboardingScreen } from './src/screens/OnboardingScreen';
+import { AppTab, IssueCategory, ReportRecord, ReportStatus, SampleIssueImage, SampleIssueRecord } from './src/types';
+import { MapReport, MapReportCategoryId, MOCK_MAP_REPORTS } from './src/data/mockMapReports';
 import { ChronicSpot } from './src/data/dashboard311';
 import { sampleIssues } from './src/data/sampleIssues';
 import { sendReportEmail } from './src/lib/reportEmail';
 import { ProfileReport } from './src/lib/profileStats';
-import { createReport, fetchReportsByIds, fetchUserReports, getSampleIssueIdFromRow, ReportRow, reportRowToMapReport } from './src/lib/reports';
+import { createReport, fetchReportByExternalId, fetchReportsByIds, fetchUserReports, getSampleIssueIdFromRow, ReportRow, reportRowToMapReport, updateReportText } from './src/lib/reports';
 import { fetchFollowedReportIds, followReport, unfollowReport } from './src/lib/reportFollows';
 
 const CATEGORY_LABEL: Record<MapReportCategoryId, IssueCategory> = {
@@ -33,12 +37,26 @@ const CATEGORY_LABEL: Record<MapReportCategoryId, IssueCategory> = {
   junk:        'Illegal Dumping',
 };
 
+const CATEGORY_ID_BY_LABEL: Record<string, MapReportCategoryId> = {
+  Pothole:                'pothole',
+  'Streetlight Outage':   'streetlight',
+  Graffiti:               'graffiti',
+  'Illegal Dumping':      'dumping',
+  'Vehicle Concerns':     'vehicle',
+  'Encampment Concerns':  'encampment',
+};
+
 const STATUS_MAP: Record<string, ReportStatus> = {
   'Submitted':   'Submitted',
   'Open':        'Received',
   'In Progress': 'In Progress',
   'Closed':      'Resolved',
 };
+
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+const LOCAL_DASHBOARD_FOLLOWS_KEY_PREFIX = 'cityfix:dashboard-follows:';
+const LOCAL_REPORT_PHOTOS_KEY_PREFIX = 'cityfix:report-photos:';
+const ONBOARDING_COMPLETE_KEY = 'cityfix:onboarding-complete';
 
 function mapReportToRecord(r: MapReport, isFollowing = false): ReportRecord {
   const category = CATEGORY_LABEL[r.categoryId];
@@ -68,10 +86,16 @@ function mapReportToRecord(r: MapReport, isFollowing = false): ReportRecord {
 
 
 
-type ReportSubmission = { mapReport: MapReport; sampleIssue: SampleIssueRecord | null };
+type ReportSubmission = {
+  mapReport: MapReport;
+  sampleIssue: SampleIssueRecord | null;
+  externalId?: string | null;
+  image?: SampleIssueImage | null;
+};
 
 const rowToSubmission = (row: ReportRow): ReportSubmission => ({
   mapReport: reportRowToMapReport(row),
+  externalId: row.external_id,
   sampleIssue: (() => {
     const sampleIssueId = getSampleIssueIdFromRow(row);
     return sampleIssueId
@@ -79,6 +103,84 @@ const rowToSubmission = (row: ReportRow): ReportSubmission => ({
       : null;
   })(),
 });
+
+const dashboardSubmissionFromExternalId = (externalId: string): ReportSubmission | null => {
+  const mapReport = MOCK_MAP_REPORTS.find((report) => report.id === externalId);
+  return mapReport ? { mapReport, sampleIssue: null, externalId } : null;
+};
+
+const localDashboardFollowsKey = (userId: string) =>
+  `${LOCAL_DASHBOARD_FOLLOWS_KEY_PREFIX}${userId}`;
+
+const readLocalDashboardFollowIds = async (userId: string): Promise<string[]> => {
+  const raw = await AsyncStorage.getItem(localDashboardFollowsKey(userId));
+  if (!raw) {
+    return [];
+  }
+
+  try {
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed.filter((item): item is string => typeof item === 'string') : [];
+  } catch {
+    return [];
+  }
+};
+
+const writeLocalDashboardFollowIds = async (userId: string, reportIds: string[]) => {
+  await AsyncStorage.setItem(
+    localDashboardFollowsKey(userId),
+    JSON.stringify(Array.from(new Set(reportIds))),
+  );
+};
+
+const localReportPhotosKey = (userId: string) =>
+  `${LOCAL_REPORT_PHOTOS_KEY_PREFIX}${userId}`;
+
+const isStoredUriImage = (value: unknown): value is Extract<SampleIssueImage, { kind: 'uri' }> => {
+  if (!value || typeof value !== 'object') {
+    return false;
+  }
+
+  const image = value as Partial<Extract<SampleIssueImage, { kind: 'uri' }>>;
+  return image.kind === 'uri' && typeof image.uri === 'string' && typeof image.alt === 'string';
+};
+
+const readLocalReportPhotos = async (userId: string): Promise<Record<string, Extract<SampleIssueImage, { kind: 'uri' }>>> => {
+  const raw = await AsyncStorage.getItem(localReportPhotosKey(userId));
+  if (!raw) {
+    return {};
+  }
+
+  try {
+    const parsed = JSON.parse(raw);
+    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+      return {};
+    }
+
+    return Object.fromEntries(
+      Object.entries(parsed).filter((entry): entry is [string, Extract<SampleIssueImage, { kind: 'uri' }>] =>
+        typeof entry[0] === 'string' && isStoredUriImage(entry[1]),
+      ),
+    );
+  } catch {
+    return {};
+  }
+};
+
+const writeLocalReportPhoto = async (
+  userId: string,
+  reportId: string,
+  image: SampleIssueImage | null,
+) => {
+  const currentPhotos = await readLocalReportPhotos(userId);
+  if (image?.kind === 'uri') {
+    currentPhotos[reportId] = image;
+  } else {
+    delete currentPhotos[reportId];
+  }
+
+  await AsyncStorage.setItem(localReportPhotosKey(userId), JSON.stringify(currentPhotos));
+};
 
 const toProfileReport = (mapReport: MapReport): ProfileReport => ({
   id: mapReport.id,
@@ -88,17 +190,46 @@ const toProfileReport = (mapReport: MapReport): ProfileReport => ({
   submittedAt: mapReport.createdAt,
 });
 
+const createGuestMapReport = (
+  classification: Classification,
+  selectedSampleIssue: SampleIssueRecord | null,
+): MapReport => {
+  const districtMatch = selectedSampleIssue?.district.match(/\d+/);
+  const district = districtMatch ? Number(districtMatch[0]) : 3;
+  const fallbackCenter = { latitude: 37.338, longitude: -121.886 };
+
+  return {
+    id: `guest-${Date.now()}`,
+    categoryId: CATEGORY_ID_BY_LABEL[classification.category] ?? 'pothole',
+    title: classification.tag,
+    address: `${classification.locationMain}, ${classification.locationSub}`,
+    district,
+    lat: classification.latitude ?? selectedSampleIssue?.latitude ?? fallbackCenter.latitude,
+    lon: classification.longitude ?? selectedSampleIssue?.longitude ?? fallbackCenter.longitude,
+    status: 'Submitted',
+    createdAt: new Date(),
+    description: classification.desc,
+    assignedTo: selectedSampleIssue?.assignedTo ?? 'Dept. of Public Works',
+    timeline: [{ label: 'Submitted', dateText: 'Just now' }],
+  };
+};
+
 type ReportStep = 'picker' | 'camera' | 'analyzing' | 'classify' | 'confirmation' | 'submitted-view';
 
 export default function App() {
   const { session, user, isLoading, signOut } = useAuth();
   const isSignedIn = Boolean(session);
   const [currentTab, setCurrentTab]                   = useState<AppTab>('report');
+  const [isGuestSession, setIsGuestSession]           = useState(false);
+  const [showAuthScreen, setShowAuthScreen]           = useState(false);
+  const [showOnboarding, setShowOnboarding]           = useState(false);
+  const [isCheckingOnboarding, setIsCheckingOnboarding] = useState(true);
   const [reportStep, setReportStep]                   = useState<ReportStep>('camera');
   const [classification, setClassification]           = useState<Classification | null>(null);
   const [mapReport, setMapReport]                     = useState<MapReport | null>(null);
   const [chronicSpot, setChronicSpot]                 = useState<ChronicSpot | null>(null);
   const [selectedSampleIssue, setSelectedSampleIssue] = useState<SampleIssueRecord | null>(null);
+  const [reportImage, setReportImage]                 = useState<SampleIssueImage | null>(null);
   const [userSubmissions, setUserSubmissions]         = useState<ReportSubmission[]>([]);
   const [followedSubmissions, setFollowedSubmissions] = useState<ReportSubmission[]>([]);
   const [focusReport, setFocusReport]                 = useState<MapReport | null>(null);
@@ -107,16 +238,221 @@ export default function App() {
   const [followedReportIds, setFollowedReportIds]     = useState<Set<string>>(new Set());
   const [followUpdatingId, setFollowUpdatingId]       = useState<string | null>(null);
 
-  const isFollowingReport = (reportId: string) => followedReportIds.has(reportId);
+  const isFollowingReport = (reportId: string) =>
+    followedReportIds.has(reportId) ||
+    followedSubmissions.some((submission) => submission.externalId === reportId);
 
   const findReportSubmission = (reportId: string) =>
     userSubmissions.find((s) => s.mapReport.id === reportId)
-    ?? followedSubmissions.find((s) => s.mapReport.id === reportId);
+    ?? followedSubmissions.find((s) => s.mapReport.id === reportId || s.externalId === reportId);
 
-  const loadFollowedSubmissions = async (followIds: string[]) => {
+  const loadFollowedSubmissions = async (
+    followIds: string[],
+    localDashboardFollowIds: string[] = [],
+  ) => {
     const rows = await fetchReportsByIds(followIds);
-    return rows.map(rowToSubmission);
+    const databaseSubmissions = rows.map(rowToSubmission);
+    const databaseExternalIds = new Set(
+      databaseSubmissions
+        .map((submission) => submission.externalId)
+        .filter((externalId): externalId is string => Boolean(externalId)),
+    );
+    const localDashboardSubmissions = localDashboardFollowIds
+      .filter((externalId) => !databaseExternalIds.has(externalId))
+      .map(dashboardSubmissionFromExternalId)
+      .filter((submission): submission is ReportSubmission => Boolean(submission));
+
+    return [...databaseSubmissions, ...localDashboardSubmissions];
   };
+
+  const updateSubmissionImage = (reportId: string, image: SampleIssueImage | null) => {
+    setUserSubmissions((prev) =>
+      prev.map((submission) =>
+        submission.mapReport.id === reportId
+          ? { ...submission, image }
+          : submission,
+      ),
+    );
+  };
+
+  const saveSubmissionImage = async (reportId: string, image: SampleIssueImage | null) => {
+    updateSubmissionImage(reportId, image);
+    if (!user?.id) {
+      return;
+    }
+
+    try {
+      await writeLocalReportPhoto(user.id, reportId, image);
+    } catch (error) {
+      console.warn('[report_photos] local save failed', error);
+    }
+  };
+
+  const imageFromPickerResult = (
+    result: ImagePicker.ImagePickerResult,
+    alt: string,
+  ): SampleIssueImage | null => {
+    if (result.canceled) {
+      return null;
+    }
+
+    const asset = result.assets[0];
+    if (!asset?.uri) {
+      Alert.alert('No photo selected', 'Please try again.');
+      return null;
+    }
+
+    return { kind: 'uri', uri: asset.uri, alt };
+  };
+
+  const replaceReportPhotoFromCamera = async (reportId: string) => {
+    try {
+      const permission = await ImagePicker.requestCameraPermissionsAsync();
+      if (!permission.granted) {
+        Alert.alert('Camera permission needed', 'Allow camera access to take a report photo.');
+        return;
+      }
+
+      const result = await ImagePicker.launchCameraAsync({
+        allowsEditing: false,
+        quality: 0.85,
+      });
+      const image = imageFromPickerResult(result, 'Updated report photo');
+      if (image) {
+        void saveSubmissionImage(reportId, image);
+      }
+    } catch (error) {
+      console.error('[image_picker] report photo camera failed', error);
+      Alert.alert('Could not open camera', 'Please try again.');
+    }
+  };
+
+  const replaceReportPhotoFromLibrary = async (reportId: string) => {
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        allowsEditing: false,
+        mediaTypes: ['images'],
+        quality: 0.85,
+      });
+      const image = imageFromPickerResult(result, 'Updated report photo');
+      if (image) {
+        void saveSubmissionImage(reportId, image);
+      }
+    } catch (error) {
+      console.error('[image_picker] report photo library failed', error);
+      Alert.alert('Could not open photo library', 'Please try again.');
+    }
+  };
+
+  const openReportPhotoEditor = (reportId: string, hasPhoto: boolean) => {
+    Alert.alert(
+      'Edit photo',
+      undefined,
+      [
+        {
+          text: 'Take new photo',
+          onPress: () => void replaceReportPhotoFromCamera(reportId),
+        },
+        {
+          text: 'Choose from library',
+          onPress: () => void replaceReportPhotoFromLibrary(reportId),
+        },
+        ...(hasPhoto
+          ? [
+              {
+                text: 'Remove photo',
+                style: 'destructive' as const,
+                onPress: () => void saveSubmissionImage(reportId, null),
+              },
+            ]
+          : []),
+        { text: 'Cancel', style: 'cancel' as const },
+      ],
+    );
+  };
+
+  async function handleSaveReportTextEdits(
+    reportId: string,
+    edits: {
+      title: string;
+      description: string;
+      locationMain: string;
+      locationSub: string;
+    },
+  ) {
+    const applyEdits = (submission: ReportSubmission): ReportSubmission => {
+      if (submission.mapReport.id !== reportId) {
+        return submission;
+      }
+
+      return {
+        ...submission,
+        mapReport: {
+          ...submission.mapReport,
+          title: edits.title,
+          description: edits.description,
+          address: `${edits.locationMain}, ${edits.locationSub}`,
+        },
+      };
+    };
+
+    const existingSubmission = userSubmissions.find((submission) => submission.mapReport.id === reportId);
+    if (user?.id && UUID_PATTERN.test(reportId)) {
+      try {
+        const updatedRow = await updateReportText(reportId, edits);
+        const updatedMapReport = reportRowToMapReport(updatedRow);
+        setUserSubmissions((prev) =>
+          prev.map((submission) =>
+            submission.mapReport.id === reportId
+              ? { ...submission, mapReport: updatedMapReport, externalId: updatedRow.external_id }
+              : submission,
+          ),
+        );
+      } catch (error) {
+        console.error('[reports] update text failed', error);
+        Alert.alert('Could not save changes', 'Please try again.');
+        return;
+      }
+    } else {
+      setUserSubmissions((prev) => prev.map(applyEdits));
+    }
+
+    Alert.alert(
+      'Send updated report?',
+      'Do you want to open your email app and send the updated report to the city?',
+      [
+        { text: 'Not now', style: 'cancel' },
+        {
+          text: 'Send Email',
+          onPress: () => {
+            const category =
+              existingSubmission?.sampleIssue?.category ??
+              (existingSubmission ? CATEGORY_LABEL[existingSubmission.mapReport.categoryId] : 'Pothole');
+            const updatedClassification: Classification = {
+              category,
+              tag: edits.title,
+              desc: edits.description,
+              locationMain: edits.locationMain,
+              locationSub: edits.locationSub,
+              latitude: existingSubmission?.mapReport.lat,
+              longitude: existingSubmission?.mapReport.lon,
+            };
+
+            void (async () => {
+              const outcome = await sendReportEmail(updatedClassification, user?.email);
+              if (outcome === 'cancelled') {
+                Alert.alert('Report not sent', 'Send the email to submit the updated report to the city.');
+                return;
+              }
+              if (outcome === 'needs_confirmation') {
+                await confirmEmailWasSent();
+              }
+            })();
+          },
+        },
+      ],
+    );
+  }
 
   const handleToggleFollow = async (reportId: string) => {
     if (!user?.id) {
@@ -124,45 +460,95 @@ export default function App() {
       return;
     }
 
-    const wasFollowing = isFollowingReport(reportId);
-    const submissionBeforeToggle = findReportSubmission(reportId);
     setFollowUpdatingId(reportId);
-    setFollowedReportIds((prev) => {
-      const next = new Set(prev);
-      if (wasFollowing) {
-        next.delete(reportId);
-      } else {
-        next.add(reportId);
-      }
-      return next;
-    });
-    if (wasFollowing) {
-      setFollowedSubmissions((prev) => prev.filter((s) => s.mapReport.id !== reportId));
-    }
-
     try {
+      const wasFollowing = isFollowingReport(reportId);
+      const existingSubmission = findReportSubmission(reportId);
+      let dashboardRow: ReportRow | null = null;
+      if (!UUID_PATTERN.test(reportId)) {
+        try {
+          dashboardRow = await fetchReportByExternalId(reportId);
+        } catch (error) {
+          console.warn('[reports] dashboard external lookup failed; using local follow fallback', error);
+        }
+      }
+      const targetReportId = existingSubmission?.mapReport.id ?? dashboardRow?.id ?? reportId;
+      const targetSubmission =
+        existingSubmission ??
+        (dashboardRow ? rowToSubmission(dashboardRow) : dashboardSubmissionFromExternalId(reportId));
+
+      if (!UUID_PATTERN.test(targetReportId)) {
+        const localSubmission = targetSubmission ?? dashboardSubmissionFromExternalId(reportId);
+        if (!localSubmission) {
+          Alert.alert('Could not follow issue', 'This dashboard issue is missing from the local issue list.');
+          return;
+        }
+
+        const localFollowIds = await readLocalDashboardFollowIds(user.id);
+        const nextLocalFollowIds = wasFollowing
+          ? localFollowIds.filter((id) => id !== reportId)
+          : [...localFollowIds, reportId];
+        await writeLocalDashboardFollowIds(user.id, nextLocalFollowIds);
+
+        setFollowedReportIds((prev) => {
+          const next = new Set(prev);
+          if (wasFollowing) {
+            next.delete(reportId);
+          } else {
+            next.add(reportId);
+          }
+          return next;
+        });
+        setFollowedSubmissions((prev) => {
+          if (wasFollowing) {
+            return prev.filter((s) => s.externalId !== reportId && s.mapReport.id !== reportId);
+          }
+          if (prev.some((s) => s.externalId === reportId || s.mapReport.id === reportId)) {
+            return prev;
+          }
+          return [localSubmission, ...prev];
+        });
+        return;
+      }
+
+      setFollowedReportIds((prev) => {
+        const next = new Set(prev);
+        if (wasFollowing) {
+          next.delete(reportId);
+          next.delete(targetReportId);
+        } else {
+          next.add(reportId);
+          next.add(targetReportId);
+        }
+        return next;
+      });
       if (wasFollowing) {
-        await unfollowReport(user.id, reportId);
+        setFollowedSubmissions((prev) =>
+          prev.filter((s) => s.mapReport.id !== targetReportId && s.externalId !== reportId),
+        );
+      }
+
+      if (wasFollowing) {
+        await unfollowReport(user.id, targetReportId);
       } else {
-        await followReport(user.id, reportId);
-        if (submissionBeforeToggle) {
+        await followReport(user.id, targetReportId);
+        if (targetSubmission) {
           setFollowedSubmissions((prev) => {
-            if (prev.some((s) => s.mapReport.id === reportId)) {
+            if (prev.some((s) => s.mapReport.id === targetReportId || s.externalId === reportId)) {
               return prev;
             }
-            return [submissionBeforeToggle, ...prev];
+            return [targetSubmission, ...prev];
           });
-        } else {
-          const rows = await fetchReportsByIds([reportId]);
-          if (rows[0]) {
-            setFollowedSubmissions((prev) => [rowToSubmission(rows[0]), ...prev]);
-          }
         }
       }
     } catch (error) {
       console.error('[report_follows] update failed', error);
       setFollowedReportIds(new Set(followedReportIds));
-      void loadFollowedSubmissions(Array.from(followedReportIds)).then(setFollowedSubmissions);
+      void (async () => {
+        const localDashboardFollowIds = user?.id ? await readLocalDashboardFollowIds(user.id) : [];
+        const followed = await loadFollowedSubmissions(Array.from(followedReportIds), localDashboardFollowIds);
+        setFollowedSubmissions(followed);
+      })();
       Alert.alert('Could not update follow', 'Please try again.');
     } finally {
       setFollowUpdatingId(null);
@@ -178,10 +564,15 @@ export default function App() {
     const isFollowUpdating = followUpdatingId === reportId;
 
     if (userSub?.sampleIssue) {
+      const statusImage =
+        userSub.image !== undefined ? userSub.image : userSub.sampleIssue.image;
       const submittedRecord: SampleIssueRecord = {
         ...userSub.sampleIssue,
         status: STATUS_MAP[mapReport.status] ?? 'Submitted',
         title: mapReport.title,
+        locationName: mapReport.address,
+        address: mapReport.address,
+        description: mapReport.description,
         isFollowing: isFollowingReport(reportId),
         timeline: mapReport.timeline.map((entry, i) => ({
           label: (STATUS_MAP[entry.label] ?? entry.label) as ReportStatus,
@@ -193,9 +584,23 @@ export default function App() {
       return (
         <IssueStatusScreen
           report={submittedRecord}
+          reportImage={statusImage}
           onBack={onBack}
           onToggleFollow={() => void handleToggleFollow(reportId)}
           isFollowUpdating={isFollowUpdating}
+          onEditPhoto={
+            userSubmissions.some((submission) => submission.mapReport.id === reportId)
+              ? () => openReportPhotoEditor(
+                  reportId,
+                  Boolean(statusImage),
+                )
+              : undefined
+          }
+          onSaveEdits={
+            userSubmissions.some((submission) => submission.mapReport.id === reportId)
+              ? (edits) => handleSaveReportTextEdits(reportId, edits)
+              : undefined
+          }
         />
       );
     }
@@ -203,12 +608,75 @@ export default function App() {
     return (
       <IssueStatusScreen
         report={mapReportToRecord(mapReport, isFollowingReport(reportId))}
+        reportImage={userSub?.image ?? null}
         onBack={onBack}
         onToggleFollow={() => void handleToggleFollow(reportId)}
         isFollowUpdating={isFollowUpdating}
+        onEditPhoto={
+          userSubmissions.some((submission) => submission.mapReport.id === reportId)
+            ? () => openReportPhotoEditor(reportId, Boolean(userSub?.image))
+            : undefined
+        }
+        onSaveEdits={
+          userSubmissions.some((submission) => submission.mapReport.id === reportId)
+            ? (edits) => handleSaveReportTextEdits(reportId, edits)
+            : undefined
+        }
       />
     );
   };
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadOnboardingStatus = async () => {
+      try {
+        const storedValue = await AsyncStorage.getItem(ONBOARDING_COMPLETE_KEY);
+        if (isMounted) {
+          setShowOnboarding(storedValue !== 'true');
+        }
+      } catch {
+        if (isMounted) {
+          setShowOnboarding(true);
+        }
+      } finally {
+        if (isMounted) {
+          setIsCheckingOnboarding(false);
+        }
+      }
+    };
+
+    void loadOnboardingStatus();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const completeOnboarding = async () => {
+    setShowOnboarding(false);
+    if (!isSignedIn) {
+      return;
+    }
+
+    try {
+      await AsyncStorage.setItem(ONBOARDING_COMPLETE_KEY, 'true');
+    } catch (error) {
+      console.warn('[onboarding] completion save failed', error);
+    }
+  };
+
+  const continueAsGuest = () => {
+    setIsGuestSession(true);
+    setShowOnboarding(true);
+  };
+
+  useEffect(() => {
+    if (isSignedIn) {
+      setIsGuestSession(false);
+      setShowAuthScreen(false);
+    }
+  }, [isSignedIn]);
 
   useEffect(() => {
     if (!user?.id) {
@@ -223,17 +691,19 @@ export default function App() {
     const loadUserData = async () => {
       setIsLoadingReports(true);
       try {
-        const [rows, followIds] = await Promise.all([
+        const [rows, followIds, localDashboardFollowIds, localReportPhotos] = await Promise.all([
           fetchUserReports(user.id),
           fetchFollowedReportIds(user.id),
+          readLocalDashboardFollowIds(user.id),
+          readLocalReportPhotos(user.id),
         ]);
         if (!isMounted) {
           return;
         }
 
-        setFollowedReportIds(new Set(followIds));
-        setUserSubmissions(rows.map(rowToSubmission));
-        const followed = await loadFollowedSubmissions(followIds);
+        setFollowedReportIds(new Set([...followIds, ...localDashboardFollowIds]));
+        setUserSubmissions(rows.map((row) => ({ ...rowToSubmission(row), image: localReportPhotos[row.id] })));
+        const followed = await loadFollowedSubmissions(followIds, localDashboardFollowIds);
         if (!isMounted) {
           return;
         }
@@ -272,18 +742,32 @@ export default function App() {
 
   const completeReportSubmission = async (c: Classification) => {
     if (!user?.id) {
-      Alert.alert('Sign in required', 'Sign in to save your report.');
+      const mapReport = createGuestMapReport(c, selectedSampleIssue);
+      setUserSubmissions((prev) => [
+        { mapReport, sampleIssue: selectedSampleIssue, image: selectedSampleIssue?.image ?? reportImage },
+        ...prev,
+      ]);
+      setFocusReport(mapReport);
+      setReportStep('confirmation');
       return;
     }
 
     try {
       const row = await createReport(user.id, c, selectedSampleIssue);
       const mapReport = reportRowToMapReport(row);
+      const submissionImage = selectedSampleIssue?.image ?? reportImage;
 
       setUserSubmissions((prev) => [
-        { mapReport, sampleIssue: selectedSampleIssue },
+        { mapReport, sampleIssue: selectedSampleIssue, image: submissionImage },
         ...prev,
       ]);
+      if (submissionImage?.kind === 'uri') {
+        try {
+          await writeLocalReportPhoto(user.id, mapReport.id, submissionImage);
+        } catch (error) {
+          console.warn('[report_photos] initial local save failed', error);
+        }
+      }
       setFocusReport(mapReport);
       setReportStep('confirmation');
     } catch (error) {
@@ -326,6 +810,7 @@ export default function App() {
     } catch {
       // Still reset local state if sign-out fails.
     }
+    setIsGuestSession(false);
     setCurrentTab('report');
     setUserSubmissions([]);
     setFollowedSubmissions([]);
@@ -340,6 +825,7 @@ export default function App() {
     setReportStep('camera');
     setClassification(null);
     setSelectedSampleIssue(null);
+    setReportImage(null);
   };
 
   const renderReportFlow = () => {
@@ -349,10 +835,12 @@ export default function App() {
           onSelectIssue={(issueId) => {
             const nextIssue = sampleIssues.find((issue) => issue.id === issueId) ?? null;
             setSelectedSampleIssue(nextIssue);
+            setReportImage(nextIssue?.image ?? null);
             setReportStep('classify');
           }}
           onOpenCamera={() => {
             setSelectedSampleIssue(null);
+            setReportImage(null);
             setReportStep('camera');
           }}
         />
@@ -361,8 +849,16 @@ export default function App() {
     if (reportStep === 'camera') {
       return (
         <ReportCameraScreen
-          onCapture={() => setReportStep('analyzing')}
-          onOpenLibrary={() => setReportStep('picker')}
+          onCapture={(image) => {
+            setSelectedSampleIssue(null);
+            setReportImage(image);
+            setReportStep('analyzing');
+          }}
+          onOpenLibrary={(image) => {
+            setSelectedSampleIssue(null);
+            setReportImage(image);
+            setReportStep('analyzing');
+          }}
         />
       );
     }
@@ -376,11 +872,14 @@ export default function App() {
           onConfirm={handleConfirmReport}
           isSubmitting={isSendingReport}
           selectedSampleIssue={selectedSampleIssue}
+          reportImage={selectedSampleIssue?.image ?? reportImage}
         />
       );
     }
-    if (reportStep === 'submitted-view' && selectedSampleIssue) {
-      const submission = userSubmissions.find((s) => s.sampleIssue?.id === selectedSampleIssue.id);
+    if (reportStep === 'submitted-view') {
+      const submission = selectedSampleIssue
+        ? userSubmissions.find((s) => s.sampleIssue?.id === selectedSampleIssue.id)
+        : userSubmissions.find((s) => s.mapReport.id === focusReport?.id);
       if (submission) {
         return renderIssueStatus(
           submission.mapReport,
@@ -395,7 +894,8 @@ export default function App() {
         classification={classification}
         onDone={handleResetFlow}
         selectedSampleIssue={selectedSampleIssue}
-        onViewIssue={selectedSampleIssue ? () => setReportStep('submitted-view') : undefined}
+        reportImage={selectedSampleIssue?.image ?? reportImage}
+        onViewIssue={focusReport ? () => setReportStep('submitted-view') : undefined}
       />
     );
   };
@@ -423,13 +923,25 @@ export default function App() {
           onFocusConsumed={() => setFocusReport(null)}
           reportImages={Object.fromEntries(
             userSubmissions
-              .filter(s => s.sampleIssue?.image)
-              .map(s => [s.mapReport.id, s.sampleIssue!.image])
+              .map(s => [s.mapReport.id, s.image ?? s.sampleIssue?.image])
+              .filter((entry): entry is [string, SampleIssueImage] => Boolean(entry[1]))
           )}
         />
       );
     }
     if (currentTab === 'profile') {
+      if (!isSignedIn && showAuthScreen) {
+        return (
+          <AuthScreen
+            onContinueAsGuest={() => {
+              setShowAuthScreen(false);
+              continueAsGuest();
+              setCurrentTab('report');
+            }}
+          />
+        );
+      }
+
       if (mapReport) {
         const userSub = findReportSubmission(mapReport.id);
         return renderIssueStatus(mapReport, userSub, () => setMapReport(null));
@@ -441,7 +953,7 @@ export default function App() {
       return (
         <ProfileScreen
           isSignedIn={isSignedIn}
-          onToggleAuth={handleSignOut}
+          onToggleAuth={isSignedIn ? handleSignOut : () => setShowAuthScreen(true)}
           displayName={
             typeof user?.user_metadata?.full_name === 'string'
               ? user.user_metadata.full_name
@@ -451,6 +963,7 @@ export default function App() {
           memberSince={user?.created_at ?? null}
           reports={profileReports}
           followingReports={followingReports}
+          onReplayOnboarding={() => setShowOnboarding(true)}
           onViewReport={(reportId) => {
             const match = findReportSubmission(reportId);
             if (match) {
@@ -464,46 +977,55 @@ export default function App() {
   };
 
   const showNav =
-    isSignedIn &&
+    !showOnboarding &&
     !chronicSpot &&
     !mapReport &&
     (currentTab === 'dashboard' ||
       currentTab === 'profile' ||
       (currentTab === 'report' && reportStep === 'camera'));
 
-  if (isLoading || isLoadingReports) {
+  if (isLoading || isLoadingReports || isCheckingOnboarding) {
     return (
-      <SafeAreaView style={styles.safeArea}>
-        <StatusBar style="light" />
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#4F8EF7" />
-        </View>
-      </SafeAreaView>
+      <SafeAreaProvider>
+        <SafeAreaView style={styles.safeArea}>
+          <StatusBar style="light" />
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color="#4F8EF7" />
+          </View>
+        </SafeAreaView>
+      </SafeAreaProvider>
     );
   }
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <StatusBar style="light" />
-      <View style={styles.container}>
-        {isSignedIn ? (
-          renderCurrentTab()
-        ) : (
-          <AuthScreen />
+    <SafeAreaProvider>
+      <SafeAreaView style={styles.safeArea}>
+        <StatusBar style="light" />
+        <View style={styles.container}>
+          {(isSignedIn || isGuestSession) && showOnboarding ? (
+            <OnboardingScreen onDone={() => void completeOnboarding()} />
+          ) : isSignedIn || isGuestSession ? (
+            renderCurrentTab()
+          ) : (
+            <AuthScreen onContinueAsGuest={continueAsGuest} />
+          )}
+        </View>
+        {showNav && (
+          <BottomNav
+            currentTab={currentTab}
+            onChangeTab={(tab) => {
+              setShowAuthScreen(false);
+              setCurrentTab(tab);
+            }}
+          />
         )}
-      </View>
-      {showNav && (
-        <BottomNav
-          currentTab={currentTab}
-          onChangeTab={(tab) => setCurrentTab(tab)}
-        />
-      )}
-    </SafeAreaView>
+      </SafeAreaView>
+    </SafeAreaProvider>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: '#fff' },
-  container: { flex: 1, backgroundColor: '#fff' },
+  safeArea: { flex: 1, backgroundColor: '#18191C' },
+  container: { flex: 1, backgroundColor: '#18191C' },
   loadingContainer: { flex: 1, alignItems: 'center', justifyContent: 'center' },
 });

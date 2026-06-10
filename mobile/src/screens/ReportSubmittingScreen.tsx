@@ -28,19 +28,19 @@ export const ReportSubmittingScreen = ({ onDone }: ReportSubmittingScreenProps) 
 }
 
 const styles = StyleSheet.create({
-  page: { flex: 1, backgroundColor: '#0f0a05' },
-  overlay: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(15,10,5,0.72)' },
+  page: { flex: 1, backgroundColor: '#18191C' },
+  overlay: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(24,25,28,0.78)' },
   body: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 28 },
   spinner: {
     width: 82,
     height: 82,
     borderRadius: 999,
     borderWidth: 8,
-    borderTopColor: '#1565FF',
-    borderColor: '#D8E4FF',
+    borderTopColor: '#4F8EF7',
+    borderColor: '#35373D',
     marginBottom: 30,
   },
-  title: { fontWeight: '800', fontSize: 46 / 2, marginBottom: 8 },
-  subtitle: { fontWeight: '500', fontSize: 38 / 2, color: '#404A5B', marginBottom: 14 },
-  bodyText: { fontWeight: '500', fontSize: 32 / 2, color: '#737E91', textAlign: 'center' },
+  title: { color: '#F2F3F5', fontWeight: '800', fontSize: 46 / 2, marginBottom: 8 },
+  subtitle: { fontWeight: '600', fontSize: 38 / 2, color: '#D1D5DB', marginBottom: 14 },
+  bodyText: { fontWeight: '500', fontSize: 32 / 2, color: '#8D939E', textAlign: 'center' },
 })
