@@ -39,6 +39,12 @@
     "plugins": [
       "expo-mail-composer",
       [
+        "expo-camera",
+        {
+          "cameraPermission": "CityFix uses your camera to attach a photo to your report."
+        }
+      ],
+      [
         "expo-location",
         {
           "locationWhenInUsePermission": "CityFix uses your location to attach your report to the correct address and map pin."

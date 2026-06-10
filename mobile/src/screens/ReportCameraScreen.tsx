@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { ActivityIndicator, Alert, Pressable, StyleSheet, Text, View } from "react-native";
+import { CameraView, useCameraPermissions } from "expo-camera";
 import * as ImagePicker from "expo-image-picker";
 import { SampleIssueImage } from "../types";
 
@@ -9,6 +10,9 @@ type ReportCameraScreenProps = {
 };
 
 export const ReportCameraScreen = ({ onCapture, onOpenLibrary }: ReportCameraScreenProps) => {
+  const cameraRef = useRef<CameraView | null>(null);
+  const [cameraPermission, requestCameraPermission] = useCameraPermissions();
+  const [isCameraReady, setIsCameraReady] = useState(false);
   const [isOpeningPicker, setIsOpeningPicker] = useState(false);
 
   const handleImageResult = (
@@ -45,20 +49,35 @@ export const ReportCameraScreen = ({ onCapture, onOpenLibrary }: ReportCameraScr
 
     setIsOpeningPicker(true);
     try {
-      const permission = await ImagePicker.requestCameraPermissionsAsync();
+      const permission = cameraPermission?.granted
+        ? cameraPermission
+        : await requestCameraPermission();
       if (!permission.granted) {
         Alert.alert("Camera permission needed", "Allow camera access to take a report photo.");
         return;
       }
 
-      const result = await ImagePicker.launchCameraAsync({
-        allowsEditing: false,
+      if (!cameraRef.current || !isCameraReady) {
+        Alert.alert("Camera not ready", "Please wait a moment and try again.");
+        return;
+      }
+
+      const result = await cameraRef.current.takePictureAsync({
         quality: 0.85,
       });
-      handleImageResult(result, "camera");
+      if (!result?.uri) {
+        Alert.alert("Could not capture photo", "Please try again.");
+        return;
+      }
+
+      onCapture({
+        kind: "uri",
+        uri: result.uri,
+        alt: "Captured report photo",
+      });
     } catch (error) {
       console.error("[image_picker] camera failed", error);
-      Alert.alert("Could not open camera", "Please try again.");
+      Alert.alert("Could not take photo", "Please try again.");
     } finally {
       setIsOpeningPicker(false);
     }
@@ -89,6 +108,28 @@ export const ReportCameraScreen = ({ onCapture, onOpenLibrary }: ReportCameraScr
     <View style={styles.page}>
       {/* Viewfinder */}
       <View style={styles.viewfinder}>
+        {cameraPermission?.granted ? (
+          <CameraView
+            ref={cameraRef}
+            style={StyleSheet.absoluteFill}
+            facing="back"
+            mode="picture"
+            active
+            onCameraReady={() => setIsCameraReady(true)}
+          />
+        ) : (
+          <View style={styles.permissionPanel}>
+            <Text style={styles.permissionTitle}>Camera access needed</Text>
+            <Pressable
+              onPress={() => void requestCameraPermission()}
+              style={styles.permissionButton}
+              accessibilityRole="button"
+            >
+              <Text style={styles.permissionButtonText}>Enable Camera</Text>
+            </Pressable>
+          </View>
+        )}
+
         {/* Rule-of-thirds grid */}
         <View style={[styles.gridLine, styles.gridV1]} />
         <View style={[styles.gridLine, styles.gridV2]} />
@@ -158,6 +199,29 @@ const styles = StyleSheet.create({
   page: { flex: 1, backgroundColor: "#0d0d0d" },
 
   viewfinder: { flex: 1, backgroundColor: "#0d0d0d", overflow: "hidden" },
+  permissionPanel: {
+    ...StyleSheet.absoluteFillObject,
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 14,
+    paddingHorizontal: 24,
+  },
+  permissionTitle: {
+    color: "#F2F3F5",
+    fontSize: 18,
+    fontWeight: "700",
+    textAlign: "center",
+  },
+  permissionButton: {
+    backgroundColor: "#F2F3F5",
+    borderRadius: 999,
+    paddingHorizontal: 18,
+    paddingVertical: 10,
+  },
+  permissionButtonText: {
+    color: "#18191C",
+    fontWeight: "800",
+  },
 
   gridLine: { position: "absolute", backgroundColor: "rgba(255,255,255,0.08)" },
   gridV1: { top: 0, bottom: 0, left: "33.33%", width: 1 },
