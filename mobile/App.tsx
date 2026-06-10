@@ -34,6 +34,15 @@ const CATEGORY_LABEL: Record<MapReportCategoryId, IssueCategory> = {
   junk:        'Illegal Dumping',
 };
 
+const CATEGORY_ID_BY_LABEL: Record<string, MapReportCategoryId> = {
+  Pothole:                'pothole',
+  'Streetlight Outage':   'streetlight',
+  Graffiti:               'graffiti',
+  'Illegal Dumping':      'dumping',
+  'Vehicle Concerns':     'vehicle',
+  'Encampment Concerns':  'encampment',
+};
+
 const STATUS_MAP: Record<string, ReportStatus> = {
   'Submitted':   'Submitted',
   'Open':        'Received',
@@ -93,12 +102,38 @@ const toProfileReport = (mapReport: MapReport): ProfileReport => ({
   submittedAt: mapReport.createdAt,
 });
 
+const createGuestMapReport = (
+  classification: Classification,
+  selectedSampleIssue: SampleIssueRecord | null,
+): MapReport => {
+  const districtMatch = selectedSampleIssue?.district.match(/\d+/);
+  const district = districtMatch ? Number(districtMatch[0]) : 3;
+  const fallbackCenter = { latitude: 37.338, longitude: -121.886 };
+
+  return {
+    id: `guest-${Date.now()}`,
+    categoryId: CATEGORY_ID_BY_LABEL[classification.category] ?? 'pothole',
+    title: classification.tag,
+    address: `${classification.locationMain}, ${classification.locationSub}`,
+    district,
+    lat: classification.latitude ?? selectedSampleIssue?.latitude ?? fallbackCenter.latitude,
+    lon: classification.longitude ?? selectedSampleIssue?.longitude ?? fallbackCenter.longitude,
+    status: 'Submitted',
+    createdAt: new Date(),
+    description: classification.desc,
+    assignedTo: selectedSampleIssue?.assignedTo ?? 'Dept. of Public Works',
+    timeline: [{ label: 'Submitted', dateText: 'Just now' }],
+  };
+};
+
 type ReportStep = 'picker' | 'camera' | 'analyzing' | 'classify' | 'confirmation' | 'submitted-view';
 
 export default function App() {
   const { session, user, isLoading, signOut } = useAuth();
   const isSignedIn = Boolean(session);
   const [currentTab, setCurrentTab]                   = useState<AppTab>('report');
+  const [isGuestSession, setIsGuestSession]           = useState(false);
+  const [showAuthScreen, setShowAuthScreen]           = useState(false);
   const [reportStep, setReportStep]                   = useState<ReportStep>('camera');
   const [classification, setClassification]           = useState<Classification | null>(null);
   const [mapReport, setMapReport]                     = useState<MapReport | null>(null);
@@ -327,6 +362,13 @@ export default function App() {
   };
 
   useEffect(() => {
+    if (isSignedIn) {
+      setIsGuestSession(false);
+      setShowAuthScreen(false);
+    }
+  }, [isSignedIn]);
+
+  useEffect(() => {
     if (!user?.id) {
       setUserSubmissions([]);
       setFollowedSubmissions([]);
@@ -388,7 +430,13 @@ export default function App() {
 
   const completeReportSubmission = async (c: Classification) => {
     if (!user?.id) {
-      Alert.alert('Sign in required', 'Sign in to save your report.');
+      const mapReport = createGuestMapReport(c, selectedSampleIssue);
+      setUserSubmissions((prev) => [
+        { mapReport, sampleIssue: selectedSampleIssue, image: selectedSampleIssue?.image ?? reportImage },
+        ...prev,
+      ]);
+      setFocusReport(mapReport);
+      setReportStep('confirmation');
       return;
     }
 
@@ -442,6 +490,7 @@ export default function App() {
     } catch {
       // Still reset local state if sign-out fails.
     }
+    setIsGuestSession(false);
     setCurrentTab('report');
     setUserSubmissions([]);
     setFollowedSubmissions([]);
@@ -561,6 +610,18 @@ export default function App() {
       );
     }
     if (currentTab === 'profile') {
+      if (!isSignedIn && showAuthScreen) {
+        return (
+          <AuthScreen
+            onContinueAsGuest={() => {
+              setShowAuthScreen(false);
+              setIsGuestSession(true);
+              setCurrentTab('report');
+            }}
+          />
+        );
+      }
+
       if (mapReport) {
         const userSub = findReportSubmission(mapReport.id);
         return renderIssueStatus(mapReport, userSub, () => setMapReport(null));
@@ -572,7 +633,7 @@ export default function App() {
       return (
         <ProfileScreen
           isSignedIn={isSignedIn}
-          onToggleAuth={handleSignOut}
+          onToggleAuth={isSignedIn ? handleSignOut : () => setShowAuthScreen(true)}
           displayName={
             typeof user?.user_metadata?.full_name === 'string'
               ? user.user_metadata.full_name
@@ -595,7 +656,6 @@ export default function App() {
   };
 
   const showNav =
-    isSignedIn &&
     !chronicSpot &&
     !mapReport &&
     (currentTab === 'dashboard' ||
@@ -617,16 +677,19 @@ export default function App() {
     <SafeAreaView style={styles.safeArea}>
       <StatusBar style="light" />
       <View style={styles.container}>
-        {isSignedIn ? (
+        {isSignedIn || isGuestSession ? (
           renderCurrentTab()
         ) : (
-          <AuthScreen />
+          <AuthScreen onContinueAsGuest={() => setIsGuestSession(true)} />
         )}
       </View>
       {showNav && (
         <BottomNav
           currentTab={currentTab}
-          onChangeTab={(tab) => setCurrentTab(tab)}
+          onChangeTab={(tab) => {
+            setShowAuthScreen(false);
+            setCurrentTab(tab);
+          }}
         />
       )}
     </SafeAreaView>

@@ -66,8 +66,18 @@ export const ProfileScreen = ({
   followingReports,
   onViewReport,
 }: ProfileScreenProps) => {
+  const [statusFilter, setStatusFilter] = useState<'active' | 'resolved'>('active')
   const { totalSubmitted, resolved } = getProfileImpactStats(reports)
   const accountAge = memberSince ? formatAccountAge(memberSince) : 'Unknown'
+  const filterReports = (items: ProfileReport[]) =>
+    items.filter((report) =>
+      statusFilter === 'resolved'
+        ? formatReportStatus(report.status) === 'Resolved'
+        : formatReportStatus(report.status) !== 'Resolved',
+    )
+  const filteredReports = filterReports(reports)
+  const filteredFollowingReports = filterReports(followingReports)
+  const emptySuffix = statusFilter === 'resolved' ? 'resolved reports' : 'active reports'
 
   return (
     <View style={styles.page}>
@@ -100,19 +110,41 @@ export const ProfileScreen = ({
               <Text style={styles.bodyText}>Resolved: {resolved}</Text>
               <Text style={styles.bodyText}>Using app for: {accountAge}</Text>
             </View>
+            <View style={styles.filterRow}>
+              <Pressable
+                style={[styles.filterTab, statusFilter === 'active' ? styles.filterTabActive : null]}
+                onPress={() => setStatusFilter('active')}
+                accessibilityRole="button"
+                accessibilityState={{ selected: statusFilter === 'active' }}
+              >
+                <Text style={[styles.filterTabText, statusFilter === 'active' ? styles.filterTabTextActive : null]}>
+                  Active
+                </Text>
+              </Pressable>
+              <Pressable
+                style={[styles.filterTab, statusFilter === 'resolved' ? styles.filterTabActive : null]}
+                onPress={() => setStatusFilter('resolved')}
+                accessibilityRole="button"
+                accessibilityState={{ selected: statusFilter === 'resolved' }}
+              >
+                <Text style={[styles.filterTabText, statusFilter === 'resolved' ? styles.filterTabTextActive : null]}>
+                  Resolved
+                </Text>
+              </Pressable>
+            </View>
             <View style={styles.card}>
               <Text style={styles.cardTitle}>My Reports</Text>
               <ReportList
-                reports={reports}
-                emptyMessage="No reports yet. File one from the Report tab."
+                reports={filteredReports}
+                emptyMessage={`No ${emptySuffix} yet.`}
                 onViewReport={onViewReport}
               />
             </View>
             <View style={styles.card}>
               <Text style={styles.cardTitle}>Following</Text>
               <ReportList
-                reports={followingReports}
-                emptyMessage="You are not following any reports yet."
+                reports={filteredFollowingReports}
+                emptyMessage={`No followed ${emptySuffix}.`}
                 onViewReport={onViewReport}
               />
             </View>
@@ -141,6 +173,29 @@ const styles = StyleSheet.create({
   content: { padding: 14, gap: 14, paddingBottom: 24 },
   title: { fontSize: 22, fontWeight: '800' },
   card: { borderColor: '#E2EAF2', borderWidth: 1, borderRadius: 14, padding: 12, gap: 10 },
+  filterRow: {
+    flexDirection: 'row',
+    backgroundColor: '#EEF2F7',
+    borderRadius: 12,
+    padding: 4,
+    gap: 4,
+  },
+  filterTab: {
+    flex: 1,
+    borderRadius: 9,
+    paddingVertical: 10,
+    alignItems: 'center',
+  },
+  filterTabActive: {
+    backgroundColor: '#fff',
+  },
+  filterTabText: {
+    color: '#737E91',
+    fontWeight: '800',
+  },
+  filterTabTextActive: {
+    color: '#1565FF',
+  },
   promptTitle: { color: '#324159', lineHeight: 22, fontSize: 16, fontWeight: '500' },
   cardTitle: { fontWeight: '800', fontSize: 17 },
   primaryButton: { marginTop: 4, backgroundColor: '#1565FF', borderRadius: 10, paddingVertical: 12, alignItems: 'center' },
