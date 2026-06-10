@@ -16,6 +16,7 @@ import { IssueStatusScreen } from './src/screens/IssueStatusScreen';
 import { RecurringIssueDetailScreen } from './src/screens/RecurringIssueDetailScreen';
 import { AuthScreen } from './src/screens/AuthScreen';
 import { SampleIssuePickerScreen } from './src/screens/SampleIssuePickerScreen';
+import { OnboardingScreen } from './src/screens/OnboardingScreen';
 import { AppTab, IssueCategory, ReportRecord, ReportStatus, SampleIssueImage, SampleIssueRecord } from './src/types';
 import { MapReport, MapReportCategoryId, MOCK_MAP_REPORTS } from './src/data/mockMapReports';
 import { ChronicSpot } from './src/data/dashboard311';
@@ -54,6 +55,7 @@ const STATUS_MAP: Record<string, ReportStatus> = {
 
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const LOCAL_DASHBOARD_FOLLOWS_KEY_PREFIX = 'cityfix:dashboard-follows:';
+const ONBOARDING_COMPLETE_KEY = 'cityfix:onboarding-complete';
 
 function mapReportToRecord(r: MapReport, isFollowing = false): ReportRecord {
   const category = CATEGORY_LABEL[r.categoryId];
@@ -170,6 +172,8 @@ export default function App() {
   const [currentTab, setCurrentTab]                   = useState<AppTab>('report');
   const [isGuestSession, setIsGuestSession]           = useState(false);
   const [showAuthScreen, setShowAuthScreen]           = useState(false);
+  const [showOnboarding, setShowOnboarding]           = useState(false);
+  const [isCheckingOnboarding, setIsCheckingOnboarding] = useState(true);
   const [reportStep, setReportStep]                   = useState<ReportStep>('camera');
   const [classification, setClassification]           = useState<Classification | null>(null);
   const [mapReport, setMapReport]                     = useState<MapReport | null>(null);
@@ -560,6 +564,51 @@ export default function App() {
   };
 
   useEffect(() => {
+    let isMounted = true;
+
+    const loadOnboardingStatus = async () => {
+      try {
+        const storedValue = await AsyncStorage.getItem(ONBOARDING_COMPLETE_KEY);
+        if (isMounted) {
+          setShowOnboarding(storedValue !== 'true');
+        }
+      } catch {
+        if (isMounted) {
+          setShowOnboarding(true);
+        }
+      } finally {
+        if (isMounted) {
+          setIsCheckingOnboarding(false);
+        }
+      }
+    };
+
+    void loadOnboardingStatus();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const completeOnboarding = async () => {
+    setShowOnboarding(false);
+    if (!isSignedIn) {
+      return;
+    }
+
+    try {
+      await AsyncStorage.setItem(ONBOARDING_COMPLETE_KEY, 'true');
+    } catch (error) {
+      console.warn('[onboarding] completion save failed', error);
+    }
+  };
+
+  const continueAsGuest = () => {
+    setIsGuestSession(true);
+    setShowOnboarding(true);
+  };
+
+  useEffect(() => {
     if (isSignedIn) {
       setIsGuestSession(false);
       setShowAuthScreen(false);
@@ -814,7 +863,7 @@ export default function App() {
           <AuthScreen
             onContinueAsGuest={() => {
               setShowAuthScreen(false);
-              setIsGuestSession(true);
+              continueAsGuest();
               setCurrentTab('report');
             }}
           />
@@ -842,6 +891,7 @@ export default function App() {
           memberSince={user?.created_at ?? null}
           reports={profileReports}
           followingReports={followingReports}
+          onReplayOnboarding={() => setShowOnboarding(true)}
           onViewReport={(reportId) => {
             const match = findReportSubmission(reportId);
             if (match) {
@@ -855,13 +905,14 @@ export default function App() {
   };
 
   const showNav =
+    !showOnboarding &&
     !chronicSpot &&
     !mapReport &&
     (currentTab === 'dashboard' ||
       currentTab === 'profile' ||
       (currentTab === 'report' && reportStep === 'camera'));
 
-  if (isLoading || isLoadingReports) {
+  if (isLoading || isLoadingReports || isCheckingOnboarding) {
     return (
       <SafeAreaProvider>
         <SafeAreaView style={styles.safeArea}>
@@ -879,10 +930,12 @@ export default function App() {
       <SafeAreaView style={styles.safeArea}>
         <StatusBar style="light" />
         <View style={styles.container}>
-          {isSignedIn || isGuestSession ? (
+          {(isSignedIn || isGuestSession) && showOnboarding ? (
+            <OnboardingScreen onDone={() => void completeOnboarding()} />
+          ) : isSignedIn || isGuestSession ? (
             renderCurrentTab()
           ) : (
-            <AuthScreen onContinueAsGuest={() => setIsGuestSession(true)} />
+            <AuthScreen onContinueAsGuest={continueAsGuest} />
           )}
         </View>
         {showNav && (

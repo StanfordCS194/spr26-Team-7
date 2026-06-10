@@ -17,6 +17,7 @@ type ProfileScreenProps = {
   memberSince?: string | null
   reports: ProfileReport[]
   followingReports: ProfileReport[]
+  onReplayOnboarding: () => void
   onViewReport: (reportId: string) => void
 }
 
@@ -64,6 +65,7 @@ export const ProfileScreen = ({
   memberSince,
   reports,
   followingReports,
+  onReplayOnboarding,
   onViewReport,
 }: ProfileScreenProps) => {
   const [statusFilter, setStatusFilter] = useState<'active' | 'resolved'>('active')
@@ -85,12 +87,20 @@ export const ProfileScreen = ({
       <ScrollView contentContainerStyle={styles.content}>
         <Text style={styles.title}>My Profile</Text>
         {!isSignedIn ? (
-          <View style={styles.card}>
-            <Text style={styles.promptTitle}>Use app without login, or sign in for history and follows.</Text>
-            <Pressable style={styles.primaryButton} onPress={onToggleAuth} accessibilityRole="button">
-              <Text style={styles.primaryButtonText}>Log In</Text>
-            </Pressable>
-          </View>
+          <>
+            <View style={styles.card}>
+              <Text style={styles.promptTitle}>Use app without login, or sign in for history and follows.</Text>
+              <Pressable style={styles.primaryButton} onPress={onToggleAuth} accessibilityRole="button">
+                <Text style={styles.primaryButtonText}>Log In</Text>
+              </Pressable>
+            </View>
+            <View style={styles.card}>
+              <Text style={styles.cardTitle}>Help</Text>
+              <Pressable style={styles.secondaryButton} onPress={onReplayOnboarding} accessibilityRole="button">
+                <Text style={styles.secondaryButtonText}>How CityFix Works</Text>
+              </Pressable>
+            </View>
+          </>
         ) : (
           <>
             <View style={styles.card}>
@@ -147,6 +157,12 @@ export const ProfileScreen = ({
                 emptyMessage={`No followed ${emptySuffix}.`}
                 onViewReport={onViewReport}
               />
+            </View>
+            <View style={styles.card}>
+              <Text style={styles.cardTitle}>Help</Text>
+              <Pressable style={styles.secondaryButton} onPress={onReplayOnboarding} accessibilityRole="button">
+                <Text style={styles.secondaryButtonText}>How CityFix Works</Text>
+              </Pressable>
             </View>
             <Pressable style={styles.secondaryButton} onPress={onToggleAuth} accessibilityRole="button">
               <Text style={styles.secondaryButtonText}>Log Out</Text>
