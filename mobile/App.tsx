@@ -22,7 +22,7 @@ import { ChronicSpot } from './src/data/dashboard311';
 import { sampleIssues } from './src/data/sampleIssues';
 import { sendReportEmail } from './src/lib/reportEmail';
 import { ProfileReport } from './src/lib/profileStats';
-import { createReport, fetchReportByExternalId, fetchReportsByIds, fetchUserReports, getSampleIssueIdFromRow, ReportRow, reportRowToMapReport } from './src/lib/reports';
+import { createReport, fetchReportByExternalId, fetchReportsByIds, fetchUserReports, getSampleIssueIdFromRow, ReportRow, reportRowToMapReport, updateReportText } from './src/lib/reports';
 import { fetchFollowedReportIds, followReport, unfollowReport } from './src/lib/reportFollows';
 
 const CATEGORY_LABEL: Record<MapReportCategoryId, IssueCategory> = {
@@ -304,6 +304,89 @@ export default function App() {
     );
   };
 
+  async function handleSaveReportTextEdits(
+    reportId: string,
+    edits: {
+      title: string;
+      description: string;
+      locationMain: string;
+      locationSub: string;
+    },
+  ) {
+    const applyEdits = (submission: ReportSubmission): ReportSubmission => {
+      if (submission.mapReport.id !== reportId) {
+        return submission;
+      }
+
+      return {
+        ...submission,
+        mapReport: {
+          ...submission.mapReport,
+          title: edits.title,
+          description: edits.description,
+          address: `${edits.locationMain}, ${edits.locationSub}`,
+        },
+      };
+    };
+
+    const existingSubmission = userSubmissions.find((submission) => submission.mapReport.id === reportId);
+    if (user?.id && UUID_PATTERN.test(reportId)) {
+      try {
+        const updatedRow = await updateReportText(reportId, edits);
+        const updatedMapReport = reportRowToMapReport(updatedRow);
+        setUserSubmissions((prev) =>
+          prev.map((submission) =>
+            submission.mapReport.id === reportId
+              ? { ...submission, mapReport: updatedMapReport, externalId: updatedRow.external_id }
+              : submission,
+          ),
+        );
+      } catch (error) {
+        console.error('[reports] update text failed', error);
+        Alert.alert('Could not save changes', 'Please try again.');
+        return;
+      }
+    } else {
+      setUserSubmissions((prev) => prev.map(applyEdits));
+    }
+
+    Alert.alert(
+      'Send updated report?',
+      'Do you want to open your email app and send the updated report to the city?',
+      [
+        { text: 'Not now', style: 'cancel' },
+        {
+          text: 'Send Email',
+          onPress: () => {
+            const category =
+              existingSubmission?.sampleIssue?.category ??
+              (existingSubmission ? CATEGORY_LABEL[existingSubmission.mapReport.categoryId] : 'Pothole');
+            const updatedClassification: Classification = {
+              category,
+              tag: edits.title,
+              desc: edits.description,
+              locationMain: edits.locationMain,
+              locationSub: edits.locationSub,
+              latitude: existingSubmission?.mapReport.lat,
+              longitude: existingSubmission?.mapReport.lon,
+            };
+
+            void (async () => {
+              const outcome = await sendReportEmail(updatedClassification, user?.email);
+              if (outcome === 'cancelled') {
+                Alert.alert('Report not sent', 'Send the email to submit the updated report to the city.');
+                return;
+              }
+              if (outcome === 'needs_confirmation') {
+                await confirmEmailWasSent();
+              }
+            })();
+          },
+        },
+      ],
+    );
+  }
+
   const handleToggleFollow = async (reportId: string) => {
     if (!user?.id) {
       Alert.alert('Sign in required', 'Sign in to follow reports.');
@@ -420,6 +503,9 @@ export default function App() {
         ...userSub.sampleIssue,
         status: STATUS_MAP[mapReport.status] ?? 'Submitted',
         title: mapReport.title,
+        locationName: mapReport.address,
+        address: mapReport.address,
+        description: mapReport.description,
         isFollowing: isFollowingReport(reportId),
         timeline: mapReport.timeline.map((entry, i) => ({
           label: (STATUS_MAP[entry.label] ?? entry.label) as ReportStatus,
@@ -443,6 +529,11 @@ export default function App() {
                 )
               : undefined
           }
+          onSaveEdits={
+            userSubmissions.some((submission) => submission.mapReport.id === reportId)
+              ? (edits) => handleSaveReportTextEdits(reportId, edits)
+              : undefined
+          }
         />
       );
     }
@@ -457,6 +548,11 @@ export default function App() {
         onEditPhoto={
           userSubmissions.some((submission) => submission.mapReport.id === reportId)
             ? () => openReportPhotoEditor(reportId, Boolean(userSub?.image))
+            : undefined
+        }
+        onSaveEdits={
+          userSubmissions.some((submission) => submission.mapReport.id === reportId)
+            ? (edits) => handleSaveReportTextEdits(reportId, edits)
             : undefined
         }
       />
