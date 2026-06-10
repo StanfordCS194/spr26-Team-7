@@ -15,7 +15,7 @@
     "ios": {
       "supportsTablet": true,
       "infoPlist": {
-        "NSLocationWhenInUseUsageDescription": "CityFix uses your location to attach the issue address to your report."
+        "NSLocationWhenInUseUsageDescription": "CityFix uses your location to attach your report to the correct address and map pin."
       }
     },
     "android": {
@@ -28,7 +28,11 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "permissions": [
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -38,7 +42,7 @@
       [
         "expo-location",
         {
-          "locationWhenInUsePermission": "CityFix uses your location to attach the issue address to your report."
+          "locationWhenInUsePermission": "CityFix uses your location to attach your report to the correct address and map pin."
         }
       ]
     ]

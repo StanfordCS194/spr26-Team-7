@@ -16,6 +16,7 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { SampleIssueImage } from "../components/SampleIssueImage";
 import { MiniMapView } from "../components/MiniMapView";
 import { detectReportLocation, formatReportDateTime, SOFA_MARKET_LOCATION } from "../lib/reportLocation";
+import { useDeviceLocation } from "../hooks/useDeviceLocation";
 import { SampleIssueRecord } from "../types";
 
 const SCREEN_HEIGHT = Dimensions.get('window').height;
@@ -100,6 +101,8 @@ export type Classification = {
   latitude?: number;
   longitude?: number;
   hasPhoto?: boolean;
+  latitude?: number;
+  longitude?: number;
 };
 
 type ClassificationScreenProps = {
@@ -147,12 +150,32 @@ export const ClassificationScreen = ({
   locationEnabled = true,
   homeDistrict = 3,
 }: ClassificationScreenProps) => {
-  const isManual = variant === "manual";
+ const isManual = variant === "manual";
 
-  const [category, setCategory] = useState(
-    isManual ? "" : getInitialCategory(selectedSampleIssue),
-  );
-  const [tag, setTag] = useState(isManual ? "" : (selectedSampleIssue?.tag ?? "Pothole"));
+const deviceLocation = useDeviceLocation();
+
+const fallbackMain =
+  selectedSampleIssue?.locationName ?? LOCATION_MAIN_LINE;
+const fallbackSub =
+  selectedSampleIssue?.address ?? LOCATION_SUB_LINE;
+
+const locationMainLine =
+  deviceLocation.status === "ready"
+    ? deviceLocation.locationMain
+    : fallbackMain;
+
+const locationSubLine =
+  deviceLocation.status === "ready"
+    ? deviceLocation.locationSub
+    : fallbackSub;
+
+const [category, setCategory] = useState(
+  isManual ? "" : getInitialCategory(selectedSampleIssue)
+);
+
+const [tag, setTag] = useState(
+  isManual ? "" : selectedSampleIssue?.tag ?? "Pothole"
+);
   const [desc, setDesc] = useState(
     isManual
       ? ""
@@ -408,29 +431,44 @@ export const ClassificationScreen = ({
         <View style={styles.card}>
           <View style={[styles.locationHeader, styles.rowBorder]}>
             <Text style={styles.rowLabel}>LOCATION</Text>
-            <View style={styles.gpsBadge}>
-              {isDetectingLocation ? (
-                <ActivityIndicator size="small" color="#4F8EF7" />
-              ) : (
-                <Text style={styles.gpsBadgeText}>📍 GPS</Text>
-              )}
+            <View style={[
+              styles.gpsBadge,
+              deviceLocation.status === "ready" && styles.gpsBadgeActive,
+              (deviceLocation.status === "denied" || deviceLocation.status === "error") && styles.gpsBadgeWarning,
+            ]}>
+              <Text style={[
+                styles.gpsBadgeText,
+                deviceLocation.status === "ready" && styles.gpsBadgeTextActive,
+                (deviceLocation.status === "denied" || deviceLocation.status === "error") && styles.gpsBadgeTextWarning,
+              ]}>
+                {deviceLocation.status === "loading" ? "Locating…" : "📍 GPS"}
+              </Text>
             </View>
           </View>
 
           <View style={styles.mapArea}>
-            <MiniMapView style={StyleSheet.absoluteFillObject} />
-            <Animated.View
-              style={[
-                styles.draggablePin,
-                { transform: pinAnim.getTranslateTransform() },
-              ]}
-              {...panResponder.panHandlers}
-            >
-              <Text style={styles.draggablePinText}>📍</Text>
-            </Animated.View>
-            <View style={styles.mapHint} pointerEvents="none">
-              <Text style={styles.mapHintText}>Drag pin to move</Text>
-            </View>
+            <MiniMapView
+              style={StyleSheet.absoluteFillObject}
+              latitude={deviceLocation.status === "ready" ? deviceLocation.latitude : undefined}
+              longitude={deviceLocation.status === "ready" ? deviceLocation.longitude : undefined}
+              isLoading={deviceLocation.status === "loading"}
+            />
+            {deviceLocation.status === "ready" ? null : (
+              <>
+                <Animated.View
+                  style={[
+                    styles.draggablePin,
+                    { transform: pinAnim.getTranslateTransform() },
+                  ]}
+                  {...panResponder.panHandlers}
+                >
+                  <Text style={styles.draggablePinText}>📍</Text>
+                </Animated.View>
+                <View style={styles.mapHint} pointerEvents="none">
+                  <Text style={styles.mapHintText}>Drag pin to move</Text>
+                </View>
+              </>
+            )}
           </View>
 
           {isManual && isEditingLocation ? (
@@ -476,6 +514,39 @@ export const ClassificationScreen = ({
               ) : null}
             </View>
           )}
+          <View style={styles.addressRow}>
+            <View style={styles.addressIcon}>
+              {deviceLocation.status === "loading" ? (
+                <ActivityIndicator size="small" color="#4F8EF7" />
+              ) : (
+                <Text>📍</Text>
+              )}
+            </View>
+            <View style={{ flex: 1 }}>
+              {deviceLocation.status === "loading" ? (
+                <Text style={styles.addressMain}>Getting your location…</Text>
+              ) : deviceLocation.status === "denied" || deviceLocation.status === "error" ? (
+                <>
+                  <Text style={styles.addressMain}>{fallbackMain}</Text>
+                  <Text style={styles.addressSub}>{deviceLocation.message}</Text>
+                </>
+              ) : (
+                <>
+                  <Text style={styles.addressMain}>{locationMainLine}</Text>
+                  <Text style={styles.addressSub}>{locationSubLine}</Text>
+                </>
+              )}
+            </View>
+            {(deviceLocation.status === "denied" || deviceLocation.status === "error") && (
+              <Pressable
+                onPress={() => void deviceLocation.refresh()}
+                accessibilityRole="button"
+                accessibilityLabel="Retry location"
+              >
+                <Text style={styles.retryLink}>Retry</Text>
+              </Pressable>
+            )}
+          </View>
         </View>
 
         <View style={styles.routingCard}>
@@ -487,7 +558,24 @@ export const ClassificationScreen = ({
 
       <View style={styles.ctaBar}>
         <Pressable
-          onPress={handleConfirmPress}
+          onPress={() => {
+            if (isSubmitting) {
+              return;
+            }
+            void onConfirm({
+              category,
+              tag,
+              desc,
+              locationMain: locationMainLine,
+              locationSub: locationSubLine,
+              ...(deviceLocation.status === "ready"
+                ? {
+                    latitude: deviceLocation.latitude,
+                    longitude: deviceLocation.longitude,
+                  }
+                : {}),
+            });
+          }}
           style={[styles.submitButton, isSubmitting ? styles.submitButtonDisabled : null]}
           disabled={isSubmitting}
           accessibilityRole="button"
@@ -648,12 +736,16 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   gpsBadge: {
-    backgroundColor: '#4F8EF728',
+    backgroundColor: '#2C2D32',
     borderRadius: 6,
     paddingHorizontal: 6,
     paddingVertical: 2,
   },
-  gpsBadgeText: { color: '#4F8EF7', fontSize: 10, fontWeight: "600" },
+  gpsBadgeActive: { backgroundColor: '#4F8EF728' },
+  gpsBadgeWarning: { backgroundColor: '#F0A03028' },
+  gpsBadgeText: { color: '#8D939E', fontSize: 10, fontWeight: "600" },
+  gpsBadgeTextActive: { color: '#4F8EF7' },
+  gpsBadgeTextWarning: { color: '#F0A030' },
 
   mapArea: {
     height: 130,
@@ -701,7 +793,7 @@ const styles = StyleSheet.create({
   },
   addressMain: { fontSize: 14, fontWeight: "700", color: '#F2F3F5' },
   addressSub: { fontSize: 12, color: '#8D939E', marginTop: 1 },
-  editLink: { color: '#8D939E', fontSize: 12, fontWeight: "600" },
+  retryLink: { color: '#4F8EF7', fontSize: 12, fontWeight: "600" },
 
   routingCard: {
     backgroundColor: '#222428',
