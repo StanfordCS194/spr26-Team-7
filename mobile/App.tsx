@@ -1,6 +1,8 @@
 import { StatusBar } from 'expo-status-bar';
 import * as ImagePicker from 'expo-image-picker';
-import { ActivityIndicator, Alert, SafeAreaView, StyleSheet, View } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { ActivityIndicator, Alert, StyleSheet, View } from 'react-native';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { useEffect, useState } from 'react';
 import { useAuth } from './src/providers/AuthProvider';
 import { BottomNav } from './src/components/BottomNav';
@@ -15,12 +17,12 @@ import { RecurringIssueDetailScreen } from './src/screens/RecurringIssueDetailSc
 import { AuthScreen } from './src/screens/AuthScreen';
 import { SampleIssuePickerScreen } from './src/screens/SampleIssuePickerScreen';
 import { AppTab, IssueCategory, ReportRecord, ReportStatus, SampleIssueImage, SampleIssueRecord } from './src/types';
-import { MapReport, MapReportCategoryId } from './src/data/mockMapReports';
+import { MapReport, MapReportCategoryId, MOCK_MAP_REPORTS } from './src/data/mockMapReports';
 import { ChronicSpot } from './src/data/dashboard311';
 import { sampleIssues } from './src/data/sampleIssues';
 import { sendReportEmail } from './src/lib/reportEmail';
 import { ProfileReport } from './src/lib/profileStats';
-import { createReport, fetchReportsByIds, fetchUserReports, getSampleIssueIdFromRow, ReportRow, reportRowToMapReport } from './src/lib/reports';
+import { createReport, fetchReportByExternalId, fetchReportsByIds, fetchUserReports, getSampleIssueIdFromRow, ReportRow, reportRowToMapReport } from './src/lib/reports';
 import { fetchFollowedReportIds, followReport, unfollowReport } from './src/lib/reportFollows';
 
 const CATEGORY_LABEL: Record<MapReportCategoryId, IssueCategory> = {
@@ -49,6 +51,9 @@ const STATUS_MAP: Record<string, ReportStatus> = {
   'In Progress': 'In Progress',
   'Closed':      'Resolved',
 };
+
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+const LOCAL_DASHBOARD_FOLLOWS_KEY_PREFIX = 'cityfix:dashboard-follows:';
 
 function mapReportToRecord(r: MapReport, isFollowing = false): ReportRecord {
   const category = CATEGORY_LABEL[r.categoryId];
@@ -81,11 +86,13 @@ function mapReportToRecord(r: MapReport, isFollowing = false): ReportRecord {
 type ReportSubmission = {
   mapReport: MapReport;
   sampleIssue: SampleIssueRecord | null;
+  externalId?: string | null;
   image?: SampleIssueImage | null;
 };
 
 const rowToSubmission = (row: ReportRow): ReportSubmission => ({
   mapReport: reportRowToMapReport(row),
+  externalId: row.external_id,
   sampleIssue: (() => {
     const sampleIssueId = getSampleIssueIdFromRow(row);
     return sampleIssueId
@@ -93,6 +100,35 @@ const rowToSubmission = (row: ReportRow): ReportSubmission => ({
       : null;
   })(),
 });
+
+const dashboardSubmissionFromExternalId = (externalId: string): ReportSubmission | null => {
+  const mapReport = MOCK_MAP_REPORTS.find((report) => report.id === externalId);
+  return mapReport ? { mapReport, sampleIssue: null, externalId } : null;
+};
+
+const localDashboardFollowsKey = (userId: string) =>
+  `${LOCAL_DASHBOARD_FOLLOWS_KEY_PREFIX}${userId}`;
+
+const readLocalDashboardFollowIds = async (userId: string): Promise<string[]> => {
+  const raw = await AsyncStorage.getItem(localDashboardFollowsKey(userId));
+  if (!raw) {
+    return [];
+  }
+
+  try {
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed.filter((item): item is string => typeof item === 'string') : [];
+  } catch {
+    return [];
+  }
+};
+
+const writeLocalDashboardFollowIds = async (userId: string, reportIds: string[]) => {
+  await AsyncStorage.setItem(
+    localDashboardFollowsKey(userId),
+    JSON.stringify(Array.from(new Set(reportIds))),
+  );
+};
 
 const toProfileReport = (mapReport: MapReport): ProfileReport => ({
   id: mapReport.id,
@@ -148,15 +184,31 @@ export default function App() {
   const [followedReportIds, setFollowedReportIds]     = useState<Set<string>>(new Set());
   const [followUpdatingId, setFollowUpdatingId]       = useState<string | null>(null);
 
-  const isFollowingReport = (reportId: string) => followedReportIds.has(reportId);
+  const isFollowingReport = (reportId: string) =>
+    followedReportIds.has(reportId) ||
+    followedSubmissions.some((submission) => submission.externalId === reportId);
 
   const findReportSubmission = (reportId: string) =>
     userSubmissions.find((s) => s.mapReport.id === reportId)
-    ?? followedSubmissions.find((s) => s.mapReport.id === reportId);
+    ?? followedSubmissions.find((s) => s.mapReport.id === reportId || s.externalId === reportId);
 
-  const loadFollowedSubmissions = async (followIds: string[]) => {
+  const loadFollowedSubmissions = async (
+    followIds: string[],
+    localDashboardFollowIds: string[] = [],
+  ) => {
     const rows = await fetchReportsByIds(followIds);
-    return rows.map(rowToSubmission);
+    const databaseSubmissions = rows.map(rowToSubmission);
+    const databaseExternalIds = new Set(
+      databaseSubmissions
+        .map((submission) => submission.externalId)
+        .filter((externalId): externalId is string => Boolean(externalId)),
+    );
+    const localDashboardSubmissions = localDashboardFollowIds
+      .filter((externalId) => !databaseExternalIds.has(externalId))
+      .map(dashboardSubmissionFromExternalId)
+      .filter((submission): submission is ReportSubmission => Boolean(submission));
+
+    return [...databaseSubmissions, ...localDashboardSubmissions];
   };
 
   const updateSubmissionImage = (reportId: string, image: SampleIssueImage | null) => {
@@ -258,45 +310,95 @@ export default function App() {
       return;
     }
 
-    const wasFollowing = isFollowingReport(reportId);
-    const submissionBeforeToggle = findReportSubmission(reportId);
     setFollowUpdatingId(reportId);
-    setFollowedReportIds((prev) => {
-      const next = new Set(prev);
-      if (wasFollowing) {
-        next.delete(reportId);
-      } else {
-        next.add(reportId);
-      }
-      return next;
-    });
-    if (wasFollowing) {
-      setFollowedSubmissions((prev) => prev.filter((s) => s.mapReport.id !== reportId));
-    }
-
     try {
+      const wasFollowing = isFollowingReport(reportId);
+      const existingSubmission = findReportSubmission(reportId);
+      let dashboardRow: ReportRow | null = null;
+      if (!UUID_PATTERN.test(reportId)) {
+        try {
+          dashboardRow = await fetchReportByExternalId(reportId);
+        } catch (error) {
+          console.warn('[reports] dashboard external lookup failed; using local follow fallback', error);
+        }
+      }
+      const targetReportId = existingSubmission?.mapReport.id ?? dashboardRow?.id ?? reportId;
+      const targetSubmission =
+        existingSubmission ??
+        (dashboardRow ? rowToSubmission(dashboardRow) : dashboardSubmissionFromExternalId(reportId));
+
+      if (!UUID_PATTERN.test(targetReportId)) {
+        const localSubmission = targetSubmission ?? dashboardSubmissionFromExternalId(reportId);
+        if (!localSubmission) {
+          Alert.alert('Could not follow issue', 'This dashboard issue is missing from the local issue list.');
+          return;
+        }
+
+        const localFollowIds = await readLocalDashboardFollowIds(user.id);
+        const nextLocalFollowIds = wasFollowing
+          ? localFollowIds.filter((id) => id !== reportId)
+          : [...localFollowIds, reportId];
+        await writeLocalDashboardFollowIds(user.id, nextLocalFollowIds);
+
+        setFollowedReportIds((prev) => {
+          const next = new Set(prev);
+          if (wasFollowing) {
+            next.delete(reportId);
+          } else {
+            next.add(reportId);
+          }
+          return next;
+        });
+        setFollowedSubmissions((prev) => {
+          if (wasFollowing) {
+            return prev.filter((s) => s.externalId !== reportId && s.mapReport.id !== reportId);
+          }
+          if (prev.some((s) => s.externalId === reportId || s.mapReport.id === reportId)) {
+            return prev;
+          }
+          return [localSubmission, ...prev];
+        });
+        return;
+      }
+
+      setFollowedReportIds((prev) => {
+        const next = new Set(prev);
+        if (wasFollowing) {
+          next.delete(reportId);
+          next.delete(targetReportId);
+        } else {
+          next.add(reportId);
+          next.add(targetReportId);
+        }
+        return next;
+      });
       if (wasFollowing) {
-        await unfollowReport(user.id, reportId);
+        setFollowedSubmissions((prev) =>
+          prev.filter((s) => s.mapReport.id !== targetReportId && s.externalId !== reportId),
+        );
+      }
+
+      if (wasFollowing) {
+        await unfollowReport(user.id, targetReportId);
       } else {
-        await followReport(user.id, reportId);
-        if (submissionBeforeToggle) {
+        await followReport(user.id, targetReportId);
+        if (targetSubmission) {
           setFollowedSubmissions((prev) => {
-            if (prev.some((s) => s.mapReport.id === reportId)) {
+            if (prev.some((s) => s.mapReport.id === targetReportId || s.externalId === reportId)) {
               return prev;
             }
-            return [submissionBeforeToggle, ...prev];
+            return [targetSubmission, ...prev];
           });
-        } else {
-          const rows = await fetchReportsByIds([reportId]);
-          if (rows[0]) {
-            setFollowedSubmissions((prev) => [rowToSubmission(rows[0]), ...prev]);
-          }
         }
       }
     } catch (error) {
       console.error('[report_follows] update failed', error);
       setFollowedReportIds(new Set(followedReportIds));
-      void loadFollowedSubmissions(Array.from(followedReportIds)).then(setFollowedSubmissions);
+      void (async () => {
+        const localDashboardFollowIds = user?.id ? await readLocalDashboardFollowIds(user.id) : [];
+        const followed = await loadFollowedSubmissions(Array.from(followedReportIds), localDashboardFollowIds);
+        setFollowedSubmissions(followed);
+      })();
       Alert.alert('Could not update follow', 'Please try again.');
     } finally {
       setFollowUpdatingId(null);
@@ -381,17 +483,18 @@ export default function App() {
     const loadUserData = async () => {
       setIsLoadingReports(true);
       try {
-        const [rows, followIds] = await Promise.all([
+        const [rows, followIds, localDashboardFollowIds] = await Promise.all([
           fetchUserReports(user.id),
           fetchFollowedReportIds(user.id),
+          readLocalDashboardFollowIds(user.id),
         ]);
         if (!isMounted) {
           return;
         }
 
-        setFollowedReportIds(new Set(followIds));
+        setFollowedReportIds(new Set([...followIds, ...localDashboardFollowIds]));
         setUserSubmissions(rows.map(rowToSubmission));
-        const followed = await loadFollowedSubmissions(followIds);
+        const followed = await loadFollowedSubmissions(followIds, localDashboardFollowIds);
         if (!isMounted) {
           return;
         }
@@ -664,35 +767,39 @@ export default function App() {
 
   if (isLoading || isLoadingReports) {
     return (
-      <SafeAreaView style={styles.safeArea}>
-        <StatusBar style="light" />
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#4F8EF7" />
-        </View>
-      </SafeAreaView>
+      <SafeAreaProvider>
+        <SafeAreaView style={styles.safeArea}>
+          <StatusBar style="light" />
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color="#4F8EF7" />
+          </View>
+        </SafeAreaView>
+      </SafeAreaProvider>
     );
   }
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <StatusBar style="light" />
-      <View style={styles.container}>
-        {isSignedIn || isGuestSession ? (
-          renderCurrentTab()
-        ) : (
-          <AuthScreen onContinueAsGuest={() => setIsGuestSession(true)} />
+    <SafeAreaProvider>
+      <SafeAreaView style={styles.safeArea}>
+        <StatusBar style="light" />
+        <View style={styles.container}>
+          {isSignedIn || isGuestSession ? (
+            renderCurrentTab()
+          ) : (
+            <AuthScreen onContinueAsGuest={() => setIsGuestSession(true)} />
+          )}
+        </View>
+        {showNav && (
+          <BottomNav
+            currentTab={currentTab}
+            onChangeTab={(tab) => {
+              setShowAuthScreen(false);
+              setCurrentTab(tab);
+            }}
+          />
         )}
-      </View>
-      {showNav && (
-        <BottomNav
-          currentTab={currentTab}
-          onChangeTab={(tab) => {
-            setShowAuthScreen(false);
-            setCurrentTab(tab);
-          }}
-        />
-      )}
-    </SafeAreaView>
+      </SafeAreaView>
+    </SafeAreaProvider>
   );
 }
 
