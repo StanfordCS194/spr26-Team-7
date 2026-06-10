@@ -13,7 +13,10 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "CityFix uses your location to attach your report to the correct address and map pin."
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -21,10 +24,23 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "permissions": [
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "plugins": [
+      "expo-mail-composer",
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "CityFix uses your location to attach your report to the correct address and map pin."
+        }
+      ]
+    ]
   }
 }

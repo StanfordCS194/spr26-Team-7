@@ -56,9 +56,13 @@ const DistrictPicker = ({ visible, current, onSelect, onClose }: PickerProps) =>
 type DashboardScreenProps = {
   onViewReport?:      (report: MapReport)   => void
   onViewChronicSpot?: (spot: ChronicSpotV2) => void
+  extraReports?:      MapReport[]
+  focusReport?:       MapReport | null
+  onFocusConsumed?:   () => void
+  reportImages?:      Record<string, import('../types').SampleIssueImage>
 }
 
-export const DashboardScreen = ({ onViewReport, onViewChronicSpot }: DashboardScreenProps) => {
+export const DashboardScreen = ({ onViewReport, onViewChronicSpot, extraReports, focusReport, onFocusConsumed, reportImages }: DashboardScreenProps) => {
   const { dashboardV2 } = useDashboardData()
   const [district,      setDistrict]      = useState(3)
   const [pickerVisible, setPickerVisible] = useState(false)
@@ -140,6 +144,10 @@ export const DashboardScreen = ({ onViewReport, onViewChronicSpot }: DashboardSc
           <DashboardMap
             district={district}
             onViewReport={onViewReport ?? (() => {})}
+            extraReports={extraReports}
+            focusReport={focusReport}
+            onFocusConsumed={onFocusConsumed}
+            reportImages={reportImages}
           />
         </View>
 

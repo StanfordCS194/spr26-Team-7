@@ -3,7 +3,7 @@ import {
   Animated, Pressable, ScrollView, StyleSheet, Text, View,
 } from 'react-native'
 import MapView, { Marker, Region } from 'react-native-maps'
-import Svg, { Defs, Line, Path, Pattern, Rect } from 'react-native-svg'
+import Svg, { Defs, Path, Pattern, Rect } from 'react-native-svg'
 import {
   ALL_CATEGORY_IDS, CATEGORY_CONFIG, DISTRICT_CENTERS, MOCK_MAP_REPORTS,
   MapReport, MapReportCategoryId, MapReportStatus,
@@ -26,7 +26,7 @@ const D = {
   red:      '#E8514A',
 } as const
 
-// ── SVG icon paths (shared with InsightsScreen) ────────────────────────────────
+// ── SVG icon paths ─────────────────────────────────────────────────────────────
 const ICON_PATH: Record<string, string> = {
   junk:        'M3 6h18M8 6V4.2A1.2 1.2 0 0 1 9.2 3h5.6A1.2 1.2 0 0 1 16 4.2V6M6 6l.9 13.2A1.6 1.6 0 0 0 8.5 21h7A1.6 1.6 0 0 0 17.1 19.2L18 6',
   graffiti:    'M9 11V5.5a1.5 1.5 0 0 1 1.5-1.5H12M7 11h6v9a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1zM14 4l1.5 1M15.5 7l1.8.3M15 10l1.7-.6',
@@ -156,7 +156,7 @@ function PulseRing({ color }: { color: string }) {
 }
 
 // ── ReportMarkerView ───────────────────────────────────────────────────────────
-const BADGE_H  = 26  // time badge height
+const BADGE_H  = 26
 const BADGE_GAP = 5
 const DOT_SIZE  = 34
 
@@ -319,19 +319,23 @@ function CategoryBar({
 }
 
 // ── Main component ─────────────────────────────────────────────────────────────
-type Props = { district: number; onViewReport: (report: MapReport) => void }
+type Props = {
+  district: number
+  onViewReport: (report: MapReport) => void
+  extraReports?: MapReport[]
+  focusReport?: MapReport | null
+  onFocusConsumed?: () => void
+  reportImages?: Record<string, unknown>
+}
 
 const CARD_W  = 252
-const CARD_H  = 96   // photo(64) + padding(22) + meta row = 96
-const FILTER_H = 116  // paddingTop(8) + row1(38) + gap(9) + row2(43) + paddingBottom(12) + border(1) ≈ 116
+const CARD_H  = 96
+const FILTER_H = 116
 
-// Anchor y = center of dot from top of the total marker view
 const ANCHOR_Y_WITH_BADGE    = (BADGE_H + BADGE_GAP + DOT_SIZE / 2) / (BADGE_H + BADGE_GAP + DOT_SIZE)
-const ANCHOR_Y_WITHOUT_BADGE = (BADGE_H + BADGE_GAP + DOT_SIZE / 2) / (BADGE_H + BADGE_GAP + DOT_SIZE)
-// Both views have same height (badge area always reserved), so anchor is the same
 const MARKER_ANCHOR = { x: 0.5, y: ANCHOR_Y_WITH_BADGE }
 
-export const DashboardMap = ({ district, onViewReport }: Props) => {
+export const DashboardMap = ({ district, onViewReport, extraReports, focusReport, onFocusConsumed }: Props) => {
   const mapRef       = useRef<MapView>(null)
   const currentRegion= useRef<Region>({
     latitude: DISTRICT_CENTERS[district]?.latitude  ?? 37.338,
@@ -351,11 +355,26 @@ export const DashboardMap = ({ district, onViewReport }: Props) => {
 
   const center = DISTRICT_CENTERS[district] ?? DISTRICT_CENTERS[3]
 
-  // ── Filtering ────────────────────────────────────────────────────────────────
+  useEffect(() => {
+    if (!focusReport) return
+    mapRef.current?.animateToRegion({
+      latitude: focusReport.lat,
+      longitude: focusReport.lon,
+      latitudeDelta: 0.003,
+      longitudeDelta: 0.003,
+    }, 800)
+    onFocusConsumed?.()
+  }, [focusReport])
+
+  const allReports = useMemo(
+    () => [...MOCK_MAP_REPORTS, ...(extraReports ?? [])],
+    [extraReports],
+  )
+
   const filtered = useMemo(() => {
     const now      = Date.now()
     const maxAgeMs = TIME_OPTS.find(o => o.id === timeFilter)!.maxAgeMs
-    return MOCK_MAP_REPORTS.filter(r => {
+    return allReports.filter(r => {
       if (r.district !== district) return false
       if (catFilter !== 'all' && r.categoryId !== catFilter) return false
       if (statusFilter === 'unresolved' && !isUnresolved(r.status)) return false
@@ -363,7 +382,7 @@ export const DashboardMap = ({ district, onViewReport }: Props) => {
       if (now - r.createdAt.getTime() > maxAgeMs) return false
       return true
     })
-  }, [district, catFilter, timeFilter, statusFilter])
+  }, [allReports, district, catFilter, timeFilter, statusFilter])
 
   const clustered = useMemo(() => clusterReports(filtered, latDelta), [filtered, latDelta])
 
@@ -374,8 +393,8 @@ export const DashboardMap = ({ district, onViewReport }: Props) => {
   }, [filtered])
 
   const unresolvedTotal = useMemo(
-    () => MOCK_MAP_REPORTS.filter(r => r.district === district && isUnresolved(r.status)).length,
-    [district],
+    () => allReports.filter(r => r.district === district && isUnresolved(r.status)).length,
+    [allReports, district],
   )
 
   const selectedReport = useMemo(
@@ -383,10 +402,8 @@ export const DashboardMap = ({ district, onViewReport }: Props) => {
     [filtered, selectedId],
   )
 
-  // ── Close menus helper ────────────────────────────────────────────────────────
   const closeMenus = () => { setTimeMenuOpen(false); setStatMenuOpen(false) }
 
-  // ── Pin tap → navigate directly ───────────────────────────────────────────────
   const handlePinTap = (report: MapReport) => {
     closeMenus()
     setSelectedId(null)
@@ -394,27 +411,23 @@ export const DashboardMap = ({ district, onViewReport }: Props) => {
     onViewReport(report)
   }
 
-  // ── Card position math ────────────────────────────────────────────────────────
   const cardLayout = useMemo(() => {
     if (!cardPos) return null
     const { width: W } = containerSize.current
     const left = Math.max(8, Math.min(cardPos.x - CARD_W / 2, W - CARD_W - 8))
     const pinY = cardPos.y
-    // Show above pin if there's room; below otherwise
     const filterAreaTop = containerSize.current.height - FILTER_H
     const above = pinY > CARD_H + 60 && pinY < filterAreaTop - 20
     const top   = above ? pinY - CARD_H - 30 : pinY + 28
     return { left, top }
   }, [cardPos])
 
-  // ── Region change ─────────────────────────────────────────────────────────────
   const handleRegionChange = (region: Region) => {
     currentRegion.current = region
     setLatDelta(region.latitudeDelta)
     const { width: W, height: H } = containerSize.current
 
     if (region.latitudeDelta < 0.018) {
-      // Proximity card: find the nearest visible pin within threshold
       const threshold = region.latitudeDelta * 0.35
       let nearest: MapReport | null = null
       let minDist = Infinity
@@ -435,7 +448,6 @@ export const DashboardMap = ({ district, onViewReport }: Props) => {
     }
   }
 
-  // ── Recenter ──────────────────────────────────────────────────────────────────
   const handleRecenter = () => {
     mapRef.current?.animateToRegion({
       latitude: center.latitude, longitude: center.longitude,
@@ -443,14 +455,10 @@ export const DashboardMap = ({ district, onViewReport }: Props) => {
     }, 400)
   }
 
-  // ── Filter labels ─────────────────────────────────────────────────────────────
   const timeLabel   = TIME_OPTS.find(o => o.id === timeFilter)!.label
   const statusLabel = STATUS_OPTS.find(o => o.id === statusFilter)!.label
   const isDefault   = catFilter === 'all' && timeFilter === 'alltime' && statusFilter === 'unresolved'
 
-  // ── Dropdown positions ────────────────────────────────────────────────────────
-  // Time menu: left-aligned with "When" pill (x=14, y=bottom + filterH + gap)
-  // Status menu: after "When" pill (approx x=150)
   const DROPDOWN_BOTTOM = FILTER_H + 6
 
   return (
@@ -554,7 +562,6 @@ export const DashboardMap = ({ district, onViewReport }: Props) => {
 
       {/* ── Filter area ── */}
       <View style={s.filterArea}>
-        {/* Row 1: time + status pills + reset */}
         <View style={s.filterRow}>
           <Pressable
             style={s.fpill}
@@ -582,7 +589,6 @@ export const DashboardMap = ({ district, onViewReport }: Props) => {
             <Text style={[s.reset, isDefault && s.resetDim]}>Reset</Text>
           </Pressable>
         </View>
-        {/* Row 2: category pills */}
         <CategoryBar active={catFilter} onSelect={id => { setCatFilter(id); closeMenus() }} />
       </View>
     </View>
