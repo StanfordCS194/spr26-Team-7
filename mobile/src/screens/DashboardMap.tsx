@@ -468,8 +468,6 @@ export const DashboardMap = ({ district, onViewReport, extraReports, focusReport
   const statusLabel = STATUS_OPTS.find(o => o.id === statusFilter)!.label
   const isDefault   = catFilter === 'all' && timeFilter === 'alltime' && statusFilter === 'unresolved'
 
-  const DROPDOWN_BOTTOM = FILTER_H + 6
-
   return (
     <View
       style={s.container}
@@ -549,28 +547,26 @@ export const DashboardMap = ({ district, onViewReport, extraReports, focusReport
         </View>
       )}
 
-      {/* ── Time dropdown ── */}
-      {timeMenuOpen && (
-        <FilterDropdown
-          options={TIME_OPTS}
-          selected={timeFilter}
-          onSelect={id => { setTimeFilter(id); setTimeMenuOpen(false) }}
-          style={[s.dropdown, { bottom: DROPDOWN_BOTTOM, left: 14 }]}
-        />
-      )}
-
-      {/* ── Status dropdown ── */}
-      {statMenuOpen && (
-        <FilterDropdown
-          options={STATUS_OPTS}
-          selected={statusFilter}
-          onSelect={id => { setStatusFilter(id); setStatMenuOpen(false) }}
-          style={[s.dropdown, { bottom: DROPDOWN_BOTTOM, left: 148 }]}
-        />
-      )}
-
       {/* ── Filter area ── */}
       <View style={s.filterArea}>
+        {/* ── Time dropdown ── */}
+        {timeMenuOpen && (
+          <FilterDropdown
+            options={TIME_OPTS}
+            selected={timeFilter}
+            onSelect={id => { setTimeFilter(id); setTimeMenuOpen(false) }}
+            style={{ bottom: '100%', left: 14, marginBottom: 8 }}
+          />
+        )}
+        {/* ── Status dropdown ── */}
+        {statMenuOpen && (
+          <FilterDropdown
+            options={STATUS_OPTS}
+            selected={statusFilter}
+            onSelect={id => { setStatusFilter(id); setStatMenuOpen(false) }}
+            style={{ bottom: '100%', left: 148, marginBottom: 8 }}
+          />
+        )}
         <View style={s.filterRow}>
           <Pressable
             style={s.fpill}
@@ -699,7 +695,6 @@ const s = StyleSheet.create({
     shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.5, shadowRadius: 8, elevation: 8,
   },
   floatingCard: { position: 'absolute', zIndex: 30 },
-  dropdown:     { zIndex: 50 },
   filterArea: {
     position: 'absolute', bottom: 0, left: 0, right: 0, zIndex: 22,
     gap: 9, paddingTop: 8, paddingBottom: 12,

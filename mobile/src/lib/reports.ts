@@ -79,12 +79,13 @@ const resolveCoordinates = (row: ReportRow) => {
 const parseTimeline = (row: ReportRow) => {
   if (Array.isArray(row.timeline) && row.timeline.length > 0) {
     return row.timeline.map((entry) => ({
-      label: String(entry.label ?? row.status),
-      dateText: String(entry.dateText ?? formatSubmittedDate(row.created_at)),
+      label:    String(entry.label ?? row.status),
+      dateText: String(entry.dateText ?? ''),
+      reached:  entry.reached !== false,
     }))
   }
 
-  return [{ label: row.status, dateText: formatSubmittedDate(row.created_at) }]
+  return [{ label: row.status, dateText: formatSubmittedDate(row.created_at), reached: true }]
 }
 
 const createExternalId = () =>

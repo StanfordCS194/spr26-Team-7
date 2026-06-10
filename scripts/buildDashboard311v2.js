@@ -15,6 +15,7 @@
 const fs       = require('fs')
 const path     = require('path')
 const readline = require('readline')
+const https    = require('https')
 
 // ── Paths ─────────────────────────────────────────────────────────────────────
 const CSV_DIR  = path.join(__dirname, '../mobile/src/data/SJ311_2017to20260512')
@@ -603,6 +604,35 @@ function buildDistrictComparison(periods) {
   }
 }
 
+// ── Geocoding helpers ─────────────────────────────────────────────────────────
+function sleep(ms) { return new Promise(resolve => setTimeout(resolve, ms)) }
+
+function reverseGeocode(lat, lon) {
+  return new Promise(resolve => {
+    const options = {
+      hostname: 'nominatim.openstreetmap.org',
+      path: `/reverse?format=json&lat=${lat}&lon=${lon}&zoom=17&addressdetails=1`,
+      headers: { 'User-Agent': 'CityFix-SJ-Dashboard/1.0 (educational project)' },
+    }
+    const req = https.get(options, res => {
+      let data = ''
+      res.on('data', chunk => { data += chunk })
+      res.on('end', () => { try { resolve(JSON.parse(data)) } catch { resolve(null) } })
+    })
+    req.on('error', () => resolve(null))
+  })
+}
+
+function formatAddress(result) {
+  if (!result || !result.address) return null
+  const a = result.address
+  const road = a.road || a.pedestrian || a.path || a.footway || null
+  const area  = a.neighbourhood || a.suburb || a.quarter || null
+  if (road && area) return `${road}, ${area}`
+  if (road) return `${road}, San Jose`
+  return null
+}
+
 // ── V2 recurring issues: incident-cycle algorithm ─────────────────────────────
 const INCIDENT_GAP_MS = 30 * 24 * 60 * 60 * 1000
 
@@ -645,6 +675,7 @@ function buildRecurringIssues(d, v1Spots) {
 
   return selected.map((e, spotIdx) => {
     const [latStr, lonStr] = e.key.split(',')
+    const lat = parseFloat(latStr)
     const lon = parseFloat(lonStr)
 
     const allEvents = (chronicSequences[d]?.[e.key] ?? [])
@@ -708,10 +739,10 @@ function buildRecurringIssues(d, v1Spots) {
     }))
 
     // Reuse V1 geocoded address by positional index (same selection algorithm → same spots)
-    const location = v1Spots[spotIdx]?.location
-      ?? `${latStr}°N, ${Math.abs(lon).toFixed(3)}°W`
+    const v1Location = v1Spots[spotIdx]?.location
+    const location = v1Location ?? `${latStr}°N, ${Math.abs(lon).toFixed(3)}°W`
 
-    return {
+    const spotObj = {
       count:            e.count,
       location,
       issueType:        TYPE_META[e.dominantType]?.name ?? e.dominantType,
@@ -725,6 +756,8 @@ function buildRecurringIssues(d, v1Spots) {
       timelineEvents,
       recentActivity,
     }
+    if (!v1Location) { spotObj._lat = lat; spotObj._lon = lon }
+    return spotObj
   })
 }
 
@@ -778,6 +811,28 @@ async function main() {
   }
 
   const districtComparison = buildDistrictComparison(periods)
+
+  // ── Geocode spots that have no V1 address ─────────────────────────────────
+  const geoCache = {}
+  let geocodeCount = 0
+  for (const dKey of Object.keys(districts)) {
+    for (const spot of districts[dKey].recurringIssues) {
+      if (spot._lat == null) continue
+      const cacheKey = `${spot._lat.toFixed(4)},${spot._lon.toFixed(4)}`
+      if (!geoCache[cacheKey]) {
+        if (geocodeCount > 0) await sleep(1200)
+        process.stdout.write(`  Geocoding ${cacheKey}…`)
+        const result = await reverseGeocode(spot._lat, spot._lon)
+        geoCache[cacheKey] = formatAddress(result) ?? null
+        process.stdout.write(` ${geoCache[cacheKey] ?? 'no result'}\n`)
+        geocodeCount++
+      }
+      if (geoCache[cacheKey]) spot.location = geoCache[cacheKey]
+      delete spot._lat
+      delete spot._lon
+    }
+  }
+  if (geocodeCount > 0) console.log(`Geocoded ${geocodeCount} spots.`)
 
   const output = {
     meta: {

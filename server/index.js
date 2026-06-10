@@ -165,6 +165,24 @@ function load2026CSVForMatching() {
   })
 }
 
+// ── Timeline helpers ──────────────────────────────────────────────────────────
+const STATUS_TO_TIMELINE_LABEL = { 'Open': 'Received', 'In Progress': 'In Progress', 'Closed': 'Resolved' }
+const ALL_TIMELINE_STAGES = ['Submitted', 'Received', 'In Progress', 'Resolved']
+
+function buildUpdatedTimeline(currentTimeline, newStatus) {
+  const dateStr = new Date().toISOString().slice(0, 10)
+  const newLabel = STATUS_TO_TIMELINE_LABEL[newStatus]
+  if (!newLabel) return currentTimeline ?? []
+  const newLabelIdx = ALL_TIMELINE_STAGES.indexOf(newLabel)
+  return ALL_TIMELINE_STAGES.map((stage, i) => {
+    const existing = (currentTimeline ?? []).find(e => e.label === stage)
+    if (i <= newLabelIdx) {
+      return { label: stage, dateText: existing?.dateText || dateStr, reached: true }
+    }
+    return { label: stage, reached: false }
+  })
+}
+
 // ── Matching job ──────────────────────────────────────────────────────────────
 async function runMatchingJob() {
   if (!supabaseAdmin) {
@@ -179,7 +197,7 @@ async function runMatchingJob() {
   const fourteenDaysAgo = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString()
   const { data: reports, error } = await supabaseAdmin
     .from('reports')
-    .select('id, category, status, pin, created_at')
+    .select('id, category, status, pin, created_at, timeline')
     .neq('status', 'Closed')
     .gte('created_at', fourteenDaysAgo)
 
@@ -214,9 +232,10 @@ async function runMatchingJob() {
     if (bestRow) {
       const newStatus = map311Status(bestRow.status)
       if (newStatus !== report.status) {
+        const newTimeline = buildUpdatedTimeline(report.timeline, newStatus)
         const { error: updateErr } = await supabaseAdmin
           .from('reports')
-          .update({ status: newStatus, updated_at: new Date().toISOString() })
+          .update({ status: newStatus, timeline: newTimeline, updated_at: new Date().toISOString() })
           .eq('id', report.id)
         if (!updateErr) {
           if (report.status === 'Submitted') matched++

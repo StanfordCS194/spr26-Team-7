@@ -24,7 +24,7 @@ export type MapReport = {
   createdAt:   Date
   description: string
   assignedTo:  string
-  timeline:    { label: string; dateText: string }[]
+  timeline:    { label: string; dateText: string; reached?: boolean }[]
 }
 
 // Category display config — icon names from @expo/vector-icons MaterialCommunityIcons

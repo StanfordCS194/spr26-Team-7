@@ -10,7 +10,6 @@ import { useDashboardData } from '../context/DashboardContext'
 type Period     = 'month' | 'year'
 type CatView    = 'fixtime' | 'resrate' | 'volume'
 type TrendScale = 'month'  | 'year'
-type RecurView  = 'volume' | 'location'
 
 // ─── Palette ─────────────────────────────────────────────────────────────────
 const D = {
@@ -162,10 +161,8 @@ export function InsightsScreen({ district, onDistrictChange, onViewChronicSpot }
   const [catView,     setCatView]     = useState<CatView>('fixtime')
   const [trendScale,  setTrendScale]  = useState<TrendScale>('month')
   const [compareKey,  setCompareKey]  = useState<string>('cityAverage')
-  const [recurView,   setRecurView]   = useState<RecurView>('volume')
   const [showCompare, setShowCompare] = useState(false)
   const [showInfo,    setShowInfo]    = useState(false)
-  const [openType,    setOpenType]    = useState<string | null | undefined>(undefined)
 
   const distStr  = String(district)
   const distData = dashboardV2.districts[distStr]
@@ -257,25 +254,12 @@ export function InsightsScreen({ district, onDistrictChange, onViewChronicSpot }
 
   // ── Section 6: Recurring ─────────────────────────────────────────────────
   const topRecur = useMemo(
-    () => [...distData.recurringIssues].sort((a, b) => b.count - a.count).slice(0, 3),
+    () => [...distData.recurringIssues]
+      .filter(s => !s.location.includes('°') && fmtLocation(s.location) !== 'Unknown Location')
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 5),
     [distData],
   )
-
-  const recurByType = useMemo(() => {
-    const g: Record<string, ChronicSpotV2[]> = {}
-    for (const sp of distData.recurringIssues) {
-      if (!g[sp.issueType]) g[sp.issueType] = []
-      g[sp.issueType].push(sp)
-    }
-    return g
-  }, [distData])
-
-  const typeKeys = useMemo(
-    () => Object.keys(recurByType).sort((a, b) => recurByType[b].length - recurByType[a].length),
-    [recurByType],
-  )
-
-  const openKey = openType === undefined ? (typeKeys[0] ?? null) : openType
 
   const navigateTo = (spot: ChronicSpotV2) =>
     onViewChronicSpot?.({
@@ -599,76 +583,31 @@ export function InsightsScreen({ district, onDistrictChange, onViewChronicSpot }
           <Text style={s.secH2}>Recurring Issues</Text>
           <Text style={s.secRight}>Since 2017</Text>
         </View>
-        <View style={[s.seg, { marginBottom: 14 }]}>
-          {([['volume','By Volume'],['location','By Location']] as [RecurView,string][]).map(([k,lbl]) => (
-            <Pressable key={k} style={[s.segBtn, recurView === k && s.segBtnOn]} onPress={() => setRecurView(k)}>
-              <Text style={[s.segText, recurView === k && s.segTextOn]}>{lbl}</Text>
+        <View style={{ gap: 10 }}>
+          {topRecur.map((spot, i) => (
+            <Pressable key={`${i}:${spot.issueType}:${spot.location}`} style={s.recurItem} onPress={() => navigateTo(spot)}>
+              <CatSquare type={spot.issueType} size={38} radius={10} />
+              <View style={s.recurBody}>
+                <Text style={s.recurTitle}>{spot.location}</Text>
+                <Text style={s.recurLoc}>{spot.issueType}</Text>
+                <Text style={s.recurMeta}>
+                  <Text style={{ color: D.text, fontWeight: '600' }}>{fmtNum(spot.count)}</Text>
+                  {' reports · '}
+                  <Text style={{ color: D.text, fontWeight: '600' }}>{spot.reopenCount}</Text>
+                  {` recurrences since ${spot.since}`}
+                </Text>
+                {spot.maxConsecYears >= 9 && (
+                  <View style={s.badge}>
+                    <Text style={s.badgeText}>↻ Reported every year since {spot.since}</Text>
+                  </View>
+                )}
+              </View>
+              <View style={{ flexShrink: 0, marginTop: 2 }}>
+                <ChevRight size={18} />
+              </View>
             </Pressable>
           ))}
         </View>
-
-        {recurView === 'volume' ? (
-          <View style={{ gap: 10 }}>
-            {topRecur.map(spot => (
-              <Pressable key={`${spot.issueType}:${spot.location}`} style={s.recurItem} onPress={() => navigateTo(spot)}>
-                <CatSquare type={spot.issueType} size={38} radius={10} />
-                <View style={s.recurBody}>
-                  <Text style={s.recurTitle}>{spot.issueType}</Text>
-                  <Text style={s.recurLoc}>{spot.location}</Text>
-                  <Text style={s.recurMeta}>
-                    <Text style={{ color: D.text, fontWeight: '600' }}>{fmtNum(spot.count)}</Text>
-                    {' reports · '}
-                    <Text style={{ color: D.text, fontWeight: '600' }}>{spot.reopenCount}</Text>
-                    {` recurrences since ${spot.since}`}
-                  </Text>
-                  {spot.maxConsecYears >= 9 && (
-                    <View style={s.badge}>
-                      <Text style={s.badgeText}>↻ Reported every year since {spot.since}</Text>
-                    </View>
-                  )}
-                </View>
-                <View style={{ flexShrink: 0, marginTop: 2 }}>
-                  <ChevRight size={18} />
-                </View>
-              </Pressable>
-            ))}
-          </View>
-        ) : (
-          <View style={{ gap: 8 }}>
-            {typeKeys.map(type => {
-              const spots  = [...recurByType[type]].sort((a, b) => b.count - a.count)
-              const isOpen = openKey === type
-              return (
-                <View key={type} style={s.accGroup}>
-                  <Pressable style={s.accHead} onPress={() => setOpenType(isOpen ? null : type)}>
-                    <CatSquare type={type} size={30} radius={8} />
-                    <Text style={s.accName}>{type}</Text>
-                    <Text style={s.accCount}>{spots.length} recurring spots</Text>
-                    <Svg width={17} height={17} viewBox="0 0 24 24" fill="none"
-                      style={{ transform: [{ rotate: isOpen ? '180deg' : '0deg' }] }}>
-                      <Path d="M6 9l6 6 6-6" stroke={D.faint} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
-                    </Svg>
-                  </Pressable>
-                  {isOpen && (
-                    <View style={s.accBody}>
-                      {spots.map((spot, si) => (
-                        <Pressable
-                          key={`${spot.location}:${si}`}
-                          style={[s.accRow, si === spots.length - 1 && { borderBottomWidth: 0 }]}
-                          onPress={() => navigateTo(spot)}
-                        >
-                          <Text style={s.accLoc} numberOfLines={1}>{fmtLocation(spot.location)}</Text>
-                          <Text style={s.accMeta}>{fmtNum(spot.count)} reports · {spot.reopenCount} recurrences</Text>
-                          <ChevRight size={16} />
-                        </Pressable>
-                      ))}
-                    </View>
-                  )}
-                </View>
-              )
-            })}
-          </View>
-        )}
       </View>
 
       <Text style={s.footer}>CityFix · San José 311 · data refreshed today</Text>
@@ -774,16 +713,6 @@ const s = StyleSheet.create({
   recurMeta:  { fontSize: 12.5, color: '#8D939E', marginTop: 7 },
   badge:      { alignSelf: 'flex-start', flexDirection: 'row', alignItems: 'center', marginTop: 9, backgroundColor: 'rgba(91,155,248,0.14)', borderWidth: 1, borderColor: 'rgba(91,155,248,0.3)', borderRadius: 20, paddingVertical: 4, paddingHorizontal: 9 },
   badgeText:  { fontSize: 10.5, fontWeight: '600', color: '#7EB4F5', letterSpacing: 0.2 },
-
-  // Accordion
-  accGroup: { backgroundColor: '#222428', borderWidth: 1, borderColor: '#313338', borderRadius: 14, overflow: 'hidden' },
-  accHead:  { flexDirection: 'row', alignItems: 'center', gap: 11, padding: 12, paddingHorizontal: 14 },
-  accName:  { flex: 1, fontSize: 14, fontWeight: '600', color: '#F2F3F5' },
-  accCount: { fontSize: 11.5, color: '#636870', paddingLeft: 8 },
-  accBody:  { borderTopWidth: 1, borderTopColor: '#313338', backgroundColor: '#1E1F22' },
-  accRow:   { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 11, paddingLeft: 22, paddingRight: 14, borderBottomWidth: 1, borderBottomColor: '#2A2B30' },
-  accLoc:   { flex: 1, fontSize: 13, color: '#D8DADF' },
-  accMeta:  { fontSize: 11.5, color: '#636870', flexShrink: 0 },
 
   // Footer
   footer: { textAlign: 'center', fontSize: 10.5, color: '#636870', paddingTop: 24, paddingBottom: 18, paddingHorizontal: 20, letterSpacing: 0.2 },
