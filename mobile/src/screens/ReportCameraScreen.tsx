@@ -1,11 +1,90 @@
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { useState } from "react";
+import { ActivityIndicator, Alert, Pressable, StyleSheet, Text, View } from "react-native";
+import * as ImagePicker from "expo-image-picker";
+import { SampleIssueImage } from "../types";
 
 type ReportCameraScreenProps = {
-  onCapture: () => void;
-  onOpenLibrary: () => void;
+  onCapture: (image: SampleIssueImage) => void;
+  onOpenLibrary: (image: SampleIssueImage) => void;
 };
 
-export const ReportCameraScreen = ({ onOpenLibrary }: ReportCameraScreenProps) => {
+export const ReportCameraScreen = ({ onCapture, onOpenLibrary }: ReportCameraScreenProps) => {
+  const [isOpeningPicker, setIsOpeningPicker] = useState(false);
+
+  const handleImageResult = (
+    result: ImagePicker.ImagePickerResult,
+    source: "camera" | "library",
+  ) => {
+    if (result.canceled) {
+      return;
+    }
+
+    const asset = result.assets[0];
+    if (!asset?.uri) {
+      Alert.alert("No photo selected", "Please try again.");
+      return;
+    }
+
+    const image: SampleIssueImage = {
+      kind: "uri",
+      uri: asset.uri,
+      alt: source === "camera" ? "Captured report photo" : "Selected report photo",
+    };
+
+    if (source === "camera") {
+      onCapture(image);
+    } else {
+      onOpenLibrary(image);
+    }
+  };
+
+  const takePhoto = async () => {
+    if (isOpeningPicker) {
+      return;
+    }
+
+    setIsOpeningPicker(true);
+    try {
+      const permission = await ImagePicker.requestCameraPermissionsAsync();
+      if (!permission.granted) {
+        Alert.alert("Camera permission needed", "Allow camera access to take a report photo.");
+        return;
+      }
+
+      const result = await ImagePicker.launchCameraAsync({
+        allowsEditing: false,
+        quality: 0.85,
+      });
+      handleImageResult(result, "camera");
+    } catch (error) {
+      console.error("[image_picker] camera failed", error);
+      Alert.alert("Could not open camera", "Please try again.");
+    } finally {
+      setIsOpeningPicker(false);
+    }
+  };
+
+  const chooseFromLibrary = async () => {
+    if (isOpeningPicker) {
+      return;
+    }
+
+    setIsOpeningPicker(true);
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        allowsEditing: false,
+        mediaTypes: ["images"],
+        quality: 0.85,
+      });
+      handleImageResult(result, "library");
+    } catch (error) {
+      console.error("[image_picker] library failed", error);
+      Alert.alert("Could not open photo library", "Please try again.");
+    } finally {
+      setIsOpeningPicker(false);
+    }
+  };
+
   return (
     <View style={styles.page}>
       {/* Viewfinder */}
@@ -39,19 +118,25 @@ export const ReportCameraScreen = ({ onOpenLibrary }: ReportCameraScreenProps) =
         <View style={{ width: 60 }} />
 
         <Pressable
-          style={[styles.shutter, styles.shutterDisabled]}
+          onPress={takePhoto}
+          style={[styles.shutter, isOpeningPicker && styles.shutterDisabled]}
           accessibilityRole="button"
           accessibilityLabel="Capture photo"
-          disabled
+          disabled={isOpeningPicker}
         >
-          <View style={styles.shutterInner} />
+          {isOpeningPicker ? (
+            <ActivityIndicator color="#222428" />
+          ) : (
+            <View style={styles.shutterInner} />
+          )}
         </Pressable>
 
         <Pressable
-          onPress={onOpenLibrary}
-          style={styles.libraryButton}
+          onPress={chooseFromLibrary}
+          style={[styles.libraryButton, isOpeningPicker && styles.libraryButtonDisabled]}
           accessibilityRole="button"
           accessibilityLabel="Photo library"
+          disabled={isOpeningPicker}
         >
           <View style={styles.libraryIconBox}>
             <View style={styles.libFrame}>
@@ -158,6 +243,7 @@ const styles = StyleSheet.create({
     width: 60,
     gap: 6,
   },
+  libraryButtonDisabled: { opacity: 0.5 },
   libraryIconBox: {
     width: 52, height: 52,
     borderRadius: 14,

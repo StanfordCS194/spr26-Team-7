@@ -3,7 +3,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons'
 import { SampleIssueImage } from '../components/SampleIssueImage'
 
 import { dashboard311 } from '../data/dashboard311'
-import { ReportRecord, SampleIssueRecord } from '../types'
+import { ReportRecord, SampleIssueImage as SampleIssueImageData, SampleIssueRecord } from '../types'
 
 const CATEGORY_ICON: Record<string, string> = {
   'Pothole':             'road-variant',
@@ -28,6 +28,8 @@ type IssueStatusScreenProps = {
   onBack: () => void
   onToggleFollow: () => void
   isFollowUpdating?: boolean
+  reportImage?: SampleIssueImageData | null
+  onEditPhoto?: () => void
   primaryActionLabel?: string
   onPrimaryAction?: () => void
 }
@@ -37,10 +39,14 @@ export const IssueStatusScreen = ({
   onBack,
   onToggleFollow,
   isFollowUpdating = false,
+  reportImage,
+  onEditPhoto,
   primaryActionLabel,
   onPrimaryAction,
 }: IssueStatusScreenProps) => {
   const isSampleIssue = 'image' in report
+  const displayImage = reportImage !== undefined ? reportImage : isSampleIssue ? report.image : null
+  const showPhotoCount = report.photoCount > 0 && Boolean(displayImage)
   const coordinatesText = isSampleIssue
     ? `${report.latitude.toFixed(6)}, ${report.longitude.toFixed(6)}`
     : null
@@ -63,9 +69,15 @@ export const IssueStatusScreen = ({
           </View>
         </View>
 
-        <View style={styles.photoCard}>
-          {'image' in report ? (
-            <SampleIssueImage image={report.image} style={{ width: '100%', height: '100%' }} />
+        <Pressable
+          style={styles.photoCard}
+          onPress={onEditPhoto}
+          disabled={!onEditPhoto}
+          accessibilityRole="button"
+          accessibilityLabel={onEditPhoto ? 'Edit report photo' : 'Report photo'}
+        >
+          {displayImage ? (
+            <SampleIssueImage image={displayImage} style={{ width: '100%', height: '100%' }} />
           ) : (
             <View style={styles.photoPlaceholder}>
               <MaterialCommunityIcons
@@ -76,10 +88,17 @@ export const IssueStatusScreen = ({
               <Text style={styles.photoPlaceholderLabel}>{report.category}</Text>
             </View>
           )}
-          <View style={styles.photoOverlay}>
-            <Text style={styles.photoOverlayText}>{report.photoCount} photo{report.photoCount === 1 ? '' : 's'}</Text>
-          </View>
-        </View>
+          {showPhotoCount ? (
+            <View style={styles.photoOverlay}>
+              <Text style={styles.photoOverlayText}>{report.photoCount} photo{report.photoCount === 1 ? '' : 's'}</Text>
+            </View>
+          ) : null}
+          {onEditPhoto ? (
+            <View style={styles.photoEditBadge}>
+              <MaterialCommunityIcons name="pencil" size={15} color="#F2F3F5" />
+            </View>
+          ) : null}
+        </Pressable>
 
         <View style={styles.card}>
           <Text style={styles.sectionTitle}>Location</Text>
@@ -229,6 +248,17 @@ const styles = StyleSheet.create({
     color: '#F2F3F5',
     fontWeight: '700',
     fontSize: 12,
+  },
+  photoEditBadge: {
+    position: 'absolute',
+    top: 12,
+    right: 12,
+    width: 34,
+    height: 34,
+    borderRadius: 999,
+    backgroundColor: 'rgba(17,24,39,0.8)',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   card: { borderRadius: 16, backgroundColor: '#222428', padding: 14, gap: 10 },
   sectionTitle: { color: '#F2F3F5', fontWeight: '800', fontSize: 18 },

@@ -15,7 +15,9 @@
     "ios": {
       "supportsTablet": true,
       "infoPlist": {
-        "NSLocationWhenInUseUsageDescription": "CityFix uses your location to attach your report to the correct address and map pin."
+        "NSCameraUsageDescription": "CityFix uses your camera to attach a photo to your report.",
+        "NSLocationWhenInUseUsageDescription": "CityFix uses your location to attach your report to the correct address and map pin.",
+        "NSPhotoLibraryUsageDescription": "CityFix lets you choose a photo from your library to attach to your report."
       }
     },
     "android": {
@@ -27,7 +29,8 @@
       "predictiveBackGestureEnabled": false,
       "permissions": [
         "ACCESS_COARSE_LOCATION",
-        "ACCESS_FINE_LOCATION"
+        "ACCESS_FINE_LOCATION",
+        "CAMERA"
       ]
     },
     "web": {
@@ -39,6 +42,13 @@
         "expo-location",
         {
           "locationWhenInUsePermission": "CityFix uses your location to attach your report to the correct address and map pin."
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "cameraPermission": "CityFix uses your camera to attach a photo to your report.",
+          "photosPermission": "CityFix lets you choose a photo from your library to attach to your report."
         }
       ]
     ]

@@ -1,4 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
+import * as ImagePicker from 'expo-image-picker';
 import { ActivityIndicator, Alert, SafeAreaView, StyleSheet, View } from 'react-native';
 import { useEffect, useState } from 'react';
 import { useAuth } from './src/providers/AuthProvider';
@@ -13,7 +14,7 @@ import { IssueStatusScreen } from './src/screens/IssueStatusScreen';
 import { RecurringIssueDetailScreen } from './src/screens/RecurringIssueDetailScreen';
 import { AuthScreen } from './src/screens/AuthScreen';
 import { SampleIssuePickerScreen } from './src/screens/SampleIssuePickerScreen';
-import { AppTab, IssueCategory, ReportRecord, ReportStatus, SampleIssueRecord } from './src/types';
+import { AppTab, IssueCategory, ReportRecord, ReportStatus, SampleIssueImage, SampleIssueRecord } from './src/types';
 import { MapReport, MapReportCategoryId } from './src/data/mockMapReports';
 import { ChronicSpot } from './src/data/dashboard311';
 import { sampleIssues } from './src/data/sampleIssues';
@@ -68,7 +69,11 @@ function mapReportToRecord(r: MapReport, isFollowing = false): ReportRecord {
 
 
 
-type ReportSubmission = { mapReport: MapReport; sampleIssue: SampleIssueRecord | null };
+type ReportSubmission = {
+  mapReport: MapReport;
+  sampleIssue: SampleIssueRecord | null;
+  image?: SampleIssueImage | null;
+};
 
 const rowToSubmission = (row: ReportRow): ReportSubmission => ({
   mapReport: reportRowToMapReport(row),
@@ -99,6 +104,7 @@ export default function App() {
   const [mapReport, setMapReport]                     = useState<MapReport | null>(null);
   const [chronicSpot, setChronicSpot]                 = useState<ChronicSpot | null>(null);
   const [selectedSampleIssue, setSelectedSampleIssue] = useState<SampleIssueRecord | null>(null);
+  const [reportImage, setReportImage]                 = useState<SampleIssueImage | null>(null);
   const [userSubmissions, setUserSubmissions]         = useState<ReportSubmission[]>([]);
   const [followedSubmissions, setFollowedSubmissions] = useState<ReportSubmission[]>([]);
   const [focusReport, setFocusReport]                 = useState<MapReport | null>(null);
@@ -116,6 +122,99 @@ export default function App() {
   const loadFollowedSubmissions = async (followIds: string[]) => {
     const rows = await fetchReportsByIds(followIds);
     return rows.map(rowToSubmission);
+  };
+
+  const updateSubmissionImage = (reportId: string, image: SampleIssueImage | null) => {
+    setUserSubmissions((prev) =>
+      prev.map((submission) =>
+        submission.mapReport.id === reportId
+          ? { ...submission, image }
+          : submission,
+      ),
+    );
+  };
+
+  const imageFromPickerResult = (
+    result: ImagePicker.ImagePickerResult,
+    alt: string,
+  ): SampleIssueImage | null => {
+    if (result.canceled) {
+      return null;
+    }
+
+    const asset = result.assets[0];
+    if (!asset?.uri) {
+      Alert.alert('No photo selected', 'Please try again.');
+      return null;
+    }
+
+    return { kind: 'uri', uri: asset.uri, alt };
+  };
+
+  const replaceReportPhotoFromCamera = async (reportId: string) => {
+    try {
+      const permission = await ImagePicker.requestCameraPermissionsAsync();
+      if (!permission.granted) {
+        Alert.alert('Camera permission needed', 'Allow camera access to take a report photo.');
+        return;
+      }
+
+      const result = await ImagePicker.launchCameraAsync({
+        allowsEditing: false,
+        quality: 0.85,
+      });
+      const image = imageFromPickerResult(result, 'Updated report photo');
+      if (image) {
+        updateSubmissionImage(reportId, image);
+      }
+    } catch (error) {
+      console.error('[image_picker] report photo camera failed', error);
+      Alert.alert('Could not open camera', 'Please try again.');
+    }
+  };
+
+  const replaceReportPhotoFromLibrary = async (reportId: string) => {
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        allowsEditing: false,
+        mediaTypes: ['images'],
+        quality: 0.85,
+      });
+      const image = imageFromPickerResult(result, 'Updated report photo');
+      if (image) {
+        updateSubmissionImage(reportId, image);
+      }
+    } catch (error) {
+      console.error('[image_picker] report photo library failed', error);
+      Alert.alert('Could not open photo library', 'Please try again.');
+    }
+  };
+
+  const openReportPhotoEditor = (reportId: string, hasPhoto: boolean) => {
+    Alert.alert(
+      'Edit photo',
+      undefined,
+      [
+        {
+          text: 'Take new photo',
+          onPress: () => void replaceReportPhotoFromCamera(reportId),
+        },
+        {
+          text: 'Choose from library',
+          onPress: () => void replaceReportPhotoFromLibrary(reportId),
+        },
+        ...(hasPhoto
+          ? [
+              {
+                text: 'Remove photo',
+                style: 'destructive' as const,
+                onPress: () => updateSubmissionImage(reportId, null),
+              },
+            ]
+          : []),
+        { text: 'Cancel', style: 'cancel' as const },
+      ],
+    );
   };
 
   const handleToggleFollow = async (reportId: string) => {
@@ -178,6 +277,8 @@ export default function App() {
     const isFollowUpdating = followUpdatingId === reportId;
 
     if (userSub?.sampleIssue) {
+      const statusImage =
+        userSub.image !== undefined ? userSub.image : userSub.sampleIssue.image;
       const submittedRecord: SampleIssueRecord = {
         ...userSub.sampleIssue,
         status: STATUS_MAP[mapReport.status] ?? 'Submitted',
@@ -193,9 +294,18 @@ export default function App() {
       return (
         <IssueStatusScreen
           report={submittedRecord}
+          reportImage={statusImage}
           onBack={onBack}
           onToggleFollow={() => void handleToggleFollow(reportId)}
           isFollowUpdating={isFollowUpdating}
+          onEditPhoto={
+            userSubmissions.some((submission) => submission.mapReport.id === reportId)
+              ? () => openReportPhotoEditor(
+                  reportId,
+                  Boolean(statusImage),
+                )
+              : undefined
+          }
         />
       );
     }
@@ -203,9 +313,15 @@ export default function App() {
     return (
       <IssueStatusScreen
         report={mapReportToRecord(mapReport, isFollowingReport(reportId))}
+        reportImage={userSub?.image ?? null}
         onBack={onBack}
         onToggleFollow={() => void handleToggleFollow(reportId)}
         isFollowUpdating={isFollowUpdating}
+        onEditPhoto={
+          userSubmissions.some((submission) => submission.mapReport.id === reportId)
+            ? () => openReportPhotoEditor(reportId, Boolean(userSub?.image))
+            : undefined
+        }
       />
     );
   };
@@ -281,7 +397,7 @@ export default function App() {
       const mapReport = reportRowToMapReport(row);
 
       setUserSubmissions((prev) => [
-        { mapReport, sampleIssue: selectedSampleIssue },
+        { mapReport, sampleIssue: selectedSampleIssue, image: selectedSampleIssue?.image ?? reportImage },
         ...prev,
       ]);
       setFocusReport(mapReport);
@@ -340,6 +456,7 @@ export default function App() {
     setReportStep('camera');
     setClassification(null);
     setSelectedSampleIssue(null);
+    setReportImage(null);
   };
 
   const renderReportFlow = () => {
@@ -349,10 +466,12 @@ export default function App() {
           onSelectIssue={(issueId) => {
             const nextIssue = sampleIssues.find((issue) => issue.id === issueId) ?? null;
             setSelectedSampleIssue(nextIssue);
+            setReportImage(nextIssue?.image ?? null);
             setReportStep('classify');
           }}
           onOpenCamera={() => {
             setSelectedSampleIssue(null);
+            setReportImage(null);
             setReportStep('camera');
           }}
         />
@@ -361,8 +480,16 @@ export default function App() {
     if (reportStep === 'camera') {
       return (
         <ReportCameraScreen
-          onCapture={() => setReportStep('analyzing')}
-          onOpenLibrary={() => setReportStep('picker')}
+          onCapture={(image) => {
+            setSelectedSampleIssue(null);
+            setReportImage(image);
+            setReportStep('analyzing');
+          }}
+          onOpenLibrary={(image) => {
+            setSelectedSampleIssue(null);
+            setReportImage(image);
+            setReportStep('analyzing');
+          }}
         />
       );
     }
@@ -376,11 +503,14 @@ export default function App() {
           onConfirm={handleConfirmReport}
           isSubmitting={isSendingReport}
           selectedSampleIssue={selectedSampleIssue}
+          reportImage={selectedSampleIssue?.image ?? reportImage}
         />
       );
     }
-    if (reportStep === 'submitted-view' && selectedSampleIssue) {
-      const submission = userSubmissions.find((s) => s.sampleIssue?.id === selectedSampleIssue.id);
+    if (reportStep === 'submitted-view') {
+      const submission = selectedSampleIssue
+        ? userSubmissions.find((s) => s.sampleIssue?.id === selectedSampleIssue.id)
+        : userSubmissions.find((s) => s.mapReport.id === focusReport?.id);
       if (submission) {
         return renderIssueStatus(
           submission.mapReport,
@@ -395,7 +525,8 @@ export default function App() {
         classification={classification}
         onDone={handleResetFlow}
         selectedSampleIssue={selectedSampleIssue}
-        onViewIssue={selectedSampleIssue ? () => setReportStep('submitted-view') : undefined}
+        reportImage={selectedSampleIssue?.image ?? reportImage}
+        onViewIssue={focusReport ? () => setReportStep('submitted-view') : undefined}
       />
     );
   };
@@ -423,8 +554,8 @@ export default function App() {
           onFocusConsumed={() => setFocusReport(null)}
           reportImages={Object.fromEntries(
             userSubmissions
-              .filter(s => s.sampleIssue?.image)
-              .map(s => [s.mapReport.id, s.sampleIssue!.image])
+              .map(s => [s.mapReport.id, s.image ?? s.sampleIssue?.image])
+              .filter((entry): entry is [string, SampleIssueImage] => Boolean(entry[1]))
           )}
         />
       );
