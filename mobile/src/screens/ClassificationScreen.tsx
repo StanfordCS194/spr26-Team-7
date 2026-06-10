@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
 import {
+  ActivityIndicator,
   Animated,
   Dimensions,
   PanResponder,
@@ -13,7 +14,8 @@ import {
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { SampleIssueImage } from "../components/SampleIssueImage";
 import { MiniMapView } from "../components/MiniMapView";
-import { SampleIssueRecord } from "../types";
+import { useDeviceLocation } from "../hooks/useDeviceLocation";
+import { SampleIssueImage as SampleIssueImageData, SampleIssueRecord } from "../types";
 import { MlClassification } from "../ml/types";
 
 const SCREEN_HEIGHT = Dimensions.get('window').height;
@@ -94,6 +96,8 @@ export type Classification = {
   desc: string;
   locationMain: string;
   locationSub: string;
+  latitude?: number;
+  longitude?: number;
 };
 
 type ClassificationScreenProps = {
@@ -102,6 +106,7 @@ type ClassificationScreenProps = {
   isSubmitting?: boolean;
   selectedSampleIssue?: SampleIssueRecord | null;
   mlResult?: MlClassification | null;
+  reportImage?: SampleIssueImageData | null;
 };
 
 const CATEGORY_COLOR: Record<string, string> = {
@@ -132,11 +137,23 @@ export const ClassificationScreen = ({
   isSubmitting = false,
   selectedSampleIssue,
   mlResult,
+  reportImage,
 }: ClassificationScreenProps) => {
-  const locationMainLine =
+  const deviceLocation = useDeviceLocation();
+
+  const fallbackMain =
     selectedSampleIssue?.locationName ?? LOCATION_MAIN_LINE;
-  const locationSubLine =
+  const fallbackSub =
     selectedSampleIssue?.address ?? LOCATION_SUB_LINE;
+
+  const locationMainLine =
+    deviceLocation.status === "ready"
+      ? deviceLocation.locationMain
+      : fallbackMain;
+  const locationSubLine =
+    deviceLocation.status === "ready"
+      ? deviceLocation.locationSub
+      : fallbackSub;
 
   const [category, setCategory] = useState(
     mlResult?.category ?? getInitialCategory(selectedSampleIssue),
@@ -173,6 +190,14 @@ export const ClassificationScreen = ({
     setShowTagMenu(false);
   };
 
+  const displayImage =
+    reportImage ??
+    selectedSampleIssue?.image ?? {
+      kind: "asset" as const,
+      source: require("../../assets/pothole.jpg"),
+      alt: "Captured pothole preview",
+    };
+
   const dept =
     DEPT_BY_CATEGORY[category] ?? DEPT_BY_CATEGORY["Roads & Infrastructure"];
 
@@ -190,13 +215,7 @@ export const ClassificationScreen = ({
       >
         <View style={styles.photoStrip}>
           <SampleIssueImage
-            image={
-              selectedSampleIssue?.image ?? {
-                kind: "asset",
-                source: require("../../assets/pothole.jpg"),
-                alt: "Captured pothole preview",
-              }
-            }
+            image={displayImage}
             style={{ width: "100%", height: "100%" }}
           />
           <View style={styles.categoryChip}>
@@ -262,38 +281,78 @@ export const ClassificationScreen = ({
         <View style={styles.card}>
           <View style={[styles.locationHeader, styles.rowBorder]}>
             <Text style={styles.rowLabel}>LOCATION</Text>
-            <View style={styles.gpsBadge}>
-              <Text style={styles.gpsBadgeText}>📍 GPS</Text>
+            <View style={[
+              styles.gpsBadge,
+              deviceLocation.status === "ready" && styles.gpsBadgeActive,
+              (deviceLocation.status === "denied" || deviceLocation.status === "error") && styles.gpsBadgeWarning,
+            ]}>
+              <Text style={[
+                styles.gpsBadgeText,
+                deviceLocation.status === "ready" && styles.gpsBadgeTextActive,
+                (deviceLocation.status === "denied" || deviceLocation.status === "error") && styles.gpsBadgeTextWarning,
+              ]}>
+                {deviceLocation.status === "loading" ? "Locating…" : "📍 GPS"}
+              </Text>
             </View>
           </View>
 
           <View style={styles.mapArea}>
-            <MiniMapView style={StyleSheet.absoluteFillObject} />
-            <Animated.View
-              style={[
-                styles.draggablePin,
-                { transform: pinAnim.getTranslateTransform() },
-              ]}
-              {...panResponder.panHandlers}
-            >
-              <Text style={styles.draggablePinText}>📍</Text>
-            </Animated.View>
-            <View style={styles.mapHint} pointerEvents="none">
-              <Text style={styles.mapHintText}>Drag pin to move</Text>
-            </View>
+            <MiniMapView
+              style={StyleSheet.absoluteFillObject}
+              latitude={deviceLocation.status === "ready" ? deviceLocation.latitude : undefined}
+              longitude={deviceLocation.status === "ready" ? deviceLocation.longitude : undefined}
+              isLoading={deviceLocation.status === "loading"}
+            />
+            {deviceLocation.status === "ready" ? null : (
+              <>
+                <Animated.View
+                  style={[
+                    styles.draggablePin,
+                    { transform: pinAnim.getTranslateTransform() },
+                  ]}
+                  {...panResponder.panHandlers}
+                >
+                  <Text style={styles.draggablePinText}>📍</Text>
+                </Animated.View>
+                <View style={styles.mapHint} pointerEvents="none">
+                  <Text style={styles.mapHintText}>Drag pin to move</Text>
+                </View>
+              </>
+            )}
           </View>
 
           <View style={styles.addressRow}>
             <View style={styles.addressIcon}>
-              <Text>📍</Text>
+              {deviceLocation.status === "loading" ? (
+                <ActivityIndicator size="small" color="#4F8EF7" />
+              ) : (
+                <Text>📍</Text>
+              )}
             </View>
             <View style={{ flex: 1 }}>
-              <Text style={styles.addressMain}>{locationMainLine}</Text>
-              <Text style={styles.addressSub}>{locationSubLine}</Text>
+              {deviceLocation.status === "loading" ? (
+                <Text style={styles.addressMain}>Getting your location…</Text>
+              ) : deviceLocation.status === "denied" || deviceLocation.status === "error" ? (
+                <>
+                  <Text style={styles.addressMain}>{fallbackMain}</Text>
+                  <Text style={styles.addressSub}>{deviceLocation.message}</Text>
+                </>
+              ) : (
+                <>
+                  <Text style={styles.addressMain}>{locationMainLine}</Text>
+                  <Text style={styles.addressSub}>{locationSubLine}</Text>
+                </>
+              )}
             </View>
-            <Pressable accessibilityRole="button">
-              <Text style={styles.editLink}>Edit</Text>
-            </Pressable>
+            {(deviceLocation.status === "denied" || deviceLocation.status === "error") && (
+              <Pressable
+                onPress={() => void deviceLocation.refresh()}
+                accessibilityRole="button"
+                accessibilityLabel="Retry location"
+              >
+                <Text style={styles.retryLink}>Retry</Text>
+              </Pressable>
+            )}
           </View>
         </View>
 
@@ -316,6 +375,12 @@ export const ClassificationScreen = ({
               desc,
               locationMain: locationMainLine,
               locationSub: locationSubLine,
+              ...(deviceLocation.status === "ready"
+                ? {
+                    latitude: deviceLocation.latitude,
+                    longitude: deviceLocation.longitude,
+                  }
+                : {}),
             });
           }}
           style={[styles.submitButton, isSubmitting ? styles.submitButtonDisabled : null]}
@@ -441,12 +506,16 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   gpsBadge: {
-    backgroundColor: '#4F8EF728',
+    backgroundColor: '#2C2D32',
     borderRadius: 6,
     paddingHorizontal: 6,
     paddingVertical: 2,
   },
-  gpsBadgeText: { color: '#4F8EF7', fontSize: 10, fontWeight: "600" },
+  gpsBadgeActive: { backgroundColor: '#4F8EF728' },
+  gpsBadgeWarning: { backgroundColor: '#F0A03028' },
+  gpsBadgeText: { color: '#8D939E', fontSize: 10, fontWeight: "600" },
+  gpsBadgeTextActive: { color: '#4F8EF7' },
+  gpsBadgeTextWarning: { color: '#F0A030' },
 
   mapArea: {
     height: 130,
@@ -494,7 +563,7 @@ const styles = StyleSheet.create({
   },
   addressMain: { fontSize: 14, fontWeight: "700", color: '#F2F3F5' },
   addressSub: { fontSize: 12, color: '#8D939E', marginTop: 1 },
-  editLink: { color: '#8D939E', fontSize: 12, fontWeight: "600" },
+  retryLink: { color: '#4F8EF7', fontSize: 12, fontWeight: "600" },
 
   routingCard: {
     backgroundColor: '#222428',

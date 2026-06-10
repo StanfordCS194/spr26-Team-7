@@ -79,12 +79,13 @@ const resolveCoordinates = (row: ReportRow) => {
 const parseTimeline = (row: ReportRow) => {
   if (Array.isArray(row.timeline) && row.timeline.length > 0) {
     return row.timeline.map((entry) => ({
-      label: String(entry.label ?? row.status),
-      dateText: String(entry.dateText ?? formatSubmittedDate(row.created_at)),
+      label:    String(entry.label ?? row.status),
+      dateText: String(entry.dateText ?? ''),
+      reached:  entry.reached !== false,
     }))
   }
 
-  return [{ label: row.status, dateText: formatSubmittedDate(row.created_at) }]
+  return [{ label: row.status, dateText: formatSubmittedDate(row.created_at), reached: true }]
 }
 
 const createExternalId = () =>
@@ -143,6 +144,51 @@ export const fetchReportsByIds = async (reportIds: string[]): Promise<ReportRow[
   return (data ?? []) as ReportRow[]
 }
 
+export const fetchReportByExternalId = async (externalId: string): Promise<ReportRow | null> => {
+  const { data, error } = await supabase
+    .from('reports')
+    .select('*')
+    .eq('external_id', externalId)
+    .maybeSingle()
+
+  if (error) {
+    throw error
+  }
+
+  return (data ?? null) as ReportRow | null
+}
+
+export const updateReportText = async (
+  reportId: string,
+  updates: {
+    title: string
+    description: string
+    locationMain: string
+    locationSub: string
+  },
+): Promise<ReportRow> => {
+  const { data, error } = await supabase
+    .from('reports')
+    .update({
+      title: updates.title,
+      tag: updates.title,
+      description: updates.description,
+      address: `${updates.locationMain}, ${updates.locationSub}`,
+      location_main: updates.locationMain,
+      location_sub: updates.locationSub,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', reportId)
+    .select('*')
+    .single()
+
+  if (error) {
+    throw error
+  }
+
+  return data as ReportRow
+}
+
 export const createReport = async (
   userId: string,
   classification: Classification,
@@ -151,8 +197,8 @@ export const createReport = async (
   const district = sampleIssue?.district ?? 'San Jose District 3'
   const districtNumber = parseDistrictNumber(district)
   const center = DISTRICT_CENTERS[districtNumber] ?? DISTRICT_CENTERS[3]
-  const lat = sampleIssue?.latitude ?? center.latitude
-  const lon = sampleIssue?.longitude ?? center.longitude
+  const lat = classification.latitude ?? sampleIssue?.latitude ?? center.latitude
+  const lon = classification.longitude ?? sampleIssue?.longitude ?? center.longitude
 
   const { data, error } = await supabase
     .from('reports')

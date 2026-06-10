@@ -81,6 +81,9 @@ export const AnalyzingScreen = ({ image, imageUri, onDone }: AnalyzingScreenProp
       if (imageUri) {
         return uriToDataUrl(imageUri);
       }
+      if (image && image.kind === "uri") {
+        return uriToDataUrl(image.uri);
+      }
       if (image && image.kind === "asset") {
         return assetToDataUrl(image.source);
       }

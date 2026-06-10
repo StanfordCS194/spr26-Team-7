@@ -13,7 +13,12 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSCameraUsageDescription": "CityFix uses your camera to attach a photo to your report.",
+        "NSLocationWhenInUseUsageDescription": "CityFix uses your location to attach your report to the correct address and map pin.",
+        "NSPhotoLibraryUsageDescription": "CityFix lets you choose a photo from your library to attach to your report."
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -21,14 +26,38 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "permissions": [
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION",
+        "CAMERA"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
       "expo-mail-composer",
-      "expo-asset"
+      "expo-asset",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "CityFix uses your camera to attach a photo to your report."
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "CityFix uses your location to attach your report to the correct address and map pin."
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "cameraPermission": "CityFix uses your camera to attach a photo to your report.",
+          "photosPermission": "CityFix lets you choose a photo from your library to attach to your report."
+        }
+      ]
     ]
   }
 }

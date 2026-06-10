@@ -64,6 +64,11 @@ export type SampleIssueImage =
       alt: string
     }
   | {
+      kind: 'uri'
+      uri: string
+      alt: string
+    }
+  | {
       kind: 'placeholder'
       label: string
       icon: string

@@ -1,8 +1,6 @@
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SampleIssueImage } from "../components/SampleIssueImage";
 import { SampleIssueRecord } from "../types";
-import { T } from "../theme";
-
 type DuplicateScreenProps = {
   onMerge: () => void;
   onNew: () => void;
@@ -30,7 +28,7 @@ export const DuplicateScreen = ({
 
     <ScrollView contentContainerStyle={styles.scroll}>
       <View style={styles.alertBanner}>
-        <Text style={styles.alertIcon}>⚠</Text>
+        <Text style={styles.alertIcon}>!</Text>
         <View style={styles.alertText}>
           <Text style={styles.alertTitle}>Similar report nearby</Text>
           <Text style={styles.alertBody}>
@@ -59,7 +57,7 @@ export const DuplicateScreen = ({
               <Text style={styles.typeBadgeText}>{selectedSampleIssue?.type ?? "Pothole"}</Text>
             </View>
             <View style={styles.countBadge}>
-              <Text style={styles.countBadgeText}>👥 4 reports</Text>
+              <Text style={styles.countBadgeText}>4 reports</Text>
             </View>
           </View>
         </View>
@@ -90,7 +88,6 @@ export const DuplicateScreen = ({
         style={styles.mergeButton}
         accessibilityRole="button"
       >
-        <Text style={styles.mergeIcon}>👥</Text>
         <Text style={styles.mergeText}>Yes, add my +1 to this report</Text>
       </Pressable>
 
@@ -99,7 +96,6 @@ export const DuplicateScreen = ({
         style={styles.newButton}
         accessibilityRole="button"
       >
-        <Text style={styles.newIcon}>📷</Text>
         <Text style={styles.newText}>No, this is different</Text>
       </Pressable>
     </ScrollView>
@@ -107,12 +103,12 @@ export const DuplicateScreen = ({
 );
 
 const styles = StyleSheet.create({
-  page: { flex: 1, backgroundColor: T.cream },
+  page: { flex: 1, backgroundColor: '#18191C' },
 
   header: {
-    backgroundColor: T.white,
+    backgroundColor: '#18191C',
     borderBottomWidth: 1,
-    borderBottomColor: T.border,
+    borderBottomColor: '#35373D',
     paddingHorizontal: 16,
     paddingVertical: 12,
     flexDirection: "row",
@@ -120,30 +116,26 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   backButton: { padding: 4, marginLeft: -4 },
-  backIcon: { fontSize: 28, color: T.ink2, lineHeight: 30, fontWeight: "300" },
-  headerTitle: { fontSize: 16, fontWeight: "700", color: T.ink },
+  backIcon: { fontSize: 28, color: '#F2F3F5', lineHeight: 30, fontWeight: "300" },
+  headerTitle: { fontSize: 16, fontWeight: "800", color: '#F2F3F5' },
 
   scroll: { padding: 16, gap: 14, paddingBottom: 32 },
 
   alertBanner: {
-    backgroundColor: T.amberLight,
-    borderWidth: 1,
-    borderColor: "#fde68a",
+    backgroundColor: '#F0A03028',
     borderRadius: 14,
     padding: 14,
     flexDirection: "row",
     alignItems: "flex-start",
     gap: 12,
   },
-  alertIcon: { fontSize: 20, lineHeight: 24 },
+  alertIcon: { color: '#F0A030', fontSize: 20, lineHeight: 24, fontWeight: '900' },
   alertText: { flex: 1, gap: 3 },
-  alertTitle: { fontSize: 14, fontWeight: "700", color: "#92400e" },
-  alertBody: { fontSize: 13, color: "#b45309", lineHeight: 20 },
+  alertTitle: { fontSize: 14, fontWeight: "800", color: '#F2F3F5' },
+  alertBody: { fontSize: 13, color: '#D1D5DB', lineHeight: 20 },
 
   reportCard: {
-    backgroundColor: T.white,
-    borderWidth: 1,
-    borderColor: T.border,
+    backgroundColor: '#222428',
     borderRadius: 14,
     overflow: "hidden",
   },
@@ -180,8 +172,8 @@ const styles = StyleSheet.create({
   countBadgeText: { color: "white", fontSize: 11, fontWeight: "600" },
 
   reportBody: { padding: 14, gap: 6 },
-  reportTitle: { fontSize: 14, fontWeight: "700", color: T.ink },
-  reportDesc: { fontSize: 13, color: T.ink3, lineHeight: 20 },
+  reportTitle: { fontSize: 14, fontWeight: "800", color: '#F2F3F5' },
+  reportDesc: { fontSize: 13, color: '#8D939E', lineHeight: 20 },
   reportMeta: {
     flexDirection: "row",
     alignItems: "center",
@@ -189,23 +181,23 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   pendingBadge: {
-    backgroundColor: "#fef3c7",
+    backgroundColor: '#F0A03028',
     borderRadius: 6,
     paddingHorizontal: 8,
     paddingVertical: 3,
   },
-  pendingText: { color: T.amber, fontSize: 11, fontWeight: "700" },
-  estText: { fontSize: 12, color: T.ink4 },
+  pendingText: { color: '#F0A030', fontSize: 11, fontWeight: "700" },
+  estText: { fontSize: 12, color: '#8D939E' },
 
   question: {
     fontSize: 14,
     fontWeight: "600",
-    color: T.ink,
+    color: '#F2F3F5',
     textAlign: "center",
   },
 
   mergeButton: {
-    backgroundColor: T.blue,
+    backgroundColor: '#4F8EF7',
     borderRadius: 14,
     paddingVertical: 15,
     flexDirection: "row",
@@ -213,13 +205,10 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     gap: 8,
   },
-  mergeIcon: { fontSize: 18 },
   mergeText: { color: "white", fontSize: 15, fontWeight: "700" },
 
   newButton: {
-    backgroundColor: T.white,
-    borderWidth: 1.5,
-    borderColor: T.border,
+    backgroundColor: '#2C2D32',
     borderRadius: 14,
     paddingVertical: 14,
     flexDirection: "row",
@@ -227,6 +216,5 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     gap: 8,
   },
-  newIcon: { fontSize: 18 },
-  newText: { color: T.ink2, fontSize: 15, fontWeight: "600" },
+  newText: { color: '#F2F3F5', fontSize: 15, fontWeight: "700" },
 });

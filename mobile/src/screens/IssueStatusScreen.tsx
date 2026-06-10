@@ -1,9 +1,12 @@
-import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { Fragment, useEffect, useState } from 'react'
+import { Image, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
 import { SampleIssueImage } from '../components/SampleIssueImage'
 
 import { dashboard311 } from '../data/dashboard311'
-import { ReportRecord, SampleIssueRecord } from '../types'
+import { dashboardV2 } from '../data/dashboard311v2'
+import { ReportRecord, ReportStatus, SampleIssueImage as SampleIssueImageData, SampleIssueRecord, TimelineEntry } from '../types'
+import { fetchSubmissionStatus } from '../api/serverApi'
 
 const CATEGORY_ICON: Record<string, string> = {
   'Pothole':             'road-variant',
@@ -23,30 +26,164 @@ const CATEGORY_COLOR: Record<string, string> = {
   'Encampment Concerns': '#A78BFA',
 }
 
+const TIMELINE_STAGES: ReportStatus[] = ['Submitted', 'Received', 'In Progress', 'Resolved']
+
+function fmtFixTime(hours: number): string {
+  const h = Math.round(hours)
+  return h < 48 ? `${h} hrs` : `${Math.round(hours / 24)} days`
+}
+
+const HorizontalTimeline = ({ timeline }: { timeline: TimelineEntry[] }) => {
+  const stageMap = new Map(timeline.map(e => [e.label as string, e]))
+  const stages = TIMELINE_STAGES.map(stage => ({
+    stage,
+    reached: stageMap.get(stage)?.reached ?? false,
+    dateText: stageMap.get(stage)?.dateText ?? null,
+  }))
+  const lastReachedIdx = stages.reduce((acc, s, i) => (s.reached ? i : acc), -1)
+
+  return (
+    <View style={tl.container}>
+      <View style={{ flexDirection: 'row' }}>
+        {stages.map(({ stage, reached, dateText }, i) => {
+          const isActive      = i === lastReachedIdx
+          const leftReached   = i > 0 && reached
+          const rightReached  = i < stages.length - 1 && stages[i + 1].reached
+          const dotSize       = isActive ? 14 : 10
+
+          return (
+            <Fragment key={stage}>
+              <View style={{ flex: 1, alignItems: 'center' }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', width: '100%', marginBottom: 8 }}>
+                  <View style={{
+                    flex: 1, height: 2,
+                    backgroundColor: i === 0 ? 'transparent' : (leftReached ? '#4F8EF7' : '#35373D'),
+                  }} />
+                  <View style={{
+                    width: dotSize, height: dotSize, borderRadius: dotSize / 2,
+                    backgroundColor: reached ? '#4F8EF7' : 'transparent',
+                    borderWidth: reached ? 0 : 1.5,
+                    borderColor: '#35373D',
+                  }} />
+                  <View style={{
+                    flex: 1, height: 2,
+                    backgroundColor: i === stages.length - 1 ? 'transparent' : (rightReached ? '#4F8EF7' : '#35373D'),
+                  }} />
+                </View>
+                <Text style={[tl.stageLabel, reached ? tl.stageLabelReached : tl.stageLabelUnreached]} numberOfLines={1}>
+                  {stage}
+                </Text>
+                {dateText ? <Text style={tl.dateText}>{dateText}</Text> : null}
+              </View>
+            </Fragment>
+          )
+        })}
+      </View>
+    </View>
+  )
+}
+
 type IssueStatusScreenProps = {
   report: ReportRecord | SampleIssueRecord
+  submissionId?: string
   onBack: () => void
   onToggleFollow: () => void
   isFollowUpdating?: boolean
+  reportImage?: SampleIssueImageData | null
+  onEditPhoto?: () => void
+  onSaveEdits?: (edits: {
+    title: string
+    description: string
+    locationMain: string
+    locationSub: string
+  }) => void
   primaryActionLabel?: string
   onPrimaryAction?: () => void
 }
 
 export const IssueStatusScreen = ({
   report,
+  submissionId,
   onBack,
   onToggleFollow,
   isFollowUpdating = false,
+  reportImage,
+  onEditPhoto,
+  onSaveEdits,
   primaryActionLabel,
   onPrimaryAction,
 }: IssueStatusScreenProps) => {
+  const [liveStatus,    setLiveStatus]    = useState<string | null>(null)
+  const [matched311Id,  setMatched311Id]  = useState<string | null>(null)
+  const [pollError,     setPollError]     = useState(false)
+
+  useEffect(() => {
+    if (!submissionId) return
+    let active = true
+    const poll = () => {
+      fetchSubmissionStatus(submissionId).then(data => {
+        if (!active) return
+        if (data?.ok) {
+          setLiveStatus(data.status)
+          setMatched311Id(data.matched311Id)
+          setPollError(false)
+        } else {
+          setPollError(true)
+        }
+      }).catch(() => { if (active) setPollError(true) })
+    }
+    poll()
+    const interval = setInterval(poll, 30_000)
+    return () => { active = false; clearInterval(interval) }
+  }, [submissionId])
+
   const isSampleIssue = 'image' in report
+  const displayStatus = liveStatus ?? report.status
+  const canEdit = Boolean(onEditPhoto || onSaveEdits)
+  const locationMainValue = isSampleIssue ? report.locationName : report.address
+  const [isEditingText, setIsEditingText] = useState(false)
+  const [draftTitle, setDraftTitle] = useState(report.title)
+  const [draftDescription, setDraftDescription] = useState(report.description)
+  const [draftLocationMain, setDraftLocationMain] = useState(locationMainValue)
+  const [draftLocationSub, setDraftLocationSub] = useState(report.address)
+  const displayImage = reportImage !== undefined ? reportImage : isSampleIssue ? report.image : null
+  const showPhotoCount = report.photoCount > 0 && Boolean(displayImage)
   const coordinatesText = isSampleIssue
     ? `${report.latitude.toFixed(6)}, ${report.longitude.toFixed(6)}`
     : null
 
   const d3IssueTypes = dashboard311.districts['3']?.issueTypes ?? []
   const issueMetrics = d3IssueTypes.find(t => t.name === report.category)
+
+  const districtKey = report.district.match(/\d+/)?.[0] ?? '3'
+  const catItems = dashboardV2.districts[districtKey]?.categoryComparison.year ?? []
+  const fixTimeHours = catItems.find(c => c.type === report.category)?.fixTimeHours ?? null
+  const estResolutionText = fixTimeHours != null ? fmtFixTime(fixTimeHours) : 'Not available'
+
+  useEffect(() => {
+    setDraftTitle(report.title)
+    setDraftDescription(report.description)
+    setDraftLocationMain(locationMainValue)
+    setDraftLocationSub(report.address)
+  }, [locationMainValue, report.address, report.description, report.title])
+
+  const handleCancelEdits = () => {
+    setDraftTitle(report.title)
+    setDraftDescription(report.description)
+    setDraftLocationMain(locationMainValue)
+    setDraftLocationSub(report.address)
+    setIsEditingText(false)
+  }
+
+  const handleSaveEdits = () => {
+    onSaveEdits?.({
+      title: draftTitle.trim() || report.title,
+      description: draftDescription.trim() || report.description,
+      locationMain: draftLocationMain.trim() || locationMainValue,
+      locationSub: draftLocationSub.trim() || report.address,
+    })
+    setIsEditingText(false)
+  }
 
   return (
     <View style={styles.page}>
@@ -59,13 +196,42 @@ export const IssueStatusScreen = ({
         <View style={styles.headingRow}>
           <View style={styles.headingCopy}>
             <Text style={styles.issueId}>{report.id}</Text>
-            <Text style={styles.issueTitle}>{report.title}</Text>
+            {isEditingText ? (
+              <TextInput
+                value={draftTitle}
+                onChangeText={setDraftTitle}
+                style={styles.titleInput}
+                placeholderTextColor="#55595F"
+              />
+            ) : (
+              <Text style={styles.issueTitle}>{report.title}</Text>
+            )}
           </View>
+          <View style={[styles.badge, displayStatus === 'Resolved' ? styles.badgeResolved : null]}>
+            <Text style={[styles.badgeText, displayStatus === 'Resolved' ? styles.badgeTextResolved : null]}>
+              {displayStatus}
+            </Text>
+          </View>
+          {canEdit ? (
+            <Pressable
+              style={styles.editTextButton}
+              onPress={() => (isEditingText ? handleCancelEdits() : setIsEditingText(true))}
+              accessibilityRole="button"
+            >
+              <Text style={styles.editTextButtonText}>{isEditingText ? 'Cancel' : 'Edit'}</Text>
+            </Pressable>
+          ) : null}
         </View>
 
-        <View style={styles.photoCard}>
-          {'image' in report ? (
-            <SampleIssueImage image={report.image} style={{ width: '100%', height: '100%' }} />
+        <Pressable
+          style={styles.photoCard}
+          onPress={onEditPhoto}
+          disabled={!onEditPhoto}
+          accessibilityRole="button"
+          accessibilityLabel={onEditPhoto ? 'Edit report photo' : 'Report photo'}
+        >
+          {displayImage ? (
+            <SampleIssueImage image={displayImage} style={{ width: '100%', height: '100%' }} />
           ) : (
             <View style={styles.photoPlaceholder}>
               <MaterialCommunityIcons
@@ -76,10 +242,17 @@ export const IssueStatusScreen = ({
               <Text style={styles.photoPlaceholderLabel}>{report.category}</Text>
             </View>
           )}
-          <View style={styles.photoOverlay}>
-            <Text style={styles.photoOverlayText}>{report.photoCount} photo{report.photoCount === 1 ? '' : 's'}</Text>
-          </View>
-        </View>
+          {showPhotoCount ? (
+            <View style={styles.photoOverlay}>
+              <Text style={styles.photoOverlayText}>{report.photoCount} photo{report.photoCount === 1 ? '' : 's'}</Text>
+            </View>
+          ) : null}
+          {onEditPhoto ? (
+            <View style={styles.photoEditBadge}>
+              <MaterialCommunityIcons name="pencil" size={15} color="#F2F3F5" />
+            </View>
+          ) : null}
+        </Pressable>
 
         <View style={styles.card}>
           <Text style={styles.sectionTitle}>Location</Text>
@@ -96,8 +269,29 @@ export const IssueStatusScreen = ({
               ]}
             />
           </View>
-          <Text style={styles.value}>{isSampleIssue ? report.locationName : report.address}</Text>
-          <Text style={styles.secondaryValue}>{report.address}</Text>
+          {isEditingText ? (
+            <>
+              <TextInput
+                value={draftLocationMain}
+                onChangeText={setDraftLocationMain}
+                style={styles.input}
+                placeholder="Location"
+                placeholderTextColor="#55595F"
+              />
+              <TextInput
+                value={draftLocationSub}
+                onChangeText={setDraftLocationSub}
+                style={styles.input}
+                placeholder="Address"
+                placeholderTextColor="#55595F"
+              />
+            </>
+          ) : (
+            <>
+              <Text style={styles.value}>{locationMainValue}</Text>
+              <Text style={styles.secondaryValue}>{report.address}</Text>
+            </>
+          )}
           {coordinatesText ? <Text style={styles.metaValue}>Coordinates: {coordinatesText}</Text> : null}
           <View style={styles.tagRow}>
             <InfoPill label={report.district} />
@@ -106,20 +300,57 @@ export const IssueStatusScreen = ({
 
         <View style={styles.card}>
           <Text style={styles.sectionTitle}>Description</Text>
-          <Text style={styles.bodyText}>{report.description}</Text>
+          {isEditingText ? (
+            <TextInput
+              multiline
+              value={draftDescription}
+              onChangeText={setDraftDescription}
+              style={[styles.input, styles.descriptionInput]}
+              placeholderTextColor="#55595F"
+              textAlignVertical="top"
+            />
+          ) : (
+            <Text style={styles.bodyText}>{report.description}</Text>
+          )}
         </View>
+
+        {submissionId && (
+          <View style={[styles.card, styles.trackingCard]}>
+            <View style={styles.trackingHeader}>
+              <View style={[styles.trackingDot, pollError ? styles.trackingDotError : styles.trackingDotLive]} />
+              <Text style={styles.trackingTitle}>
+                {pollError ? 'Status tracking unavailable' : 'Live status tracking'}
+              </Text>
+            </View>
+            <Text style={styles.trackingStatus}>
+              {liveStatus ? `Current: ${liveStatus}` : 'Waiting for city to receive report…'}
+            </Text>
+            {matched311Id && (
+              <Text style={styles.trackingRef}>311 Case #{matched311Id}</Text>
+            )}
+            <Text style={styles.trackingNote}>Updates every 30 seconds via city 311 data</Text>
+          </View>
+        )}
+        {isEditingText ? (
+          <View style={styles.editActionRow}>
+            <Pressable style={styles.saveEditButton} onPress={handleSaveEdits} accessibilityRole="button">
+              <Text style={styles.saveEditButtonText}>Save Changes</Text>
+            </Pressable>
+          </View>
+        ) : null}
 
         <View style={styles.card}>
           <Text style={styles.sectionTitle}>Status Timeline</Text>
-          {report.timeline.map((entry, index) => (
-            <View key={`${entry.label}-${index}`} style={styles.timelineRow}>
-              <View style={[styles.dot, entry.reached ? styles.dotReached : styles.dotPending]} />
-              <View style={styles.timelineTextWrap}>
-                <Text style={styles.timelineLabel}>{entry.label}</Text>
-                <Text style={styles.timelineDate}>{entry.dateText}</Text>
-              </View>
-            </View>
-          ))}
+          <HorizontalTimeline timeline={report.timeline} />
+          {displayStatus === 'Submitted' && (
+            <Text style={styles.pendingNote}>
+              Pending city confirmation — we'll update the status when the city processes your report
+            </Text>
+          )}
+          <View style={styles.estResolutionRow}>
+            <Text style={styles.estResolutionLabel}>Estimated resolution</Text>
+            <Text style={styles.estResolutionValue}>{estResolutionText}</Text>
+          </View>
         </View>
 
         <View style={styles.card}>
@@ -190,6 +421,14 @@ const InfoPill = ({ label }: { label: string }) => {
   )
 }
 
+const tl = StyleSheet.create({
+  container: { gap: 0 },
+  stageLabel: { fontSize: 10, textAlign: 'center', fontWeight: '700' },
+  stageLabelReached: { color: '#F2F3F5' },
+  stageLabelUnreached: { color: '#55595F' },
+  dateText: { fontSize: 9, color: '#8D939E', textAlign: 'center', marginTop: 2 },
+})
+
 const styles = StyleSheet.create({
   page: { flex: 1, backgroundColor: '#18191C' },
   content: { padding: 14, gap: 14, paddingBottom: 32 },
@@ -197,6 +436,25 @@ const styles = StyleSheet.create({
   headingCopy: { gap: 6 },
   issueId: { fontSize: 13, fontWeight: '700', color: '#8D939E', letterSpacing: 0.4 },
   issueTitle: { fontSize: 24, fontWeight: '900', color: '#F2F3F5', lineHeight: 30 },
+  titleInput: {
+    borderWidth: 1,
+    borderColor: '#35373D',
+    borderRadius: 12,
+    backgroundColor: '#222428',
+    color: '#F2F3F5',
+    fontSize: 20,
+    fontWeight: '800',
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+  },
+  editTextButton: {
+    alignSelf: 'flex-start',
+    borderRadius: 999,
+    backgroundColor: '#2C2D32',
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+  },
+  editTextButtonText: { color: '#F2F3F5', fontWeight: '800', fontSize: 13 },
   badge: {
     backgroundColor: '#F0A03028',
     alignSelf: 'flex-start',
@@ -229,6 +487,17 @@ const styles = StyleSheet.create({
     color: '#F2F3F5',
     fontWeight: '700',
     fontSize: 12,
+  },
+  photoEditBadge: {
+    position: 'absolute',
+    top: 12,
+    right: 12,
+    width: 34,
+    height: 34,
+    borderRadius: 999,
+    backgroundColor: 'rgba(17,24,39,0.8)',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   card: { borderRadius: 16, backgroundColor: '#222428', padding: 14, gap: 10 },
   sectionTitle: { color: '#F2F3F5', fontWeight: '800', fontSize: 18 },
@@ -265,6 +534,34 @@ const styles = StyleSheet.create({
   timelineLabel: { fontSize: 16, fontWeight: '700', color: '#F2F3F5' },
   timelineDate: { color: '#8D939E', fontWeight: '500', lineHeight: 20 },
   bodyText: { color: '#8D939E', lineHeight: 22, fontWeight: '500' },
+  trackingCard:       { backgroundColor: '#1C2435', borderColor: '#2D4263', borderWidth: 1, gap: 4 },
+  trackingHeader:     { flexDirection: 'row', alignItems: 'center', gap: 7 },
+  trackingDot:        { width: 8, height: 8, borderRadius: 4 },
+  trackingDotLive:    { backgroundColor: '#22C55E' },
+  trackingDotError:   { backgroundColor: '#636870' },
+  trackingTitle:      { fontSize: 13, fontWeight: '700', color: '#7EB4F5' },
+  trackingStatus:     { fontSize: 14, fontWeight: '600', color: '#B3D4F8' },
+  trackingRef:        { fontSize: 12, color: '#5B9BF8', fontWeight: '500' },
+  trackingNote:       { fontSize: 11, color: '#636870', marginTop: 2 },
+  input: {
+    borderWidth: 1,
+    borderColor: '#35373D',
+    borderRadius: 12,
+    backgroundColor: '#2C2D32',
+    color: '#F2F3F5',
+    paddingHorizontal: 12,
+    paddingVertical: 11,
+    fontWeight: '600',
+  },
+  descriptionInput: { minHeight: 110, lineHeight: 22 },
+  editActionRow: { gap: 10 },
+  saveEditButton: {
+    borderRadius: 14,
+    backgroundColor: '#4F8EF7',
+    paddingVertical: 15,
+    alignItems: 'center',
+  },
+  saveEditButtonText: { color: '#fff', fontWeight: '800', fontSize: 16 },
   insightRow: { gap: 4 },
   insightLabel: { color: '#8D939E', fontWeight: '700', fontSize: 13, textTransform: 'uppercase' },
   insightValue: { color: '#F2F3F5', fontWeight: '600', lineHeight: 22 },
@@ -298,6 +595,22 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   closeIcon: { color: '#8D939E', fontSize: 14, fontWeight: '600' },
+  pendingNote: {
+    fontSize: 12,
+    color: '#8D939E',
+    lineHeight: 18,
+    fontStyle: 'italic',
+  },
+  estResolutionRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingTop: 10,
+    borderTopWidth: 1,
+    borderTopColor: '#35373D',
+  },
+  estResolutionLabel: { fontSize: 13, fontWeight: '700', color: '#8D939E', textTransform: 'uppercase' },
+  estResolutionValue: { fontSize: 14, fontWeight: '700', color: '#F2F3F5' },
   photoPlaceholder: {
     flex: 1,
     backgroundColor: '#2C2D32',
