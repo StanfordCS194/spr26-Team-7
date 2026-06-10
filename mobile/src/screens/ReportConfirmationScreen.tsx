@@ -10,6 +10,7 @@ type ReportConfirmationScreenProps = {
   classification: Classification | null;
   onDone: () => void;
   selectedSampleIssue?: SampleIssueRecord | null;
+  onTrackStatus?: () => void;
   reportImage?: SampleIssueImageData | null;
   onViewIssue?: () => void;
 };
@@ -19,6 +20,7 @@ export const ReportConfirmationScreen = ({
   classification,
   onDone,
   selectedSampleIssue,
+  onTrackStatus,
   reportImage,
   onViewIssue,
 }: ReportConfirmationScreenProps) => {
@@ -124,7 +126,12 @@ export const ReportConfirmationScreen = ({
           </Pressable>
         </Animated.View>
 
-        <Animated.View style={{ width: '100%', opacity: fadeAnim, transform: [{ translateY: slideAnim }] }}>
+        <Animated.View style={{ width: '100%', opacity: fadeAnim, transform: [{ translateY: slideAnim }], gap: 10 }}>
+          {onTrackStatus && !merged && (
+            <Pressable onPress={onTrackStatus} style={styles.trackButton} accessibilityRole="button">
+              <Text style={styles.trackText}>Track report status</Text>
+            </Pressable>
+          )}
           <Pressable onPress={onDone} style={styles.homeButton} accessibilityRole="button">
             <Text style={styles.homeIcon}>🏠</Text>
             <Text style={styles.homeText}>Back to Reporting</Text>
@@ -207,6 +214,15 @@ const styles = StyleSheet.create({
   viewReportText: { fontSize: 14, fontWeight: '600', color: '#F2F3F5' },
   viewReportChevron: { fontSize: 20, color: '#55595F', lineHeight: 22 },
 
+  trackButton: {
+    borderRadius: 14,
+    borderWidth: 1.5,
+    borderColor: '#4F8EF7',
+    paddingVertical: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  trackText: { color: '#4F8EF7', fontSize: 15, fontWeight: '700' },
   homeButton: {
     backgroundColor: '#4F8EF7',
     borderRadius: 14,

@@ -5,6 +5,7 @@ import { SampleIssueImage } from '../components/SampleIssueImage'
 
 import { dashboard311 } from '../data/dashboard311'
 import { ReportRecord, SampleIssueImage as SampleIssueImageData, SampleIssueRecord } from '../types'
+import { fetchSubmissionStatus } from '../api/serverApi'
 
 const CATEGORY_ICON: Record<string, string> = {
   'Pothole':             'road-variant',
@@ -26,6 +27,7 @@ const CATEGORY_COLOR: Record<string, string> = {
 
 type IssueStatusScreenProps = {
   report: ReportRecord | SampleIssueRecord
+  submissionId?: string
   onBack: () => void
   onToggleFollow: () => void
   isFollowUpdating?: boolean
@@ -43,6 +45,7 @@ type IssueStatusScreenProps = {
 
 export const IssueStatusScreen = ({
   report,
+  submissionId,
   onBack,
   onToggleFollow,
   isFollowUpdating = false,
@@ -52,7 +55,32 @@ export const IssueStatusScreen = ({
   primaryActionLabel,
   onPrimaryAction,
 }: IssueStatusScreenProps) => {
+  const [liveStatus,    setLiveStatus]    = useState<string | null>(null)
+  const [matched311Id,  setMatched311Id]  = useState<string | null>(null)
+  const [pollError,     setPollError]     = useState(false)
+
+  useEffect(() => {
+    if (!submissionId) return
+    let active = true
+    const poll = () => {
+      fetchSubmissionStatus(submissionId).then(data => {
+        if (!active) return
+        if (data?.ok) {
+          setLiveStatus(data.status)
+          setMatched311Id(data.matched311Id)
+          setPollError(false)
+        } else {
+          setPollError(true)
+        }
+      }).catch(() => { if (active) setPollError(true) })
+    }
+    poll()
+    const interval = setInterval(poll, 30_000)
+    return () => { active = false; clearInterval(interval) }
+  }, [submissionId])
+
   const isSampleIssue = 'image' in report
+  const displayStatus = liveStatus ?? report.status
   const canEdit = Boolean(onEditPhoto || onSaveEdits)
   const locationMainValue = isSampleIssue ? report.locationName : report.address
   const [isEditingText, setIsEditingText] = useState(false)
@@ -115,6 +143,11 @@ export const IssueStatusScreen = ({
             ) : (
               <Text style={styles.issueTitle}>{report.title}</Text>
             )}
+          </View>
+          <View style={[styles.badge, displayStatus === 'Resolved' ? styles.badgeResolved : null]}>
+            <Text style={[styles.badgeText, displayStatus === 'Resolved' ? styles.badgeTextResolved : null]}>
+              {displayStatus}
+            </Text>
           </View>
           {canEdit ? (
             <Pressable
@@ -218,6 +251,23 @@ export const IssueStatusScreen = ({
           )}
         </View>
 
+        {submissionId && (
+          <View style={[styles.card, styles.trackingCard]}>
+            <View style={styles.trackingHeader}>
+              <View style={[styles.trackingDot, pollError ? styles.trackingDotError : styles.trackingDotLive]} />
+              <Text style={styles.trackingTitle}>
+                {pollError ? 'Status tracking unavailable' : 'Live status tracking'}
+              </Text>
+            </View>
+            <Text style={styles.trackingStatus}>
+              {liveStatus ? `Current: ${liveStatus}` : 'Waiting for city to receive report…'}
+            </Text>
+            {matched311Id && (
+              <Text style={styles.trackingRef}>311 Case #{matched311Id}</Text>
+            )}
+            <Text style={styles.trackingNote}>Updates every 30 seconds via city 311 data</Text>
+          </View>
+        )}
         {isEditingText ? (
           <View style={styles.editActionRow}>
             <Pressable style={styles.saveEditButton} onPress={handleSaveEdits} accessibilityRole="button">
@@ -412,6 +462,15 @@ const styles = StyleSheet.create({
   timelineLabel: { fontSize: 16, fontWeight: '700', color: '#F2F3F5' },
   timelineDate: { color: '#8D939E', fontWeight: '500', lineHeight: 20 },
   bodyText: { color: '#8D939E', lineHeight: 22, fontWeight: '500' },
+  trackingCard:       { backgroundColor: '#1C2435', borderColor: '#2D4263', borderWidth: 1, gap: 4 },
+  trackingHeader:     { flexDirection: 'row', alignItems: 'center', gap: 7 },
+  trackingDot:        { width: 8, height: 8, borderRadius: 4 },
+  trackingDotLive:    { backgroundColor: '#22C55E' },
+  trackingDotError:   { backgroundColor: '#636870' },
+  trackingTitle:      { fontSize: 13, fontWeight: '700', color: '#7EB4F5' },
+  trackingStatus:     { fontSize: 14, fontWeight: '600', color: '#B3D4F8' },
+  trackingRef:        { fontSize: 12, color: '#5B9BF8', fontWeight: '500' },
+  trackingNote:       { fontSize: 11, color: '#636870', marginTop: 2 },
   input: {
     borderWidth: 1,
     borderColor: '#35373D',

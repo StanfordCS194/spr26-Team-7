@@ -53,4 +53,6 @@ ml/__pycache__/
 *.pyo
 
 # ML model weights (download with: cd ml && python scripts/download_models.py)
-ml/weights/
+ml/weights/server/.env
+scripts/.env
+server/.env

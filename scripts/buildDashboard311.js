@@ -807,7 +807,7 @@ function buildChronicSpots(d) {
         timelineEvents.push({ date: new Date(allEvents[i-1].date).toISOString().slice(0, 10), eventType: 'resolved' })
         timelineEvents.push({ date: new Date(allEvents[i].date).toISOString().slice(0, 10), eventType: 'reported' })
       }
-    }
+    }git branch
 
     // Recent activity: 5 most recent records, newest first
     const recentActivity = allEvents.slice(-5).reverse().map(ev => ({
