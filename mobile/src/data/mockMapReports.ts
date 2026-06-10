@@ -37,14 +37,14 @@ export type CategoryConfig = {
 }
 
 export const CATEGORY_CONFIG: Record<MapReportCategoryId, CategoryConfig> = {
-  pothole:     { id: 'pothole',     label: 'Pothole',           icon: 'road-variant',          color: '#E8514A' },
-  streetlight: { id: 'streetlight', label: 'Streetlight',       icon: 'lightbulb-on-outline',  color: '#5B9BF8' },
-  graffiti:    { id: 'graffiti',    label: 'Graffiti',          icon: 'format-paint',          color: '#3ECF82' },
-  dumping:     { id: 'dumping',     label: 'Illegal Dumping',   icon: 'trash-can-outline',     color: '#F0A030' },
-  vehicle:     { id: 'vehicle',     label: 'Vehicle Concerns',  icon: 'car',                   color: '#E8514A' },
-  container:   { id: 'container',   label: 'Container Issues',  icon: 'package-variant',       color: '#F0A030' },
-  encampment:  { id: 'encampment',  label: 'Encampment',        icon: 'tent',                  color: '#A78BFA' },
-  junk:        { id: 'junk',        label: 'Junk Pickup',       icon: 'delete-sweep-outline',  color: '#F0A030' },
+  pothole:     { id: 'pothole',     label: 'Pothole',           icon: 'road-variant',          color: '#C89838' },
+  streetlight: { id: 'streetlight', label: 'Streetlight',       icon: 'lightbulb-on-outline',  color: '#B8B030' },
+  graffiti:    { id: 'graffiti',    label: 'Graffiti',          icon: 'format-paint',          color: '#B05898' },
+  dumping:     { id: 'dumping',     label: 'Illegal Dumping',   icon: 'trash-can-outline',     color: '#C04830' },
+  vehicle:     { id: 'vehicle',     label: 'Vehicle Concerns',  icon: 'car',                   color: '#6855C0' },
+  container:   { id: 'container',   label: 'Container Issues',  icon: 'package-variant',       color: '#38B078' },
+  encampment:  { id: 'encampment',  label: 'Encampment',        icon: 'tent',                  color: '#38A8B8' },
+  junk:        { id: 'junk',        label: 'Junk Pickup',       icon: 'delete-sweep-outline',  color: '#4A8CB5' },
 }
 
 export const ALL_CATEGORY_IDS = Object.keys(CATEGORY_CONFIG) as MapReportCategoryId[]

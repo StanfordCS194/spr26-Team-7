@@ -10,6 +10,7 @@ type ReportConfirmationScreenProps = {
   classification: Classification | null;
   onDone: () => void;
   selectedSampleIssue?: SampleIssueRecord | null;
+  onTrackStatus?: () => void;
 };
 
 export const ReportConfirmationScreen = ({
@@ -17,6 +18,7 @@ export const ReportConfirmationScreen = ({
   classification,
   onDone,
   selectedSampleIssue,
+  onTrackStatus,
 }: ReportConfirmationScreenProps) => {
   const scaleAnim = useRef(new Animated.Value(0)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -112,7 +114,12 @@ export const ReportConfirmationScreen = ({
           </View>
         </Animated.View>
 
-        <Animated.View style={{ width: '100%', opacity: fadeAnim, transform: [{ translateY: slideAnim }] }}>
+        <Animated.View style={{ width: '100%', opacity: fadeAnim, transform: [{ translateY: slideAnim }], gap: 10 }}>
+          {onTrackStatus && !merged && (
+            <Pressable onPress={onTrackStatus} style={styles.trackButton} accessibilityRole="button">
+              <Text style={styles.trackText}>Track report status</Text>
+            </Pressable>
+          )}
           <Pressable onPress={onDone} style={styles.homeButton} accessibilityRole="button">
             <Text style={styles.homeIcon}>🏠</Text>
             <Text style={styles.homeText}>Back to home</Text>
@@ -185,6 +192,15 @@ const styles = StyleSheet.create({
   tag: { backgroundColor: T.warm, borderRadius: 8, paddingHorizontal: 8, paddingVertical: 4 },
   tagText: { fontSize: 11, color: T.ink3, fontWeight: '500' },
 
+  trackButton: {
+    borderRadius: 14,
+    borderWidth: 1.5,
+    borderColor: T.blue,
+    paddingVertical: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  trackText: { color: T.blue, fontSize: 15, fontWeight: '700' },
   homeButton: {
     backgroundColor: T.blue,
     borderRadius: 14,

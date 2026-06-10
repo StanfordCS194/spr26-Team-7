@@ -1,12 +1,15 @@
+import { useEffect, useState } from 'react'
 import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
 import { MockStreetPhoto } from '../components/MockStreetPhoto'
 import { SampleIssueImage } from '../components/SampleIssueImage'
 import { WireframeHeader } from '../components/WireframeHeader'
 import { T } from '../theme'
 import { ReportRecord, SampleIssueRecord } from '../types'
+import { fetchSubmissionStatus } from '../api/serverApi'
 
 type IssueStatusScreenProps = {
   report: ReportRecord | SampleIssueRecord
+  submissionId?: string
   onBack: () => void
   onToggleFollow: () => void
   onAddPhoto: () => void
@@ -16,13 +19,39 @@ type IssueStatusScreenProps = {
 
 export const IssueStatusScreen = ({
   report,
+  submissionId,
   onBack,
   onToggleFollow,
   onAddPhoto,
   primaryActionLabel,
   onPrimaryAction,
 }: IssueStatusScreenProps) => {
+  const [liveStatus,    setLiveStatus]    = useState<string | null>(null)
+  const [matched311Id,  setMatched311Id]  = useState<string | null>(null)
+  const [pollError,     setPollError]     = useState(false)
+
+  useEffect(() => {
+    if (!submissionId) return
+    let active = true
+    const poll = () => {
+      fetchSubmissionStatus(submissionId).then(data => {
+        if (!active) return
+        if (data?.ok) {
+          setLiveStatus(data.status)
+          setMatched311Id(data.matched311Id)
+          setPollError(false)
+        } else {
+          setPollError(true)
+        }
+      }).catch(() => { if (active) setPollError(true) })
+    }
+    poll()
+    const interval = setInterval(poll, 30_000)
+    return () => { active = false; clearInterval(interval) }
+  }, [submissionId])
+
   const isSampleIssue = 'image' in report
+  const displayStatus = liveStatus ?? report.status
   const coordinatesText = isSampleIssue
     ? `${report.latitude.toFixed(6)}, ${report.longitude.toFixed(6)}`
     : null
@@ -36,9 +65,9 @@ export const IssueStatusScreen = ({
             <Text style={styles.issueId}>{report.id}</Text>
             <Text style={styles.issueTitle}>{report.title}</Text>
           </View>
-          <View style={[styles.badge, report.status === 'Resolved' ? styles.badgeResolved : null]}>
-            <Text style={[styles.badgeText, report.status === 'Resolved' ? styles.badgeTextResolved : null]}>
-              {report.status}
+          <View style={[styles.badge, displayStatus === 'Resolved' ? styles.badgeResolved : null]}>
+            <Text style={[styles.badgeText, displayStatus === 'Resolved' ? styles.badgeTextResolved : null]}>
+              {displayStatus}
             </Text>
           </View>
         </View>
@@ -83,6 +112,24 @@ export const IssueStatusScreen = ({
           <Text style={styles.sectionTitle}>Description</Text>
           <Text style={styles.bodyText}>{report.description}</Text>
         </View>
+
+        {submissionId && (
+          <View style={[styles.card, styles.trackingCard]}>
+            <View style={styles.trackingHeader}>
+              <View style={[styles.trackingDot, pollError ? styles.trackingDotError : styles.trackingDotLive]} />
+              <Text style={styles.trackingTitle}>
+                {pollError ? 'Status tracking unavailable' : 'Live status tracking'}
+              </Text>
+            </View>
+            <Text style={styles.trackingStatus}>
+              {liveStatus ? `Current: ${liveStatus}` : 'Waiting for city to receive report…'}
+            </Text>
+            {matched311Id && (
+              <Text style={styles.trackingRef}>311 Case #{matched311Id}</Text>
+            )}
+            <Text style={styles.trackingNote}>Updates every 30 seconds via city 311 data</Text>
+          </View>
+        )}
 
         <View style={styles.card}>
           <Text style={styles.sectionTitle}>Status Timeline</Text>
@@ -237,6 +284,15 @@ const styles = StyleSheet.create({
   timelineLabel: { fontSize: 16, fontWeight: '700', color: T.ink },
   timelineDate: { color: '#667287', fontWeight: '500', lineHeight: 20 },
   bodyText: { color: T.ink2, lineHeight: 22, fontWeight: '500' },
+  trackingCard:       { backgroundColor: '#EFF6FF', borderColor: '#BFDBFE', gap: 4 },
+  trackingHeader:     { flexDirection: 'row', alignItems: 'center', gap: 7 },
+  trackingDot:        { width: 8, height: 8, borderRadius: 4 },
+  trackingDotLive:    { backgroundColor: '#22C55E' },
+  trackingDotError:   { backgroundColor: '#9CA3AF' },
+  trackingTitle:      { fontSize: 13, fontWeight: '700', color: '#1E40AF' },
+  trackingStatus:     { fontSize: 14, fontWeight: '600', color: '#1E3A8A' },
+  trackingRef:        { fontSize: 12, color: '#3B82F6', fontWeight: '500' },
+  trackingNote:       { fontSize: 11, color: '#6B7280', marginTop: 2 },
   insightRow: { gap: 4 },
   insightLabel: { color: T.ink3, fontWeight: '700', fontSize: 13, textTransform: 'uppercase' },
   insightValue: { color: T.ink, fontWeight: '600', lineHeight: 22 },

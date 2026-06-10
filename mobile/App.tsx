@@ -15,8 +15,10 @@ import { AuthScreen } from './src/screens/AuthScreen';
 import { SampleIssuePickerScreen } from './src/screens/SampleIssuePickerScreen';
 import { AppTab, IssueCategory, ReportRecord, ReportStatus, SampleIssueRecord } from './src/types';
 import { MapReport, MapReportCategoryId } from './src/data/mockMapReports';
-import { ChronicSpot } from './src/data/dashboard311';
+import { ChronicSpotV2 } from './src/data/dashboard311v2';
 import { sampleIssues } from './src/data/sampleIssues';
+import { DashboardProvider } from './src/context/DashboardContext';
+import { postSubmission } from './src/api/serverApi';
 
 const CATEGORY_LABEL: Record<MapReportCategoryId, IssueCategory> = {
   pothole:     'Pothole',
@@ -66,6 +68,31 @@ const REPORT_API_BASE = (
   process.env.EXPO_PUBLIC_REPORT_API_URL ?? 'http://127.0.0.1:3001'
 ).replace(/\/$/, '');
 
+function makeSubmissionId(): string {
+  return `sub_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`
+}
+
+function classificationToRecord(c: Classification, id: string): ReportRecord {
+  return {
+    id,
+    title:               c.tag,
+    category:            c.category as IssueCategory,
+    tag:                 c.tag,
+    district:            c.locationSub || 'San Jose',
+    status:              'Submitted',
+    description:         c.desc,
+    address:             c.locationMain,
+    assignedTo:          'Pending assignment',
+    estimatedResolution: '2–3 weeks',
+    reportCount:         1,
+    isFollowing:         false,
+    isUserOwned:         true,
+    photoCount:          0,
+    pin:                 { top: 50, left: 50, color: '#5B9BF8' },
+    timeline:            [{ label: 'Submitted', dateText: 'Just now', reached: true }],
+  }
+}
+
 const postDifferentIssueReport = (c: Classification) => {
   const url = `${REPORT_API_BASE}/api/report-different-issue`;
   void fetch(url, {
@@ -81,7 +108,7 @@ const postDifferentIssueReport = (c: Classification) => {
   }).catch(() => {});
 };
 
-type ReportStep = 'picker' | 'issue' | 'camera' | 'analyzing' | 'classify' | 'duplicate' | 'confirmation';
+type ReportStep = 'picker' | 'issue' | 'camera' | 'analyzing' | 'classify' | 'duplicate' | 'confirmation' | 'tracking';
 
 export default function App() {
   const [currentTab, setCurrentTab]                   = useState<AppTab>('report');
@@ -90,8 +117,10 @@ export default function App() {
   const [merged, setMerged]                           = useState(false);
   const [isSignedIn, setIsSignedIn]                   = useState(false);
   const [mapReport, setMapReport]                     = useState<MapReport | null>(null);
-  const [chronicSpot, setChronicSpot]                 = useState<ChronicSpot | null>(null);
+  const [chronicSpot, setChronicSpot]                 = useState<ChronicSpotV2 | null>(null);
   const [selectedSampleIssue, setSelectedSampleIssue] = useState<SampleIssueRecord | null>(null);
+  const [pendingSubmissionId, setPendingSubmissionId] = useState<string | null>(null);
+  const [pendingRecord, setPendingRecord]             = useState<ReportRecord | null>(null);
 
   const handleAuthenticate = () => {
     setIsSignedIn(true);
@@ -109,6 +138,8 @@ export default function App() {
     setClassification(null);
     setMerged(false);
     setSelectedSampleIssue(null);
+    setPendingSubmissionId(null);
+    setPendingRecord(null);
   };
 
   const renderReportFlow = () => {
@@ -164,6 +195,18 @@ export default function App() {
           onNew={() => {
             if (classification) {
               postDifferentIssueReport(classification);
+              // Also create a submission for status tracking
+              const subId = makeSubmissionId();
+              const record = classificationToRecord(classification, subId);
+              setPendingSubmissionId(subId);
+              setPendingRecord(record);
+              void postSubmission({
+                id:          subId,
+                lat:         37.338,   // demo: SJ city center (real app would use device GPS)
+                lon:         -121.886,
+                category:    classification.category,
+                submittedAt: new Date().toISOString(),
+              }).catch(() => {});
             }
             setMerged(false);
             setReportStep('confirmation');
@@ -173,12 +216,24 @@ export default function App() {
         />
       );
     }
+    if (reportStep === 'tracking' && pendingRecord && pendingSubmissionId) {
+      return (
+        <IssueStatusScreen
+          report={pendingRecord}
+          submissionId={pendingSubmissionId}
+          onBack={() => setReportStep('confirmation')}
+          onToggleFollow={() => {}}
+          onAddPhoto={() => {}}
+        />
+      );
+    }
     return (
       <ReportConfirmationScreen
         merged={merged}
         classification={classification}
         onDone={handleResetFlow}
         selectedSampleIssue={selectedSampleIssue}
+        onTrackStatus={pendingSubmissionId ? () => setReportStep('tracking') : undefined}
       />
     );
   };
@@ -230,22 +285,24 @@ export default function App() {
       (currentTab === 'report' && reportStep === 'picker'));
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <StatusBar style="light" />
-      <View style={styles.container}>
-        {isSignedIn ? (
-          renderCurrentTab()
-        ) : (
-          <AuthScreen onAuthenticate={handleAuthenticate} />
+    <DashboardProvider>
+      <SafeAreaView style={styles.safeArea}>
+        <StatusBar style="light" />
+        <View style={styles.container}>
+          {isSignedIn ? (
+            renderCurrentTab()
+          ) : (
+            <AuthScreen onAuthenticate={handleAuthenticate} />
+          )}
+        </View>
+        {showNav && (
+          <BottomNav
+            currentTab={currentTab}
+            onChangeTab={(tab) => setCurrentTab(tab)}
+          />
         )}
-      </View>
-      {showNav && (
-        <BottomNav
-          currentTab={currentTab}
-          onChangeTab={(tab) => setCurrentTab(tab)}
-        />
-      )}
-    </SafeAreaView>
+      </SafeAreaView>
+    </DashboardProvider>
   );
 }
 
