@@ -38,6 +38,7 @@
     },
     "plugins": [
       "expo-mail-composer",
+      "expo-asset",
       [
         "expo-camera",
         {

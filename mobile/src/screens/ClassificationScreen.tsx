@@ -16,6 +16,7 @@ import { SampleIssueImage } from "../components/SampleIssueImage";
 import { MiniMapView } from "../components/MiniMapView";
 import { useDeviceLocation } from "../hooks/useDeviceLocation";
 import { SampleIssueImage as SampleIssueImageData, SampleIssueRecord } from "../types";
+import { MlClassification } from "../ml/types";
 
 const SCREEN_HEIGHT = Dimensions.get('window').height;
 
@@ -104,6 +105,7 @@ type ClassificationScreenProps = {
   onConfirm: (c: Classification) => void | Promise<void>;
   isSubmitting?: boolean;
   selectedSampleIssue?: SampleIssueRecord | null;
+  mlResult?: MlClassification | null;
   reportImage?: SampleIssueImageData | null;
 };
 
@@ -134,6 +136,7 @@ export const ClassificationScreen = ({
   onConfirm,
   isSubmitting = false,
   selectedSampleIssue,
+  mlResult,
   reportImage,
 }: ClassificationScreenProps) => {
   const deviceLocation = useDeviceLocation();
@@ -152,10 +155,15 @@ export const ClassificationScreen = ({
       ? deviceLocation.locationSub
       : fallbackSub;
 
-  const [category, setCategory] = useState(getInitialCategory(selectedSampleIssue));
-  const [tag, setTag] = useState(selectedSampleIssue?.tag ?? "Pothole");
+  const [category, setCategory] = useState(
+    mlResult?.category ?? getInitialCategory(selectedSampleIssue),
+  );
+  const [tag, setTag] = useState(
+    mlResult?.tag ?? selectedSampleIssue?.tag ?? "Pothole",
+  );
   const [desc, setDesc] = useState(
-    selectedSampleIssue?.description ??
+    mlResult?.desc ??
+      selectedSampleIssue?.description ??
       "Significant pothole on Glen Eyrie Ave near Carolyn Ave causing road hazard. Approximately 2ft wide with visible asphalt damage.",
   );
   const [showTagMenu, setShowTagMenu] = useState(false);

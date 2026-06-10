@@ -1,21 +1,36 @@
 import { useEffect, useRef, useState } from "react";
 import { Animated, Easing, StyleSheet, Text, View } from "react-native";
+import { useML, MlStage } from "../ml/MLProvider";
+import { assetToDataUrl, uriToDataUrl } from "../ml/imageToDataUrl";
+import { MlClassification } from "../ml/types";
+import { SampleIssueImage } from "../types";
 
 type AnalyzingScreenProps = {
-  onDone: () => void;
+  image?: SampleIssueImage | null;
+  imageUri?: string | null;
+  onDone: (result: MlClassification | null) => void;
 };
 
-const PHASES = [
-  "Checking location…",
-  "Identifying issue…",
-  "Finding the right agency…",
-];
+const STAGE_LABEL: Record<MlStage, string> = {
+  router: "Identifying the issue…",
+  extract: "Analyzing the details…",
+  describe: "Writing the report…",
+};
 
-export const AnalyzingScreen = ({ onDone }: AnalyzingScreenProps) => {
-  const [phase, setPhase] = useState(0);
+// Keep the analysis screen up for at least this long so the result never flashes
+// by instantly, even when on-device inference finishes faster.
+const MIN_VISIBLE_MS = 2000;
+
+export const AnalyzingScreen = ({ image, imageUri, onDone }: AnalyzingScreenProps) => {
+  const { status, loadPct, classify } = useML();
+  const [phaseText, setPhaseText] = useState("Preparing photo…");
   const [progress, setProgress] = useState(0);
   const spinAnim = useRef(new Animated.Value(0)).current;
   const phaseOpacity = useRef(new Animated.Value(1)).current;
+  const onDoneRef = useRef(onDone);
+  onDoneRef.current = onDone;
+  const startedAtRef = useRef(Date.now());
+  const finishTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     Animated.loop(
@@ -26,38 +41,106 @@ export const AnalyzingScreen = ({ onDone }: AnalyzingScreenProps) => {
         useNativeDriver: true,
       }),
     ).start();
+  }, [spinAnim]);
 
-    const interval = setInterval(
-      () => setProgress((p) => Math.min(p + 2.5, 100)),
-      70,
-    );
-
-    const advancePhase = (nextPhase: number) => {
+  const setPhase = (text: string) => {
+    Animated.timing(phaseOpacity, {
+      toValue: 0,
+      duration: 160,
+      useNativeDriver: true,
+    }).start(() => {
+      setPhaseText(text);
       Animated.timing(phaseOpacity, {
-        toValue: 0,
-        duration: 200,
+        toValue: 1,
+        duration: 160,
         useNativeDriver: true,
-      }).start(() => {
-        setPhase(nextPhase);
-        Animated.timing(phaseOpacity, {
-          toValue: 1,
-          duration: 200,
-          useNativeDriver: true,
-        }).start();
-      });
+      }).start();
+    });
+  };
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const finish = (result: MlClassification | null) => {
+      if (cancelled) {
+        return;
+      }
+      const remaining = MIN_VISIBLE_MS - (Date.now() - startedAtRef.current);
+      if (remaining <= 0) {
+        onDoneRef.current(result);
+        return;
+      }
+      finishTimerRef.current = setTimeout(() => {
+        if (!cancelled) {
+          onDoneRef.current(result);
+        }
+      }, remaining);
     };
 
-    const t1 = setTimeout(() => advancePhase(1), 800);
-    const t2 = setTimeout(() => advancePhase(2), 1800);
-    const t3 = setTimeout(() => onDone(), 2800);
+    const resolveDataUrl = async (): Promise<string | null> => {
+      if (imageUri) {
+        return uriToDataUrl(imageUri);
+      }
+      if (image && image.kind === "uri") {
+        return uriToDataUrl(image.uri);
+      }
+      if (image && image.kind === "asset") {
+        return assetToDataUrl(image.source);
+      }
+      return null;
+    };
+
+    const run = async () => {
+      try {
+        const dataUrl = await resolveDataUrl();
+        if (cancelled) {
+          return;
+        }
+        if (!dataUrl) {
+          finish(null);
+          return;
+        }
+
+        if (status !== "ready") {
+          setPhase("Loading on-device model…");
+        }
+
+        const result = await classify(dataUrl, (stage) => {
+          if (!cancelled) {
+            setPhase(STAGE_LABEL[stage]);
+            setProgress((p) => Math.max(p, stage === "router" ? 55 : stage === "extract" ? 75 : 92));
+          }
+        });
+
+        if (!cancelled) {
+          setProgress(100);
+          finish(result);
+        }
+      } catch (error) {
+        console.error("[ml] classification failed", error);
+        finish(null);
+      }
+    };
+
+    void run();
 
     return () => {
-      clearInterval(interval);
-      clearTimeout(t1);
-      clearTimeout(t2);
-      clearTimeout(t3);
+      cancelled = true;
+      if (finishTimerRef.current) {
+        clearTimeout(finishTimerRef.current);
+      }
     };
-  }, [onDone]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // While the model downloads, mirror the real load percentage; otherwise creep
+  // forward so the bar always feels alive during inference.
+  useEffect(() => {
+    if (status === "ready") {
+      return;
+    }
+    setProgress(Math.min(45, Math.round(loadPct * 0.45)));
+  }, [status, loadPct]);
 
   const spin = spinAnim.interpolate({
     inputRange: [0, 1],
@@ -77,7 +160,7 @@ export const AnalyzingScreen = ({ onDone }: AnalyzingScreenProps) => {
         <View style={styles.textBlock}>
           <Text style={styles.title}>Analyzing photo</Text>
           <Animated.Text style={[styles.phase, { opacity: phaseOpacity }]}>
-            {PHASES[phase]}
+            {phaseText}
           </Animated.Text>
         </View>
 
