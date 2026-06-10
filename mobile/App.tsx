@@ -55,6 +55,7 @@ const STATUS_MAP: Record<string, ReportStatus> = {
 
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const LOCAL_DASHBOARD_FOLLOWS_KEY_PREFIX = 'cityfix:dashboard-follows:';
+const LOCAL_REPORT_PHOTOS_KEY_PREFIX = 'cityfix:report-photos:';
 const ONBOARDING_COMPLETE_KEY = 'cityfix:onboarding-complete';
 
 function mapReportToRecord(r: MapReport, isFollowing = false): ReportRecord {
@@ -130,6 +131,55 @@ const writeLocalDashboardFollowIds = async (userId: string, reportIds: string[])
     localDashboardFollowsKey(userId),
     JSON.stringify(Array.from(new Set(reportIds))),
   );
+};
+
+const localReportPhotosKey = (userId: string) =>
+  `${LOCAL_REPORT_PHOTOS_KEY_PREFIX}${userId}`;
+
+const isStoredUriImage = (value: unknown): value is Extract<SampleIssueImage, { kind: 'uri' }> => {
+  if (!value || typeof value !== 'object') {
+    return false;
+  }
+
+  const image = value as Partial<Extract<SampleIssueImage, { kind: 'uri' }>>;
+  return image.kind === 'uri' && typeof image.uri === 'string' && typeof image.alt === 'string';
+};
+
+const readLocalReportPhotos = async (userId: string): Promise<Record<string, Extract<SampleIssueImage, { kind: 'uri' }>>> => {
+  const raw = await AsyncStorage.getItem(localReportPhotosKey(userId));
+  if (!raw) {
+    return {};
+  }
+
+  try {
+    const parsed = JSON.parse(raw);
+    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+      return {};
+    }
+
+    return Object.fromEntries(
+      Object.entries(parsed).filter((entry): entry is [string, Extract<SampleIssueImage, { kind: 'uri' }>] =>
+        typeof entry[0] === 'string' && isStoredUriImage(entry[1]),
+      ),
+    );
+  } catch {
+    return {};
+  }
+};
+
+const writeLocalReportPhoto = async (
+  userId: string,
+  reportId: string,
+  image: SampleIssueImage | null,
+) => {
+  const currentPhotos = await readLocalReportPhotos(userId);
+  if (image?.kind === 'uri') {
+    currentPhotos[reportId] = image;
+  } else {
+    delete currentPhotos[reportId];
+  }
+
+  await AsyncStorage.setItem(localReportPhotosKey(userId), JSON.stringify(currentPhotos));
 };
 
 const toProfileReport = (mapReport: MapReport): ProfileReport => ({
@@ -225,6 +275,19 @@ export default function App() {
     );
   };
 
+  const saveSubmissionImage = async (reportId: string, image: SampleIssueImage | null) => {
+    updateSubmissionImage(reportId, image);
+    if (!user?.id) {
+      return;
+    }
+
+    try {
+      await writeLocalReportPhoto(user.id, reportId, image);
+    } catch (error) {
+      console.warn('[report_photos] local save failed', error);
+    }
+  };
+
   const imageFromPickerResult = (
     result: ImagePicker.ImagePickerResult,
     alt: string,
@@ -256,7 +319,7 @@ export default function App() {
       });
       const image = imageFromPickerResult(result, 'Updated report photo');
       if (image) {
-        updateSubmissionImage(reportId, image);
+        void saveSubmissionImage(reportId, image);
       }
     } catch (error) {
       console.error('[image_picker] report photo camera failed', error);
@@ -273,7 +336,7 @@ export default function App() {
       });
       const image = imageFromPickerResult(result, 'Updated report photo');
       if (image) {
-        updateSubmissionImage(reportId, image);
+        void saveSubmissionImage(reportId, image);
       }
     } catch (error) {
       console.error('[image_picker] report photo library failed', error);
@@ -299,7 +362,7 @@ export default function App() {
               {
                 text: 'Remove photo',
                 style: 'destructive' as const,
-                onPress: () => updateSubmissionImage(reportId, null),
+                onPress: () => void saveSubmissionImage(reportId, null),
               },
             ]
           : []),
@@ -628,17 +691,18 @@ export default function App() {
     const loadUserData = async () => {
       setIsLoadingReports(true);
       try {
-        const [rows, followIds, localDashboardFollowIds] = await Promise.all([
+        const [rows, followIds, localDashboardFollowIds, localReportPhotos] = await Promise.all([
           fetchUserReports(user.id),
           fetchFollowedReportIds(user.id),
           readLocalDashboardFollowIds(user.id),
+          readLocalReportPhotos(user.id),
         ]);
         if (!isMounted) {
           return;
         }
 
         setFollowedReportIds(new Set([...followIds, ...localDashboardFollowIds]));
-        setUserSubmissions(rows.map(rowToSubmission));
+        setUserSubmissions(rows.map((row) => ({ ...rowToSubmission(row), image: localReportPhotos[row.id] })));
         const followed = await loadFollowedSubmissions(followIds, localDashboardFollowIds);
         if (!isMounted) {
           return;
@@ -691,11 +755,19 @@ export default function App() {
     try {
       const row = await createReport(user.id, c, selectedSampleIssue);
       const mapReport = reportRowToMapReport(row);
+      const submissionImage = selectedSampleIssue?.image ?? reportImage;
 
       setUserSubmissions((prev) => [
-        { mapReport, sampleIssue: selectedSampleIssue, image: selectedSampleIssue?.image ?? reportImage },
+        { mapReport, sampleIssue: selectedSampleIssue, image: submissionImage },
         ...prev,
       ]);
+      if (submissionImage?.kind === 'uri') {
+        try {
+          await writeLocalReportPhoto(user.id, mapReport.id, submissionImage);
+        } catch (error) {
+          console.warn('[report_photos] initial local save failed', error);
+        }
+      }
       setFocusReport(mapReport);
       setReportStep('confirmation');
     } catch (error) {
