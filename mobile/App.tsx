@@ -896,8 +896,10 @@ export default function App() {
             setReportImage(image);
             setReportStep('analyzing');
           }}
-          onOpenLibrary={() => {
-            setReportStep('picker');
+          onOpenLibrary={(image) => {
+            setSelectedSampleIssue(null);
+            setReportImage(image);
+            setReportStep('analyzing');
           }}
         />
       );
