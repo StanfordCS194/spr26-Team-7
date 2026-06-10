@@ -1,5 +1,5 @@
 import { Asset } from 'expo-asset'
-import { ImageSourcePropType } from 'react-native'
+import { Image, ImageSourcePropType } from 'react-native'
 import { SampleIssueImage } from '../types'
 import { supabase } from './supabase'
 
@@ -17,7 +17,12 @@ const getPhotoExtension = (localUri: string) => {
 }
 
 export const resolveAssetUri = async (source: ImageSourcePropType): Promise<string> => {
-  const asset = Asset.fromModule(source)
+  const resolvedSource = Image.resolveAssetSource(source)
+  if (!resolvedSource?.uri) {
+    throw new Error('Could not resolve bundled image asset')
+  }
+
+  const asset = Asset.fromModule(resolvedSource.uri)
   await asset.downloadAsync()
   if (!asset.localUri) {
     throw new Error('Could not resolve bundled image asset')

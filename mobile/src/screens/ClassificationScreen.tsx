@@ -101,8 +101,6 @@ export type Classification = {
   latitude?: number;
   longitude?: number;
   hasPhoto?: boolean;
-  latitude?: number;
-  longitude?: number;
 };
 
 type ClassificationScreenProps = {
@@ -153,21 +151,6 @@ export const ClassificationScreen = ({
  const isManual = variant === "manual";
 
 const deviceLocation = useDeviceLocation();
-
-const fallbackMain =
-  selectedSampleIssue?.locationName ?? LOCATION_MAIN_LINE;
-const fallbackSub =
-  selectedSampleIssue?.address ?? LOCATION_SUB_LINE;
-
-const locationMainLine =
-  deviceLocation.status === "ready"
-    ? deviceLocation.locationMain
-    : fallbackMain;
-
-const locationSubLine =
-  deviceLocation.status === "ready"
-    ? deviceLocation.locationSub
-    : fallbackSub;
 
 const [category, setCategory] = useState(
   isManual ? "" : getInitialCategory(selectedSampleIssue)
@@ -527,7 +510,7 @@ const [tag, setTag] = useState(
                 <Text style={styles.addressMain}>Getting your location…</Text>
               ) : deviceLocation.status === "denied" || deviceLocation.status === "error" ? (
                 <>
-                  <Text style={styles.addressMain}>{fallbackMain}</Text>
+                  <Text style={styles.addressMain}>{locationMainLine}</Text>
                   <Text style={styles.addressSub}>{deviceLocation.message}</Text>
                 </>
               ) : (
@@ -694,6 +677,7 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
   },
   doneEditText: { color: '#4F8EF7', fontWeight: '700', fontSize: 14 },
+  editLink: { color: '#4F8EF7', fontWeight: '800', fontSize: 14 },
 
   dropdown: {
     marginTop: 4,
