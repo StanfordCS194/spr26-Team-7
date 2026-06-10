@@ -9,12 +9,17 @@ import {
 } from 'react'
 import { StyleSheet, View } from 'react-native'
 import { WebView, WebViewMessageEvent } from 'react-native-webview'
-import { PIPELINE_HTML } from './pipeline.html'
+import { PIPELINE_HTML } from './pipelineHtml'
 import { MlClassification, PipelineResponse, toMlClassification } from './types'
 
 export type MlStatus = 'loading' | 'ready' | 'error'
 
 export type MlStage = 'router' | 'extract' | 'describe'
+
+// Stable identity: react-native-webview reloads the page whenever the `source`
+// object identity changes, which would restart the model download on every
+// re-render. Keep it at module scope so it never changes.
+const WEBVIEW_SOURCE = { html: PIPELINE_HTML, baseUrl: 'https://cityfix.local/' }
 
 type MLContextValue = {
   status: MlStatus
@@ -170,7 +175,7 @@ export const MLProvider = ({ children }: MLProviderProps) => {
       <View style={styles.hidden} pointerEvents="none">
         <WebView
           ref={webViewRef}
-          source={{ html: PIPELINE_HTML, baseUrl: 'https://cityfix.local/' }}
+          source={WEBVIEW_SOURCE}
           originWhitelist={['*']}
           onMessage={handleMessage}
           javaScriptEnabled

@@ -1,7 +1,12 @@
 // On-device port of the Python ML pipeline (ml/pipeline + ml/models).
 //
-// CLIP (zero-shot) handles routing + structured extraction and BLIP handles
-// captioning, mirroring ml/models/classifier.py and ml/models/captioner.py.
+// CLIP (zero-shot) handles routing + structured extraction, mirroring
+// ml/models/classifier.py. For captioning we use the open ViT-GPT2 model
+// instead of BLIP: the Salesforce BLIP repos (and their Xenova/onnx-community
+// mirrors) are gated on the Hub and return 401 to anonymous browser clients,
+// and Hugging Face does not allow access tokens in client-side code. ViT-GPT2
+// is fully public and exposes the same image-to-text pipeline.
+//
 // Everything runs client-side via transformers.js inside a WebView, so the app
 // needs no separate Python/FastAPI server.
 //
@@ -10,13 +15,16 @@
 
 const TRANSFORMERS_CDN = 'https://cdn.jsdelivr.net/npm/@huggingface/transformers@3';
 const CLIP_MODEL = 'Xenova/clip-vit-base-patch32';
-const BLIP_MODEL = 'Xenova/blip-image-captioning-base';
+const CAPTION_MODEL = 'Xenova/vit-gpt2-image-captioning';
 
 const PIPELINE_SCRIPT = `
 import { pipeline, env } from '${TRANSFORMERS_CDN}';
 
 env.allowLocalModels = false;
 env.backends.onnx.wasm.numThreads = 1;
+// Persist downloaded weights in the WebView's Cache Storage so they are fetched
+// from the Hub only once and reused on subsequent launches.
+env.useBrowserCache = true;
 
 function post(obj) {
   if (window.ReactNativeWebView) {
@@ -25,8 +33,10 @@ function post(obj) {
 }
 
 let clip = null;
-let blip = null;
+let captioner = null;
 let ready = false;
+let initError = null;
+let initPromise = null;
 
 function loadProgress(which) {
   return function (p) {
@@ -36,16 +46,41 @@ function loadProgress(which) {
   };
 }
 
+// A tiny throwaway image used to compile the ONNX graphs at startup so the
+// first real classification doesn't pay the warm-up cost.
+function warmupImage() {
+  const c = document.createElement('canvas');
+  c.width = 64;
+  c.height = 64;
+  const ctx = c.getContext('2d');
+  ctx.fillStyle = '#808080';
+  ctx.fillRect(0, 0, 64, 64);
+  return c.toDataURL('image/png');
+}
+
+async function warmup() {
+  try {
+    const img = warmupImage();
+    await clip(img, ['a photo'], { hypothesis_template: '{}' });
+    await captioner(img, { max_new_tokens: 1 });
+  } catch (e) {
+    // Warm-up is best-effort; a failure here doesn't block real inference.
+  }
+}
+
 async function init() {
   try {
     post({ type: 'status', state: 'loading', detail: 'Loading vision model' });
     clip = await pipeline('zero-shot-image-classification', '${CLIP_MODEL}', { progress_callback: loadProgress('clip') });
     post({ type: 'status', state: 'loading', detail: 'Loading caption model' });
-    blip = await pipeline('image-to-text', '${BLIP_MODEL}', { progress_callback: loadProgress('blip') });
+    captioner = await pipeline('image-to-text', '${CAPTION_MODEL}', { progress_callback: loadProgress('caption') });
+    post({ type: 'status', state: 'loading', detail: 'Warming up models' });
+    await warmup();
     ready = true;
     post({ type: 'status', state: 'ready' });
   } catch (e) {
-    post({ type: 'status', state: 'error', message: String(e && e.message ? e.message : e) });
+    initError = String(e && e.message ? e.message : e);
+    post({ type: 'status', state: 'error', message: initError });
   }
 }
 
@@ -74,7 +109,7 @@ async function clipBool(image, trueText, falseText) {
 }
 
 async function caption(image) {
-  const out = await blip(image, { max_new_tokens: 60 });
+  const out = await captioner(image, { max_new_tokens: 60 });
   return (out && out[0] && out[0].generated_text ? out[0].generated_text : '').trim();
 }
 
@@ -376,7 +411,8 @@ STAGES.vehicle = {
 
 window.__mlClassify = async function (requestId, dataUrl) {
   try {
-    if (!ready) { post({ type: 'error', requestId: requestId, message: 'Model not ready' }); return; }
+    if (initPromise) { await initPromise; }
+    if (!ready) { post({ type: 'error', requestId: requestId, message: initError || 'Model not ready' }); return; }
     post({ type: 'progress', requestId: requestId, stage: 'router' });
     const routerResult = await route(dataUrl);
     const category = routerResult.top_category;
@@ -391,7 +427,7 @@ window.__mlClassify = async function (requestId, dataUrl) {
   }
 };
 
-init();
+initPromise = init();
 `;
 
 export const PIPELINE_HTML = `<!DOCTYPE html>

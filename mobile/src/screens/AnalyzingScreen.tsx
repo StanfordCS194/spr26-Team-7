@@ -17,6 +17,10 @@ const STAGE_LABEL: Record<MlStage, string> = {
   describe: "Writing the report…",
 };
 
+// Keep the analysis screen up for at least this long so the result never flashes
+// by instantly, even when on-device inference finishes faster.
+const MIN_VISIBLE_MS = 2000;
+
 export const AnalyzingScreen = ({ image, imageUri, onDone }: AnalyzingScreenProps) => {
   const { status, loadPct, classify } = useML();
   const [phaseText, setPhaseText] = useState("Preparing photo…");
@@ -25,6 +29,8 @@ export const AnalyzingScreen = ({ image, imageUri, onDone }: AnalyzingScreenProp
   const phaseOpacity = useRef(new Animated.Value(1)).current;
   const onDoneRef = useRef(onDone);
   onDoneRef.current = onDone;
+  const startedAtRef = useRef(Date.now());
+  const finishTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     Animated.loop(
@@ -55,6 +61,22 @@ export const AnalyzingScreen = ({ image, imageUri, onDone }: AnalyzingScreenProp
   useEffect(() => {
     let cancelled = false;
 
+    const finish = (result: MlClassification | null) => {
+      if (cancelled) {
+        return;
+      }
+      const remaining = MIN_VISIBLE_MS - (Date.now() - startedAtRef.current);
+      if (remaining <= 0) {
+        onDoneRef.current(result);
+        return;
+      }
+      finishTimerRef.current = setTimeout(() => {
+        if (!cancelled) {
+          onDoneRef.current(result);
+        }
+      }, remaining);
+    };
+
     const resolveDataUrl = async (): Promise<string | null> => {
       if (imageUri) {
         return uriToDataUrl(imageUri);
@@ -72,7 +94,7 @@ export const AnalyzingScreen = ({ image, imageUri, onDone }: AnalyzingScreenProp
           return;
         }
         if (!dataUrl) {
-          onDoneRef.current(null);
+          finish(null);
           return;
         }
 
@@ -89,13 +111,11 @@ export const AnalyzingScreen = ({ image, imageUri, onDone }: AnalyzingScreenProp
 
         if (!cancelled) {
           setProgress(100);
-          onDoneRef.current(result);
+          finish(result);
         }
       } catch (error) {
         console.error("[ml] classification failed", error);
-        if (!cancelled) {
-          onDoneRef.current(null);
-        }
+        finish(null);
       }
     };
 
@@ -103,6 +123,9 @@ export const AnalyzingScreen = ({ image, imageUri, onDone }: AnalyzingScreenProp
 
     return () => {
       cancelled = true;
+      if (finishTimerRef.current) {
+        clearTimeout(finishTimerRef.current);
+      }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
