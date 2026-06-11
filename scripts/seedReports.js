@@ -78,8 +78,6 @@ function supabaseRequest(method, table, body, params) {
 }
 
 // ── Seed report definitions ───────────────────────────────────────────────────
-const SEED_USER_ID = 'fea756a7-6d93-49e5-9cb0-63987e3fcb6a'
-
 const now = Date.now()
 const mins = (m) => m * 60_000
 
@@ -90,7 +88,7 @@ function ts(minutesAgo) {
 const SEED_REPORTS = [
   // ── 3 days ago — 4 reports ──────────────────────────────────────────────────
   {
-    user_id:             SEED_USER_ID,
+    user_id:             null,
     external_id:         'GC-2026-05421',
     title:               'Illegal Dumping at 4th & Santa Clara',
     category:            'Illegal Dumping',
@@ -117,7 +115,7 @@ const SEED_REPORTS = [
     created_at: ts(mins(3 * 24 * 60 + 22 * 60 + 46)),
   },
   {
-    user_id:             SEED_USER_ID,
+    user_id:             null,
     external_id:         'GC-2026-05422',
     title:               'Graffiti on Market & Post',
     category:            'Graffiti',
@@ -144,7 +142,7 @@ const SEED_REPORTS = [
     created_at: ts(mins(3 * 24 * 60 + 20 * 60 + 13)),
   },
   {
-    user_id:             SEED_USER_ID,
+    user_id:             null,
     external_id:         'GC-2026-05423',
     title:               'Pothole at 7th & Empire',
     category:            'Pothole',
@@ -171,7 +169,7 @@ const SEED_REPORTS = [
     created_at: ts(mins(3 * 24 * 60 + 16 * 60 + 27)),
   },
   {
-    user_id:             SEED_USER_ID,
+    user_id:             null,
     external_id:         'GC-2026-05424',
     title:               'Illegal Dumping at S 1st & Reed',
     category:            'Illegal Dumping',
@@ -200,7 +198,7 @@ const SEED_REPORTS = [
 
   // ── Yesterday — 5 reports ───────────────────────────────────────────────────
   {
-    user_id:             SEED_USER_ID,
+    user_id:             null,
     external_id:         'GC-2026-05425',
     title:               'Pothole at Santa Clara & 10th',
     category:            'Pothole',
@@ -227,7 +225,7 @@ const SEED_REPORTS = [
     created_at: ts(mins(1 * 24 * 60 + 23 * 60 + 38)),
   },
   {
-    user_id:             SEED_USER_ID,
+    user_id:             null,
     external_id:         'GC-2026-05426',
     title:               'Streetlight Out at N 1st & Saint James',
     category:            'Streetlight Outage',
@@ -254,7 +252,7 @@ const SEED_REPORTS = [
     created_at: ts(mins(1 * 24 * 60 + 21 * 60 + 55)),
   },
   {
-    user_id:             SEED_USER_ID,
+    user_id:             null,
     external_id:         'GC-2026-05427',
     title:               'Graffiti on 3rd & Saint James',
     category:            'Graffiti',
@@ -281,7 +279,7 @@ const SEED_REPORTS = [
     created_at: ts(mins(1 * 24 * 60 + 19 * 60 + 30)),
   },
   {
-    user_id:             SEED_USER_ID,
+    user_id:             null,
     external_id:         'GC-2026-05428',
     title:               'Illegal Dumping near San Pedro & Julian',
     category:            'Illegal Dumping',
@@ -308,7 +306,7 @@ const SEED_REPORTS = [
     created_at: ts(mins(1 * 24 * 60 + 15 * 60 + 42)),
   },
   {
-    user_id:             SEED_USER_ID,
+    user_id:             null,
     external_id:         'GC-2026-05429',
     title:               'Abandoned Vehicle at Almaden & Park',
     category:            'Vehicle Concerns',
@@ -337,7 +335,7 @@ const SEED_REPORTS = [
 
   // ── Today (within last 24h) — 6 reports ─────────────────────────────────────
   {
-    user_id:             SEED_USER_ID,
+    user_id:             null,
     external_id:         'GC-2026-05430',
     title:               'Pothole at 1st & San Fernando',
     category:            'Pothole',
@@ -364,7 +362,7 @@ const SEED_REPORTS = [
     created_at: ts(mins(7 * 60)),
   },
   {
-    user_id:             SEED_USER_ID,
+    user_id:             null,
     external_id:         'GC-2026-05431',
     title:               'Streetlight Out at N Market & Hedding',
     category:            'Streetlight Outage',
@@ -391,7 +389,7 @@ const SEED_REPORTS = [
     created_at: ts(mins(6 * 60)),
   },
   {
-    user_id:             SEED_USER_ID,
+    user_id:             null,
     external_id:         'GC-2026-05432',
     title:               'Graffiti at W Santa Clara & Delmas',
     category:            'Graffiti',
@@ -418,7 +416,7 @@ const SEED_REPORTS = [
     created_at: ts(mins(5 * 60)),
   },
   {
-    user_id:             SEED_USER_ID,
+    user_id:             null,
     external_id:         'GC-2026-05433',
     title:               'Illegal Dumping at Race & Julian',
     category:            'Illegal Dumping',
@@ -445,7 +443,7 @@ const SEED_REPORTS = [
     created_at: ts(mins(4 * 60)),
   },
   {
-    user_id:             SEED_USER_ID,
+    user_id:             null,
     external_id:         'GC-2026-05434',
     title:               'Encampment at N 4th & William',
     category:            'Encampment Concerns',
@@ -472,7 +470,7 @@ const SEED_REPORTS = [
     created_at: ts(mins(3 * 60)),
   },
   {
-    user_id:             SEED_USER_ID,
+    user_id:             null,
     external_id:         'GC-2026-05435',
     title:               'Junk Pickup at Almaden & San Carlos',
     category:            'Illegal Dumping',

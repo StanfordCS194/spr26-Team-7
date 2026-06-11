@@ -8,7 +8,7 @@ import { useDashboardData } from '../context/DashboardContext'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type Period     = 'month' | 'year'
-type CatView    = 'fixtime' | 'resrate' | 'volume'
+type CatView    = 'fixtime' | 'resrate'
 type TrendScale = 'month'  | 'year'
 
 // ─── Palette ─────────────────────────────────────────────────────────────────
@@ -115,8 +115,11 @@ function ChevRight({ size = 18, color = D.faint }: { size?: number; color?: stri
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 function fmtTime(h: number): string {
-  const r = Math.round(h)
-  return r < 48 ? `${r} hrs` : `${Math.round(h / 24)} days`
+  if (h < 1) {
+    const mins = Math.round(h * 60)
+    return mins < 1 ? '< 1 min' : `${mins} mins`
+  }
+  return h < 48 ? `${Math.round(h)} hrs` : `${Math.round(h / 24)} days`
 }
 function fmtNum(n: number): string { return Math.round(n).toLocaleString('en-US') }
 
@@ -159,7 +162,7 @@ export function InsightsScreen({ district, onDistrictChange, onViewChronicSpot }
 
   const [period,      setPeriod]      = useState<Period>('month')
   const [catView,     setCatView]     = useState<CatView>('fixtime')
-  const [trendScale,  setTrendScale]  = useState<TrendScale>('month')
+  const [trendScale,  setTrendScale]  = useState<TrendScale>('year')
   const [compareKey,  setCompareKey]  = useState<string>('cityAverage')
   const [showCompare, setShowCompare] = useState(false)
   const [showInfo,    setShowInfo]    = useState(false)
@@ -177,8 +180,12 @@ export function InsightsScreen({ district, onDistrictChange, onViewChronicSpot }
 
   const sortedCatItems = useMemo(() => {
     if (catView === 'fixtime')
-      return catItems.filter(c => c.fixTimeHours !== null)
-        .sort((a, b) => (a.fixTimeHours ?? 0) - (b.fixTimeHours ?? 0))
+      return [...catItems].sort((a, b) => {
+        if (a.fixTimeHours === null && b.fixTimeHours === null) return 0
+        if (a.fixTimeHours === null) return 1
+        if (b.fixTimeHours === null) return -1
+        return a.fixTimeHours - b.fixTimeHours
+      })
     if (catView === 'resrate')
       return [...catItems].sort((a, b) => b.resolutionRate - a.resolutionRate)
     return [...catItems].sort((a, b) => b.volume - a.volume)
@@ -210,10 +217,18 @@ export function InsightsScreen({ district, onDistrictChange, onViewChronicSpot }
   })), [trendKeys, trendScale, distData])
 
   const trendChanges = useMemo(() => {
-    const raw: { name: string; pct: number }[] = trendScale === 'month'
-      ? (v1?.trendsVsMonth ?? []) : (v1?.trendsVsYear ?? [])
-    return [...raw].sort((a, b) => Math.abs(b.pct) - Math.abs(a.pct))
-  }, [trendScale, v1])
+    return trendKeys.map(key => {
+      const pts = trendScale === 'month'
+        ? distData.trendLines[key]?.monthly
+        : distData.trendLines[key]?.yearly
+      if (!pts || pts.length < 2) return null
+      const prev = pts[pts.length - 2].count
+      const curr = pts[pts.length - 1].count
+      if (prev === 0) return null
+      const pct = Math.round(((curr - prev) / prev) * 100)
+      return { name: key, pct }
+    }).filter((x): x is { name: string; pct: number } => x !== null)
+  }, [trendKeys, trendScale, distData])
 
   const CHART_H = 158
   const padL = 32, padR = 8, padT = 12, padB = 24
@@ -378,7 +393,7 @@ export function InsightsScreen({ district, onDistrictChange, onViewChronicSpot }
             <Text style={s.secRight}>{period === 'month' ? 'This month' : 'This year'}</Text>
           </View>
           <View style={s.seg}>
-            {([['fixtime','Fix Time'],['resrate','Resolution Rate'],['volume','Volume']] as [CatView,string][]).map(([k,lbl]) => (
+            {([['fixtime','Fix Time'],['resrate','Resolution Rate']] as [CatView,string][]).map(([k,lbl]) => (
               <Pressable key={k} style={[s.segBtn, catView === k && s.segBtnOn]} onPress={() => setCatView(k)}>
                 <Text style={[s.segText, catView === k && s.segTextOn]}>{lbl}</Text>
               </Pressable>
@@ -386,23 +401,23 @@ export function InsightsScreen({ district, onDistrictChange, onViewChronicSpot }
           </View>
           <View style={{ gap: 14 }}>
             {sortedCatItems.map(item => {
-              const raw   = catView === 'fixtime' ? item.fixTimeHours!
-                          : catView === 'resrate'  ? item.resolutionRate
-                          : item.volume
-              const frac  = catView === 'resrate' ? raw / 100 : raw / barMax
-              const color = barColor(catView, raw, barMax)
-              const label = catView === 'fixtime' ? fmtTime(item.fixTimeHours!)
-                          : catView === 'resrate'  ? `${item.resolutionRate}%`
-                          : fmtNum(item.volume)
+              const noData = catView === 'fixtime' && item.fixTimeHours === null
+              const raw    = catView === 'fixtime' ? (item.fixTimeHours ?? 0) : item.resolutionRate
+              const frac   = noData ? 0 : catView === 'resrate' ? raw / 100 : raw / barMax
+              const color  = barColor(catView, raw, barMax)
+              const label  = noData ? 'N/A' : catView === 'fixtime' ? fmtTime(item.fixTimeHours!) : `${item.resolutionRate}%`
               return (
                 <View key={item.type}>
                   <View style={s.barTopRow}>
                     <CatIcon type={item.type} size={15} color={D.faint} />
                     <Text style={s.barName}>{item.type}</Text>
-                    <Text style={s.barVal}>{label}</Text>
+                    <Text style={[s.barVal, noData && { color: D.muted, fontSize: 11 }]}>{label}</Text>
                   </View>
                   <View style={s.barTrack}>
-                    <View style={[s.barFill, { width: `${Math.round(frac * 100)}%` as any, backgroundColor: color }]} />
+                    {noData
+                      ? <View style={[s.barFill, { width: '100%', backgroundColor: '#2a2b2f' }]} />
+                      : <View style={[s.barFill, { width: `${Math.round(frac * 100)}%` as any, backgroundColor: color }]} />
+                    }
                   </View>
                 </View>
               )
@@ -446,7 +461,7 @@ export function InsightsScreen({ district, onDistrictChange, onViewChronicSpot }
           <Text style={s.secH2}>Trends</Text>
         </View>
         <View style={[s.seg, { marginBottom: 14 }]}>
-          {([['month','vs Last Month'],['year','vs Last Year']] as [TrendScale,string][]).map(([k,lbl]) => (
+          {([['month','2026 Monthly'],['year','Since 2017']] as [TrendScale,string][]).map(([k,lbl]) => (
             <Pressable key={k} style={[s.segBtn, trendScale === k && s.segBtnOn]} onPress={() => setTrendScale(k)}>
               <Text style={[s.segText, trendScale === k && s.segTextOn]}>{lbl}</Text>
             </Pressable>

@@ -9,6 +9,8 @@ import {
   MapReport, MapReportCategoryId, MapReportStatus,
 } from '../data/mockMapReports'
 import { fetchAllMapReports } from '../lib/mapReports'
+import { SampleIssueImage as SampleIssueImageData } from '../types'
+import { SampleIssueImage } from '../components/SampleIssueImage'
 
 // ── Palette ────────────────────────────────────────────────────────────────────
 const D = {
@@ -222,9 +224,9 @@ const ClusterMarkerView = ({ count, dominantCat }: { count: number; dominantCat:
 
 // ── PreviewCard ────────────────────────────────────────────────────────────────
 const PreviewCard = ({
-  report, onTap,
+  report, image, onTap,
 }: {
-  report: MapReport; onTap: () => void
+  report: MapReport; image?: SampleIssueImageData | null; onTap: () => void
 }) => {
   const slideY = useRef(new Animated.Value(20)).current
   const ago    = timeAgo(report.createdAt) ?? report.createdAt.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
@@ -241,7 +243,10 @@ const PreviewCard = ({
   return (
     <Animated.View style={[pc.card, { transform: [{ translateY: slideY }] }]}>
       <Pressable style={pc.top} onPress={onTap}>
-        <PhotoPlaceholder size={64} />
+        {image
+          ? <SampleIssueImage image={image} style={{ width: 64, height: 64, borderRadius: 10 }} />
+          : <PhotoPlaceholder size={64} />
+        }
         <View style={pc.info}>
           <Text style={pc.type} numberOfLines={1}>{report.title.split(' at ')[0]}</Text>
           <Text style={pc.loc}  numberOfLines={2}>{report.address.replace(', San Jose, CA', '').replace(', San José, CA', '')}</Text>
@@ -326,7 +331,7 @@ type Props = {
   extraReports?: MapReport[]
   focusReport?: MapReport | null
   onFocusConsumed?: () => void
-  reportImages?: Record<string, unknown>
+  reportImages?: Record<string, SampleIssueImageData>
 }
 
 const CARD_W  = 252
@@ -336,7 +341,7 @@ const FILTER_H = 116
 const ANCHOR_Y_WITH_BADGE    = (BADGE_H + BADGE_GAP + DOT_SIZE / 2) / (BADGE_H + BADGE_GAP + DOT_SIZE)
 const MARKER_ANCHOR = { x: 0.5, y: ANCHOR_Y_WITH_BADGE }
 
-export const DashboardMap = ({ district, onViewReport, extraReports, focusReport, onFocusConsumed }: Props) => {
+export const DashboardMap = ({ district, onViewReport, extraReports, focusReport, onFocusConsumed, reportImages }: Props) => {
   const mapRef       = useRef<MapView>(null)
   const currentRegion= useRef<Region>({
     latitude: DISTRICT_CENTERS[district]?.latitude  ?? 37.338,
@@ -542,6 +547,7 @@ export const DashboardMap = ({ district, onViewReport, extraReports, focusReport
         >
           <PreviewCard
             report={selectedReport}
+            image={reportImages?.[selectedReport.id]}
             onTap={() => onViewReport(selectedReport)}
           />
         </View>

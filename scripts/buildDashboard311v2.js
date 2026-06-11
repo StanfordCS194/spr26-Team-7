@@ -172,7 +172,7 @@ function loadPopulationShares(features) {
 }
 
 // ── Data quality threshold ────────────────────────────────────────────────────
-const MIN_CLOSED_FOR_AVG = 50
+const MIN_CLOSED_FOR_AVG = 5
 
 // ── Count accumulators ────────────────────────────────────────────────────────
 const distStats     = {}  // [d][ym]            = { total, closed, open }
@@ -557,6 +557,28 @@ function buildTrendLines(d, currentYM, allYears) {
       })),
     }
   }
+
+  // Trim leading months where every category has 0 — avoids a long flat
+  // zero run at the start when the dataset doesn't cover the full 12 months.
+  const allSeries = Object.values(result)
+  let firstNonZero = 0
+  for (let i = 0; i < last12.length; i++) {
+    if (allSeries.some(s => s.monthly[i].count > 0)) { firstNonZero = i; break }
+  }
+  if (firstNonZero > 0) {
+    for (const series of allSeries) series.monthly = series.monthly.slice(firstNonZero)
+  }
+
+  // Same trim for yearly
+  const yearLen = allYears.length
+  let firstNonZeroYear = 0
+  for (let i = 0; i < yearLen; i++) {
+    if (allSeries.some(s => s.yearly[i].count > 0)) { firstNonZeroYear = i; break }
+  }
+  if (firstNonZeroYear > 0) {
+    for (const series of allSeries) series.yearly = series.yearly.slice(firstNonZeroYear)
+  }
+
   return result
 }
 
