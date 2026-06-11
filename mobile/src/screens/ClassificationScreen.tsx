@@ -389,7 +389,7 @@ export const ClassificationScreen = ({
           accessibilityState={{ disabled: isSubmitting, busy: isSubmitting }}
         >
           {isSubmitting ? (
-            <Text style={styles.submitText}>Opening email…</Text>
+            <Text style={styles.submitText}>Opening 311 form…</Text>
           ) : (
             <>
               <Text style={styles.submitCheck}>✓</Text>

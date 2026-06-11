@@ -24,6 +24,8 @@ import { sampleIssues } from './src/data/sampleIssues';
 import { DashboardProvider } from './src/context/DashboardContext';
 import { postSubmission } from './src/api/serverApi';
 import { sendReportEmail } from './src/lib/reportEmail';
+import { confirmSj311Submission, submitSanJose311Report, Sj311SubmitSession } from './src/lib/sanjose311/submitReport';
+import { SanJose311SubmitScreen } from './src/screens/SanJose311SubmitScreen';
 import { ProfileReport } from './src/lib/profileStats';
 import { createReport, fetchReportByExternalId, fetchReportsByIds, fetchUserReports, getSampleIssueIdFromRow, ReportRow, reportRowToMapReport, updateReportText } from './src/lib/reports';
 import { fetchFollowedReportIds, followReport, unfollowReport } from './src/lib/reportFollows';
@@ -252,7 +254,7 @@ const createGuestMapReport = (
   };
 };
 
-type ReportStep = 'picker' | 'camera' | 'analyzing' | 'classify' | 'confirmation' | 'tracking' | 'submitted-view';
+type ReportStep = 'picker' | 'camera' | 'analyzing' | 'classify' | 'sj311_submit' | 'confirmation' | 'tracking' | 'submitted-view';
 
 export default function App() {
   const { session, user, isLoading, signOut } = useAuth();
@@ -263,6 +265,7 @@ export default function App() {
   const [showOnboarding, setShowOnboarding]           = useState(false);
   const [isCheckingOnboarding, setIsCheckingOnboarding] = useState(true);
   const [reportStep, setReportStep]                   = useState<ReportStep>('camera');
+  const [sj311SubmitSession, setSj311SubmitSession] = useState<Sj311SubmitSession | null>(null);
   const [classification, setClassification]           = useState<Classification | null>(null);
   const [mapReport, setMapReport]                     = useState<MapReport | null>(null);
   const [chronicSpot, setChronicSpot]                 = useState<ChronicSpotV2 | null>(null);
@@ -840,24 +843,37 @@ export default function App() {
     setIsSendingReport(true);
 
     try {
-      const outcome = await sendReportEmail(c, user?.email);
-
-      if (outcome === 'cancelled') {
-        Alert.alert('Report not sent', 'Send the email to submit your report to the city.');
-        return;
-      }
-
-      if (outcome === 'needs_confirmation') {
-        const confirmed = await confirmEmailWasSent();
-        if (!confirmed) {
-          return;
-        }
-      }
-
-      await completeReportSubmission(c);
+      const { session } = await submitSanJose311Report(c, { email: user?.email ?? null });
+      setSj311SubmitSession(session);
+      setReportStep('sj311_submit');
+    } catch (error) {
+      console.error('[sj311] prepare failed', error);
+      Alert.alert(
+        'Could not open 311 form',
+        'CityFix could not prepare the San José 311 submission. Please try again.',
+      );
     } finally {
       setIsSendingReport(false);
     }
+  };
+
+  const handleSj311Cancel = () => {
+    setSj311SubmitSession(null);
+    setReportStep('classify');
+  };
+
+  const handleSj311Submitted = async () => {
+    if (!classification) {
+      return;
+    }
+
+    const confirmed = await confirmSj311Submission();
+    if (!confirmed) {
+      return;
+    }
+
+    setSj311SubmitSession(null);
+    await completeReportSubmission(classification);
   };
 
   const handleSignOut = async () => {
@@ -885,6 +901,7 @@ export default function App() {
     setPendingSubmissionId(null);
     setPendingRecord(null);
     setReportImage(null);
+    setSj311SubmitSession(null);
   };
 
   const renderReportFlow = () => {
@@ -942,6 +959,15 @@ export default function App() {
           selectedSampleIssue={selectedSampleIssue}
           mlResult={mlResult}
           reportImage={selectedSampleIssue?.image ?? reportImage}
+        />
+      );
+    }
+    if (reportStep === 'sj311_submit' && sj311SubmitSession) {
+      return (
+        <SanJose311SubmitScreen
+          session={sj311SubmitSession}
+          onCancel={handleSj311Cancel}
+          onSubmitted={handleSj311Submitted}
         />
       );
     }
