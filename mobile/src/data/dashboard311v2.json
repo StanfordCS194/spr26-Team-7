@@ -1,6 +1,6 @@
 {
   "meta": {
-    "generatedAt": "2026-06-10T21:33:52.337Z",
+    "generatedAt": "2026-06-11T00:36:48.225Z",
     "currentMonth": "2026-05",
     "currentYear": 2026,
     "isPartialMonth": true,
@@ -50,13 +50,13 @@
           },
           {
             "type": "Encampment Concerns",
-            "fixTimeHours": null,
+            "fixTimeHours": 47.3,
             "resolutionRate": 50,
             "volume": 12
           },
           {
             "type": "Streetlight Outage",
-            "fixTimeHours": null,
+            "fixTimeHours": 4.9,
             "resolutionRate": 82,
             "volume": 11
           },
@@ -149,34 +149,6 @@
         "Junk Pickup": {
           "monthly": [
             {
-              "period": "2025-06",
-              "count": 0
-            },
-            {
-              "period": "2025-07",
-              "count": 0
-            },
-            {
-              "period": "2025-08",
-              "count": 0
-            },
-            {
-              "period": "2025-09",
-              "count": 0
-            },
-            {
-              "period": "2025-10",
-              "count": 0
-            },
-            {
-              "period": "2025-11",
-              "count": 0
-            },
-            {
-              "period": "2025-12",
-              "count": 0
-            },
-            {
               "period": "2026-01",
               "count": 890
             },
@@ -234,34 +206,6 @@
         },
         "Graffiti": {
           "monthly": [
-            {
-              "period": "2025-06",
-              "count": 0
-            },
-            {
-              "period": "2025-07",
-              "count": 0
-            },
-            {
-              "period": "2025-08",
-              "count": 0
-            },
-            {
-              "period": "2025-09",
-              "count": 0
-            },
-            {
-              "period": "2025-10",
-              "count": 0
-            },
-            {
-              "period": "2025-11",
-              "count": 0
-            },
-            {
-              "period": "2025-12",
-              "count": 0
-            },
             {
               "period": "2026-01",
               "count": 497
@@ -321,34 +265,6 @@
         "Streetlight Outage": {
           "monthly": [
             {
-              "period": "2025-06",
-              "count": 0
-            },
-            {
-              "period": "2025-07",
-              "count": 0
-            },
-            {
-              "period": "2025-08",
-              "count": 0
-            },
-            {
-              "period": "2025-09",
-              "count": 0
-            },
-            {
-              "period": "2025-10",
-              "count": 0
-            },
-            {
-              "period": "2025-11",
-              "count": 0
-            },
-            {
-              "period": "2025-12",
-              "count": 0
-            },
-            {
               "period": "2026-01",
               "count": 30
             },
@@ -406,34 +322,6 @@
         },
         "Illegal Dumping": {
           "monthly": [
-            {
-              "period": "2025-06",
-              "count": 0
-            },
-            {
-              "period": "2025-07",
-              "count": 0
-            },
-            {
-              "period": "2025-08",
-              "count": 0
-            },
-            {
-              "period": "2025-09",
-              "count": 0
-            },
-            {
-              "period": "2025-10",
-              "count": 0
-            },
-            {
-              "period": "2025-11",
-              "count": 0
-            },
-            {
-              "period": "2025-12",
-              "count": 0
-            },
             {
               "period": "2026-01",
               "count": 355
@@ -493,34 +381,6 @@
         "Vehicle Concerns": {
           "monthly": [
             {
-              "period": "2025-06",
-              "count": 0
-            },
-            {
-              "period": "2025-07",
-              "count": 0
-            },
-            {
-              "period": "2025-08",
-              "count": 0
-            },
-            {
-              "period": "2025-09",
-              "count": 0
-            },
-            {
-              "period": "2025-10",
-              "count": 0
-            },
-            {
-              "period": "2025-11",
-              "count": 0
-            },
-            {
-              "period": "2025-12",
-              "count": 0
-            },
-            {
               "period": "2026-01",
               "count": 341
             },
@@ -578,34 +438,6 @@
         },
         "Container Issues": {
           "monthly": [
-            {
-              "period": "2025-06",
-              "count": 0
-            },
-            {
-              "period": "2025-07",
-              "count": 0
-            },
-            {
-              "period": "2025-08",
-              "count": 0
-            },
-            {
-              "period": "2025-09",
-              "count": 0
-            },
-            {
-              "period": "2025-10",
-              "count": 0
-            },
-            {
-              "period": "2025-11",
-              "count": 0
-            },
-            {
-              "period": "2025-12",
-              "count": 0
-            },
             {
               "period": "2026-01",
               "count": 173
@@ -665,34 +497,6 @@
         "Encampment Concerns": {
           "monthly": [
             {
-              "period": "2025-06",
-              "count": 0
-            },
-            {
-              "period": "2025-07",
-              "count": 0
-            },
-            {
-              "period": "2025-08",
-              "count": 0
-            },
-            {
-              "period": "2025-09",
-              "count": 0
-            },
-            {
-              "period": "2025-10",
-              "count": 0
-            },
-            {
-              "period": "2025-11",
-              "count": 0
-            },
-            {
-              "period": "2025-12",
-              "count": 0
-            },
-            {
               "period": "2026-01",
               "count": 20
             },
@@ -750,34 +554,6 @@
         },
         "Pothole": {
           "monthly": [
-            {
-              "period": "2025-06",
-              "count": 0
-            },
-            {
-              "period": "2025-07",
-              "count": 0
-            },
-            {
-              "period": "2025-08",
-              "count": 0
-            },
-            {
-              "period": "2025-09",
-              "count": 0
-            },
-            {
-              "period": "2025-10",
-              "count": 0
-            },
-            {
-              "period": "2025-11",
-              "count": 0
-            },
-            {
-              "period": "2025-12",
-              "count": 0
-            },
             {
               "period": "2026-01",
               "count": 17
@@ -2883,7 +2659,7 @@
           },
           {
             "type": "Encampment Concerns",
-            "fixTimeHours": null,
+            "fixTimeHours": 15.9,
             "resolutionRate": 38,
             "volume": 21
           },
@@ -2982,34 +2758,6 @@
         "Junk Pickup": {
           "monthly": [
             {
-              "period": "2025-06",
-              "count": 0
-            },
-            {
-              "period": "2025-07",
-              "count": 0
-            },
-            {
-              "period": "2025-08",
-              "count": 0
-            },
-            {
-              "period": "2025-09",
-              "count": 0
-            },
-            {
-              "period": "2025-10",
-              "count": 0
-            },
-            {
-              "period": "2025-11",
-              "count": 0
-            },
-            {
-              "period": "2025-12",
-              "count": 0
-            },
-            {
               "period": "2026-01",
               "count": 857
             },
@@ -3067,34 +2815,6 @@
         },
         "Graffiti": {
           "monthly": [
-            {
-              "period": "2025-06",
-              "count": 0
-            },
-            {
-              "period": "2025-07",
-              "count": 0
-            },
-            {
-              "period": "2025-08",
-              "count": 0
-            },
-            {
-              "period": "2025-09",
-              "count": 0
-            },
-            {
-              "period": "2025-10",
-              "count": 0
-            },
-            {
-              "period": "2025-11",
-              "count": 0
-            },
-            {
-              "period": "2025-12",
-              "count": 0
-            },
             {
               "period": "2026-01",
               "count": 718
@@ -3154,34 +2874,6 @@
         "Streetlight Outage": {
           "monthly": [
             {
-              "period": "2025-06",
-              "count": 0
-            },
-            {
-              "period": "2025-07",
-              "count": 0
-            },
-            {
-              "period": "2025-08",
-              "count": 0
-            },
-            {
-              "period": "2025-09",
-              "count": 0
-            },
-            {
-              "period": "2025-10",
-              "count": 0
-            },
-            {
-              "period": "2025-11",
-              "count": 0
-            },
-            {
-              "period": "2025-12",
-              "count": 0
-            },
-            {
               "period": "2026-01",
               "count": 59
             },
@@ -3239,34 +2931,6 @@
         },
         "Illegal Dumping": {
           "monthly": [
-            {
-              "period": "2025-06",
-              "count": 0
-            },
-            {
-              "period": "2025-07",
-              "count": 0
-            },
-            {
-              "period": "2025-08",
-              "count": 0
-            },
-            {
-              "period": "2025-09",
-              "count": 0
-            },
-            {
-              "period": "2025-10",
-              "count": 0
-            },
-            {
-              "period": "2025-11",
-              "count": 0
-            },
-            {
-              "period": "2025-12",
-              "count": 0
-            },
             {
               "period": "2026-01",
               "count": 267
@@ -3326,34 +2990,6 @@
         "Vehicle Concerns": {
           "monthly": [
             {
-              "period": "2025-06",
-              "count": 0
-            },
-            {
-              "period": "2025-07",
-              "count": 0
-            },
-            {
-              "period": "2025-08",
-              "count": 0
-            },
-            {
-              "period": "2025-09",
-              "count": 0
-            },
-            {
-              "period": "2025-10",
-              "count": 0
-            },
-            {
-              "period": "2025-11",
-              "count": 0
-            },
-            {
-              "period": "2025-12",
-              "count": 0
-            },
-            {
               "period": "2026-01",
               "count": 262
             },
@@ -3411,34 +3047,6 @@
         },
         "Container Issues": {
           "monthly": [
-            {
-              "period": "2025-06",
-              "count": 0
-            },
-            {
-              "period": "2025-07",
-              "count": 0
-            },
-            {
-              "period": "2025-08",
-              "count": 0
-            },
-            {
-              "period": "2025-09",
-              "count": 0
-            },
-            {
-              "period": "2025-10",
-              "count": 0
-            },
-            {
-              "period": "2025-11",
-              "count": 0
-            },
-            {
-              "period": "2025-12",
-              "count": 0
-            },
             {
               "period": "2026-01",
               "count": 167
@@ -3498,34 +3106,6 @@
         "Encampment Concerns": {
           "monthly": [
             {
-              "period": "2025-06",
-              "count": 0
-            },
-            {
-              "period": "2025-07",
-              "count": 0
-            },
-            {
-              "period": "2025-08",
-              "count": 0
-            },
-            {
-              "period": "2025-09",
-              "count": 0
-            },
-            {
-              "period": "2025-10",
-              "count": 0
-            },
-            {
-              "period": "2025-11",
-              "count": 0
-            },
-            {
-              "period": "2025-12",
-              "count": 0
-            },
-            {
               "period": "2026-01",
               "count": 25
             },
@@ -3583,34 +3163,6 @@
         },
         "Pothole": {
           "monthly": [
-            {
-              "period": "2025-06",
-              "count": 0
-            },
-            {
-              "period": "2025-07",
-              "count": 0
-            },
-            {
-              "period": "2025-08",
-              "count": 0
-            },
-            {
-              "period": "2025-09",
-              "count": 0
-            },
-            {
-              "period": "2025-10",
-              "count": 0
-            },
-            {
-              "period": "2025-11",
-              "count": 0
-            },
-            {
-              "period": "2025-12",
-              "count": 0
-            },
             {
               "period": "2026-01",
               "count": 16
@@ -5436,7 +4988,7 @@
           },
           {
             "type": "Encampment Concerns",
-            "fixTimeHours": null,
+            "fixTimeHours": 49.8,
             "resolutionRate": 38,
             "volume": 34
           },
@@ -5535,34 +5087,6 @@
         "Junk Pickup": {
           "monthly": [
             {
-              "period": "2025-06",
-              "count": 0
-            },
-            {
-              "period": "2025-07",
-              "count": 0
-            },
-            {
-              "period": "2025-08",
-              "count": 0
-            },
-            {
-              "period": "2025-09",
-              "count": 0
-            },
-            {
-              "period": "2025-10",
-              "count": 0
-            },
-            {
-              "period": "2025-11",
-              "count": 0
-            },
-            {
-              "period": "2025-12",
-              "count": 0
-            },
-            {
               "period": "2026-01",
               "count": 900
             },
@@ -5620,34 +5144,6 @@
         },
         "Graffiti": {
           "monthly": [
-            {
-              "period": "2025-06",
-              "count": 0
-            },
-            {
-              "period": "2025-07",
-              "count": 0
-            },
-            {
-              "period": "2025-08",
-              "count": 0
-            },
-            {
-              "period": "2025-09",
-              "count": 0
-            },
-            {
-              "period": "2025-10",
-              "count": 0
-            },
-            {
-              "period": "2025-11",
-              "count": 0
-            },
-            {
-              "period": "2025-12",
-              "count": 0
-            },
             {
               "period": "2026-01",
               "count": 570
@@ -5707,34 +5203,6 @@
         "Streetlight Outage": {
           "monthly": [
             {
-              "period": "2025-06",
-              "count": 0
-            },
-            {
-              "period": "2025-07",
-              "count": 0
-            },
-            {
-              "period": "2025-08",
-              "count": 0
-            },
-            {
-              "period": "2025-09",
-              "count": 0
-            },
-            {
-              "period": "2025-10",
-              "count": 0
-            },
-            {
-              "period": "2025-11",
-              "count": 0
-            },
-            {
-              "period": "2025-12",
-              "count": 0
-            },
-            {
               "period": "2026-01",
               "count": 56
             },
@@ -5792,34 +5260,6 @@
         },
         "Illegal Dumping": {
           "monthly": [
-            {
-              "period": "2025-06",
-              "count": 0
-            },
-            {
-              "period": "2025-07",
-              "count": 0
-            },
-            {
-              "period": "2025-08",
-              "count": 0
-            },
-            {
-              "period": "2025-09",
-              "count": 0
-            },
-            {
-              "period": "2025-10",
-              "count": 0
-            },
-            {
-              "period": "2025-11",
-              "count": 0
-            },
-            {
-              "period": "2025-12",
-              "count": 0
-            },
             {
               "period": "2026-01",
               "count": 620
@@ -5879,34 +5319,6 @@
         "Vehicle Concerns": {
           "monthly": [
             {
-              "period": "2025-06",
-              "count": 0
-            },
-            {
-              "period": "2025-07",
-              "count": 0
-            },
-            {
-              "period": "2025-08",
-              "count": 0
-            },
-            {
-              "period": "2025-09",
-              "count": 0
-            },
-            {
-              "period": "2025-10",
-              "count": 0
-            },
-            {
-              "period": "2025-11",
-              "count": 0
-            },
-            {
-              "period": "2025-12",
-              "count": 0
-            },
-            {
               "period": "2026-01",
               "count": 444
             },
@@ -5964,34 +5376,6 @@
         },
         "Container Issues": {
           "monthly": [
-            {
-              "period": "2025-06",
-              "count": 0
-            },
-            {
-              "period": "2025-07",
-              "count": 0
-            },
-            {
-              "period": "2025-08",
-              "count": 0
-            },
-            {
-              "period": "2025-09",
-              "count": 0
-            },
-            {
-              "period": "2025-10",
-              "count": 0
-            },
-            {
-              "period": "2025-11",
-              "count": 0
-            },
-            {
-              "period": "2025-12",
-              "count": 0
-            },
             {
               "period": "2026-01",
               "count": 175
@@ -6051,34 +5435,6 @@
         "Encampment Concerns": {
           "monthly": [
             {
-              "period": "2025-06",
-              "count": 0
-            },
-            {
-              "period": "2025-07",
-              "count": 0
-            },
-            {
-              "period": "2025-08",
-              "count": 0
-            },
-            {
-              "period": "2025-09",
-              "count": 0
-            },
-            {
-              "period": "2025-10",
-              "count": 0
-            },
-            {
-              "period": "2025-11",
-              "count": 0
-            },
-            {
-              "period": "2025-12",
-              "count": 0
-            },
-            {
               "period": "2026-01",
               "count": 85
             },
@@ -6136,34 +5492,6 @@
         },
         "Pothole": {
           "monthly": [
-            {
-              "period": "2025-06",
-              "count": 0
-            },
-            {
-              "period": "2025-07",
-              "count": 0
-            },
-            {
-              "period": "2025-08",
-              "count": 0
-            },
-            {
-              "period": "2025-09",
-              "count": 0
-            },
-            {
-              "period": "2025-10",
-              "count": 0
-            },
-            {
-              "period": "2025-11",
-              "count": 0
-            },
-            {
-              "period": "2025-12",
-              "count": 0
-            },
             {
               "period": "2026-01",
               "count": 19
@@ -8145,19 +7473,19 @@
           },
           {
             "type": "Graffiti",
-            "fixTimeHours": null,
+            "fixTimeHours": 0,
             "resolutionRate": 70,
             "volume": 47
           },
           {
             "type": "Illegal Dumping",
-            "fixTimeHours": null,
+            "fixTimeHours": 46.7,
             "resolutionRate": 71,
             "volume": 35
           },
           {
             "type": "Encampment Concerns",
-            "fixTimeHours": null,
+            "fixTimeHours": 18.5,
             "resolutionRate": 63,
             "volume": 24
           },
@@ -8256,34 +7584,6 @@
         "Junk Pickup": {
           "monthly": [
             {
-              "period": "2025-06",
-              "count": 0
-            },
-            {
-              "period": "2025-07",
-              "count": 0
-            },
-            {
-              "period": "2025-08",
-              "count": 0
-            },
-            {
-              "period": "2025-09",
-              "count": 0
-            },
-            {
-              "period": "2025-10",
-              "count": 0
-            },
-            {
-              "period": "2025-11",
-              "count": 0
-            },
-            {
-              "period": "2025-12",
-              "count": 0
-            },
-            {
               "period": "2026-01",
               "count": 927
             },
@@ -8341,34 +7641,6 @@
         },
         "Graffiti": {
           "monthly": [
-            {
-              "period": "2025-06",
-              "count": 0
-            },
-            {
-              "period": "2025-07",
-              "count": 0
-            },
-            {
-              "period": "2025-08",
-              "count": 0
-            },
-            {
-              "period": "2025-09",
-              "count": 0
-            },
-            {
-              "period": "2025-10",
-              "count": 0
-            },
-            {
-              "period": "2025-11",
-              "count": 0
-            },
-            {
-              "period": "2025-12",
-              "count": 0
-            },
             {
               "period": "2026-01",
               "count": 119
@@ -8428,34 +7700,6 @@
         "Streetlight Outage": {
           "monthly": [
             {
-              "period": "2025-06",
-              "count": 0
-            },
-            {
-              "period": "2025-07",
-              "count": 0
-            },
-            {
-              "period": "2025-08",
-              "count": 0
-            },
-            {
-              "period": "2025-09",
-              "count": 0
-            },
-            {
-              "period": "2025-10",
-              "count": 0
-            },
-            {
-              "period": "2025-11",
-              "count": 0
-            },
-            {
-              "period": "2025-12",
-              "count": 0
-            },
-            {
               "period": "2026-01",
               "count": 63
             },
@@ -8513,34 +7757,6 @@
         },
         "Illegal Dumping": {
           "monthly": [
-            {
-              "period": "2025-06",
-              "count": 0
-            },
-            {
-              "period": "2025-07",
-              "count": 0
-            },
-            {
-              "period": "2025-08",
-              "count": 0
-            },
-            {
-              "period": "2025-09",
-              "count": 0
-            },
-            {
-              "period": "2025-10",
-              "count": 0
-            },
-            {
-              "period": "2025-11",
-              "count": 0
-            },
-            {
-              "period": "2025-12",
-              "count": 0
-            },
             {
               "period": "2026-01",
               "count": 148
@@ -8600,34 +7816,6 @@
         "Vehicle Concerns": {
           "monthly": [
             {
-              "period": "2025-06",
-              "count": 0
-            },
-            {
-              "period": "2025-07",
-              "count": 0
-            },
-            {
-              "period": "2025-08",
-              "count": 0
-            },
-            {
-              "period": "2025-09",
-              "count": 0
-            },
-            {
-              "period": "2025-10",
-              "count": 0
-            },
-            {
-              "period": "2025-11",
-              "count": 0
-            },
-            {
-              "period": "2025-12",
-              "count": 0
-            },
-            {
               "period": "2026-01",
               "count": 261
             },
@@ -8685,34 +7873,6 @@
         },
         "Container Issues": {
           "monthly": [
-            {
-              "period": "2025-06",
-              "count": 0
-            },
-            {
-              "period": "2025-07",
-              "count": 0
-            },
-            {
-              "period": "2025-08",
-              "count": 0
-            },
-            {
-              "period": "2025-09",
-              "count": 0
-            },
-            {
-              "period": "2025-10",
-              "count": 0
-            },
-            {
-              "period": "2025-11",
-              "count": 0
-            },
-            {
-              "period": "2025-12",
-              "count": 0
-            },
             {
               "period": "2026-01",
               "count": 180
@@ -8772,34 +7932,6 @@
         "Encampment Concerns": {
           "monthly": [
             {
-              "period": "2025-06",
-              "count": 0
-            },
-            {
-              "period": "2025-07",
-              "count": 0
-            },
-            {
-              "period": "2025-08",
-              "count": 0
-            },
-            {
-              "period": "2025-09",
-              "count": 0
-            },
-            {
-              "period": "2025-10",
-              "count": 0
-            },
-            {
-              "period": "2025-11",
-              "count": 0
-            },
-            {
-              "period": "2025-12",
-              "count": 0
-            },
-            {
               "period": "2026-01",
               "count": 36
             },
@@ -8857,34 +7989,6 @@
         },
         "Pothole": {
           "monthly": [
-            {
-              "period": "2025-06",
-              "count": 0
-            },
-            {
-              "period": "2025-07",
-              "count": 0
-            },
-            {
-              "period": "2025-08",
-              "count": 0
-            },
-            {
-              "period": "2025-09",
-              "count": 0
-            },
-            {
-              "period": "2025-10",
-              "count": 0
-            },
-            {
-              "period": "2025-11",
-              "count": 0
-            },
-            {
-              "period": "2025-12",
-              "count": 0
-            },
             {
               "period": "2026-01",
               "count": 24
@@ -10846,7 +9950,7 @@
           },
           {
             "type": "Encampment Concerns",
-            "fixTimeHours": null,
+            "fixTimeHours": 21.3,
             "resolutionRate": 55,
             "volume": 11
           },
@@ -10945,34 +10049,6 @@
         "Junk Pickup": {
           "monthly": [
             {
-              "period": "2025-06",
-              "count": 0
-            },
-            {
-              "period": "2025-07",
-              "count": 0
-            },
-            {
-              "period": "2025-08",
-              "count": 0
-            },
-            {
-              "period": "2025-09",
-              "count": 0
-            },
-            {
-              "period": "2025-10",
-              "count": 0
-            },
-            {
-              "period": "2025-11",
-              "count": 0
-            },
-            {
-              "period": "2025-12",
-              "count": 0
-            },
-            {
               "period": "2026-01",
               "count": 914
             },
@@ -11030,34 +10106,6 @@
         },
         "Graffiti": {
           "monthly": [
-            {
-              "period": "2025-06",
-              "count": 0
-            },
-            {
-              "period": "2025-07",
-              "count": 0
-            },
-            {
-              "period": "2025-08",
-              "count": 0
-            },
-            {
-              "period": "2025-09",
-              "count": 0
-            },
-            {
-              "period": "2025-10",
-              "count": 0
-            },
-            {
-              "period": "2025-11",
-              "count": 0
-            },
-            {
-              "period": "2025-12",
-              "count": 0
-            },
             {
               "period": "2026-01",
               "count": 389
@@ -11117,34 +10165,6 @@
         "Streetlight Outage": {
           "monthly": [
             {
-              "period": "2025-06",
-              "count": 0
-            },
-            {
-              "period": "2025-07",
-              "count": 0
-            },
-            {
-              "period": "2025-08",
-              "count": 0
-            },
-            {
-              "period": "2025-09",
-              "count": 0
-            },
-            {
-              "period": "2025-10",
-              "count": 0
-            },
-            {
-              "period": "2025-11",
-              "count": 0
-            },
-            {
-              "period": "2025-12",
-              "count": 0
-            },
-            {
               "period": "2026-01",
               "count": 90
             },
@@ -11202,34 +10222,6 @@
         },
         "Illegal Dumping": {
           "monthly": [
-            {
-              "period": "2025-06",
-              "count": 0
-            },
-            {
-              "period": "2025-07",
-              "count": 0
-            },
-            {
-              "period": "2025-08",
-              "count": 0
-            },
-            {
-              "period": "2025-09",
-              "count": 0
-            },
-            {
-              "period": "2025-10",
-              "count": 0
-            },
-            {
-              "period": "2025-11",
-              "count": 0
-            },
-            {
-              "period": "2025-12",
-              "count": 0
-            },
             {
               "period": "2026-01",
               "count": 333
@@ -11289,34 +10281,6 @@
         "Vehicle Concerns": {
           "monthly": [
             {
-              "period": "2025-06",
-              "count": 0
-            },
-            {
-              "period": "2025-07",
-              "count": 0
-            },
-            {
-              "period": "2025-08",
-              "count": 0
-            },
-            {
-              "period": "2025-09",
-              "count": 0
-            },
-            {
-              "period": "2025-10",
-              "count": 0
-            },
-            {
-              "period": "2025-11",
-              "count": 0
-            },
-            {
-              "period": "2025-12",
-              "count": 0
-            },
-            {
               "period": "2026-01",
               "count": 247
             },
@@ -11374,34 +10338,6 @@
         },
         "Container Issues": {
           "monthly": [
-            {
-              "period": "2025-06",
-              "count": 0
-            },
-            {
-              "period": "2025-07",
-              "count": 0
-            },
-            {
-              "period": "2025-08",
-              "count": 0
-            },
-            {
-              "period": "2025-09",
-              "count": 0
-            },
-            {
-              "period": "2025-10",
-              "count": 0
-            },
-            {
-              "period": "2025-11",
-              "count": 0
-            },
-            {
-              "period": "2025-12",
-              "count": 0
-            },
             {
               "period": "2026-01",
               "count": 178
@@ -11461,34 +10397,6 @@
         "Encampment Concerns": {
           "monthly": [
             {
-              "period": "2025-06",
-              "count": 0
-            },
-            {
-              "period": "2025-07",
-              "count": 0
-            },
-            {
-              "period": "2025-08",
-              "count": 0
-            },
-            {
-              "period": "2025-09",
-              "count": 0
-            },
-            {
-              "period": "2025-10",
-              "count": 0
-            },
-            {
-              "period": "2025-11",
-              "count": 0
-            },
-            {
-              "period": "2025-12",
-              "count": 0
-            },
-            {
               "period": "2026-01",
               "count": 29
             },
@@ -11546,34 +10454,6 @@
         },
         "Pothole": {
           "monthly": [
-            {
-              "period": "2025-06",
-              "count": 0
-            },
-            {
-              "period": "2025-07",
-              "count": 0
-            },
-            {
-              "period": "2025-08",
-              "count": 0
-            },
-            {
-              "period": "2025-09",
-              "count": 0
-            },
-            {
-              "period": "2025-10",
-              "count": 0
-            },
-            {
-              "period": "2025-11",
-              "count": 0
-            },
-            {
-              "period": "2025-12",
-              "count": 0
-            },
             {
               "period": "2026-01",
               "count": 16
@@ -13535,19 +12415,19 @@
           },
           {
             "type": "Encampment Concerns",
-            "fixTimeHours": null,
+            "fixTimeHours": 97.3,
             "resolutionRate": 40,
             "volume": 30
           },
           {
             "type": "Streetlight Outage",
-            "fixTimeHours": null,
+            "fixTimeHours": 29.2,
             "resolutionRate": 57,
             "volume": 14
           },
           {
             "type": "Pothole",
-            "fixTimeHours": null,
+            "fixTimeHours": 4.1,
             "resolutionRate": 88,
             "volume": 8
           }
@@ -13634,34 +12514,6 @@
         "Junk Pickup": {
           "monthly": [
             {
-              "period": "2025-06",
-              "count": 0
-            },
-            {
-              "period": "2025-07",
-              "count": 0
-            },
-            {
-              "period": "2025-08",
-              "count": 0
-            },
-            {
-              "period": "2025-09",
-              "count": 0
-            },
-            {
-              "period": "2025-10",
-              "count": 0
-            },
-            {
-              "period": "2025-11",
-              "count": 0
-            },
-            {
-              "period": "2025-12",
-              "count": 0
-            },
-            {
               "period": "2026-01",
               "count": 881
             },
@@ -13719,34 +12571,6 @@
         },
         "Graffiti": {
           "monthly": [
-            {
-              "period": "2025-06",
-              "count": 0
-            },
-            {
-              "period": "2025-07",
-              "count": 0
-            },
-            {
-              "period": "2025-08",
-              "count": 0
-            },
-            {
-              "period": "2025-09",
-              "count": 0
-            },
-            {
-              "period": "2025-10",
-              "count": 0
-            },
-            {
-              "period": "2025-11",
-              "count": 0
-            },
-            {
-              "period": "2025-12",
-              "count": 0
-            },
             {
               "period": "2026-01",
               "count": 460
@@ -13806,34 +12630,6 @@
         "Streetlight Outage": {
           "monthly": [
             {
-              "period": "2025-06",
-              "count": 0
-            },
-            {
-              "period": "2025-07",
-              "count": 0
-            },
-            {
-              "period": "2025-08",
-              "count": 0
-            },
-            {
-              "period": "2025-09",
-              "count": 0
-            },
-            {
-              "period": "2025-10",
-              "count": 0
-            },
-            {
-              "period": "2025-11",
-              "count": 0
-            },
-            {
-              "period": "2025-12",
-              "count": 0
-            },
-            {
               "period": "2026-01",
               "count": 86
             },
@@ -13891,34 +12687,6 @@
         },
         "Illegal Dumping": {
           "monthly": [
-            {
-              "period": "2025-06",
-              "count": 0
-            },
-            {
-              "period": "2025-07",
-              "count": 0
-            },
-            {
-              "period": "2025-08",
-              "count": 0
-            },
-            {
-              "period": "2025-09",
-              "count": 0
-            },
-            {
-              "period": "2025-10",
-              "count": 0
-            },
-            {
-              "period": "2025-11",
-              "count": 0
-            },
-            {
-              "period": "2025-12",
-              "count": 0
-            },
             {
               "period": "2026-01",
               "count": 331
@@ -13978,34 +12746,6 @@
         "Vehicle Concerns": {
           "monthly": [
             {
-              "period": "2025-06",
-              "count": 0
-            },
-            {
-              "period": "2025-07",
-              "count": 0
-            },
-            {
-              "period": "2025-08",
-              "count": 0
-            },
-            {
-              "period": "2025-09",
-              "count": 0
-            },
-            {
-              "period": "2025-10",
-              "count": 0
-            },
-            {
-              "period": "2025-11",
-              "count": 0
-            },
-            {
-              "period": "2025-12",
-              "count": 0
-            },
-            {
               "period": "2026-01",
               "count": 404
             },
@@ -14063,34 +12803,6 @@
         },
         "Container Issues": {
           "monthly": [
-            {
-              "period": "2025-06",
-              "count": 0
-            },
-            {
-              "period": "2025-07",
-              "count": 0
-            },
-            {
-              "period": "2025-08",
-              "count": 0
-            },
-            {
-              "period": "2025-09",
-              "count": 0
-            },
-            {
-              "period": "2025-10",
-              "count": 0
-            },
-            {
-              "period": "2025-11",
-              "count": 0
-            },
-            {
-              "period": "2025-12",
-              "count": 0
-            },
             {
               "period": "2026-01",
               "count": 171
@@ -14150,34 +12862,6 @@
         "Encampment Concerns": {
           "monthly": [
             {
-              "period": "2025-06",
-              "count": 0
-            },
-            {
-              "period": "2025-07",
-              "count": 0
-            },
-            {
-              "period": "2025-08",
-              "count": 0
-            },
-            {
-              "period": "2025-09",
-              "count": 0
-            },
-            {
-              "period": "2025-10",
-              "count": 0
-            },
-            {
-              "period": "2025-11",
-              "count": 0
-            },
-            {
-              "period": "2025-12",
-              "count": 0
-            },
-            {
               "period": "2026-01",
               "count": 69
             },
@@ -14235,34 +12919,6 @@
         },
         "Pothole": {
           "monthly": [
-            {
-              "period": "2025-06",
-              "count": 0
-            },
-            {
-              "period": "2025-07",
-              "count": 0
-            },
-            {
-              "period": "2025-08",
-              "count": 0
-            },
-            {
-              "period": "2025-09",
-              "count": 0
-            },
-            {
-              "period": "2025-10",
-              "count": 0
-            },
-            {
-              "period": "2025-11",
-              "count": 0
-            },
-            {
-              "period": "2025-12",
-              "count": 0
-            },
             {
               "period": "2026-01",
               "count": 18
@@ -16368,7 +15024,7 @@
           },
           {
             "type": "Encampment Concerns",
-            "fixTimeHours": null,
+            "fixTimeHours": 85.7,
             "resolutionRate": 37,
             "volume": 38
           },
@@ -16467,34 +15123,6 @@
         "Junk Pickup": {
           "monthly": [
             {
-              "period": "2025-06",
-              "count": 0
-            },
-            {
-              "period": "2025-07",
-              "count": 0
-            },
-            {
-              "period": "2025-08",
-              "count": 0
-            },
-            {
-              "period": "2025-09",
-              "count": 0
-            },
-            {
-              "period": "2025-10",
-              "count": 0
-            },
-            {
-              "period": "2025-11",
-              "count": 0
-            },
-            {
-              "period": "2025-12",
-              "count": 0
-            },
-            {
               "period": "2026-01",
               "count": 865
             },
@@ -16552,34 +15180,6 @@
         },
         "Graffiti": {
           "monthly": [
-            {
-              "period": "2025-06",
-              "count": 0
-            },
-            {
-              "period": "2025-07",
-              "count": 0
-            },
-            {
-              "period": "2025-08",
-              "count": 0
-            },
-            {
-              "period": "2025-09",
-              "count": 0
-            },
-            {
-              "period": "2025-10",
-              "count": 0
-            },
-            {
-              "period": "2025-11",
-              "count": 0
-            },
-            {
-              "period": "2025-12",
-              "count": 0
-            },
             {
               "period": "2026-01",
               "count": 201
@@ -16639,34 +15239,6 @@
         "Streetlight Outage": {
           "monthly": [
             {
-              "period": "2025-06",
-              "count": 0
-            },
-            {
-              "period": "2025-07",
-              "count": 0
-            },
-            {
-              "period": "2025-08",
-              "count": 0
-            },
-            {
-              "period": "2025-09",
-              "count": 0
-            },
-            {
-              "period": "2025-10",
-              "count": 0
-            },
-            {
-              "period": "2025-11",
-              "count": 0
-            },
-            {
-              "period": "2025-12",
-              "count": 0
-            },
-            {
               "period": "2026-01",
               "count": 75
             },
@@ -16724,34 +15296,6 @@
         },
         "Illegal Dumping": {
           "monthly": [
-            {
-              "period": "2025-06",
-              "count": 0
-            },
-            {
-              "period": "2025-07",
-              "count": 0
-            },
-            {
-              "period": "2025-08",
-              "count": 0
-            },
-            {
-              "period": "2025-09",
-              "count": 0
-            },
-            {
-              "period": "2025-10",
-              "count": 0
-            },
-            {
-              "period": "2025-11",
-              "count": 0
-            },
-            {
-              "period": "2025-12",
-              "count": 0
-            },
             {
               "period": "2026-01",
               "count": 250
@@ -16811,34 +15355,6 @@
         "Vehicle Concerns": {
           "monthly": [
             {
-              "period": "2025-06",
-              "count": 0
-            },
-            {
-              "period": "2025-07",
-              "count": 0
-            },
-            {
-              "period": "2025-08",
-              "count": 0
-            },
-            {
-              "period": "2025-09",
-              "count": 0
-            },
-            {
-              "period": "2025-10",
-              "count": 0
-            },
-            {
-              "period": "2025-11",
-              "count": 0
-            },
-            {
-              "period": "2025-12",
-              "count": 0
-            },
-            {
               "period": "2026-01",
               "count": 299
             },
@@ -16896,34 +15412,6 @@
         },
         "Container Issues": {
           "monthly": [
-            {
-              "period": "2025-06",
-              "count": 0
-            },
-            {
-              "period": "2025-07",
-              "count": 0
-            },
-            {
-              "period": "2025-08",
-              "count": 0
-            },
-            {
-              "period": "2025-09",
-              "count": 0
-            },
-            {
-              "period": "2025-10",
-              "count": 0
-            },
-            {
-              "period": "2025-11",
-              "count": 0
-            },
-            {
-              "period": "2025-12",
-              "count": 0
-            },
             {
               "period": "2026-01",
               "count": 168
@@ -16983,34 +15471,6 @@
         "Encampment Concerns": {
           "monthly": [
             {
-              "period": "2025-06",
-              "count": 0
-            },
-            {
-              "period": "2025-07",
-              "count": 0
-            },
-            {
-              "period": "2025-08",
-              "count": 0
-            },
-            {
-              "period": "2025-09",
-              "count": 0
-            },
-            {
-              "period": "2025-10",
-              "count": 0
-            },
-            {
-              "period": "2025-11",
-              "count": 0
-            },
-            {
-              "period": "2025-12",
-              "count": 0
-            },
-            {
               "period": "2026-01",
               "count": 68
             },
@@ -17068,34 +15528,6 @@
         },
         "Pothole": {
           "monthly": [
-            {
-              "period": "2025-06",
-              "count": 0
-            },
-            {
-              "period": "2025-07",
-              "count": 0
-            },
-            {
-              "period": "2025-08",
-              "count": 0
-            },
-            {
-              "period": "2025-09",
-              "count": 0
-            },
-            {
-              "period": "2025-10",
-              "count": 0
-            },
-            {
-              "period": "2025-11",
-              "count": 0
-            },
-            {
-              "period": "2025-12",
-              "count": 0
-            },
             {
               "period": "2026-01",
               "count": 28
@@ -18851,7 +17283,7 @@
           },
           {
             "type": "Graffiti",
-            "fixTimeHours": null,
+            "fixTimeHours": 0.4,
             "resolutionRate": 86,
             "volume": 28
           },
@@ -18869,7 +17301,7 @@
           },
           {
             "type": "Pothole",
-            "fixTimeHours": null,
+            "fixTimeHours": 28.8,
             "resolutionRate": 86,
             "volume": 7
           }
@@ -18919,7 +17351,7 @@
           },
           {
             "type": "Pothole",
-            "fixTimeHours": null,
+            "fixTimeHours": 13.4,
             "resolutionRate": 93,
             "volume": 28
           }
@@ -18955,34 +17387,6 @@
       "trendLines": {
         "Junk Pickup": {
           "monthly": [
-            {
-              "period": "2025-06",
-              "count": 0
-            },
-            {
-              "period": "2025-07",
-              "count": 0
-            },
-            {
-              "period": "2025-08",
-              "count": 0
-            },
-            {
-              "period": "2025-09",
-              "count": 0
-            },
-            {
-              "period": "2025-10",
-              "count": 0
-            },
-            {
-              "period": "2025-11",
-              "count": 0
-            },
-            {
-              "period": "2025-12",
-              "count": 0
-            },
             {
               "period": "2026-01",
               "count": 887
@@ -19042,34 +17446,6 @@
         "Graffiti": {
           "monthly": [
             {
-              "period": "2025-06",
-              "count": 0
-            },
-            {
-              "period": "2025-07",
-              "count": 0
-            },
-            {
-              "period": "2025-08",
-              "count": 0
-            },
-            {
-              "period": "2025-09",
-              "count": 0
-            },
-            {
-              "period": "2025-10",
-              "count": 0
-            },
-            {
-              "period": "2025-11",
-              "count": 0
-            },
-            {
-              "period": "2025-12",
-              "count": 0
-            },
-            {
               "period": "2026-01",
               "count": 132
             },
@@ -19127,34 +17503,6 @@
         },
         "Streetlight Outage": {
           "monthly": [
-            {
-              "period": "2025-06",
-              "count": 0
-            },
-            {
-              "period": "2025-07",
-              "count": 0
-            },
-            {
-              "period": "2025-08",
-              "count": 0
-            },
-            {
-              "period": "2025-09",
-              "count": 0
-            },
-            {
-              "period": "2025-10",
-              "count": 0
-            },
-            {
-              "period": "2025-11",
-              "count": 0
-            },
-            {
-              "period": "2025-12",
-              "count": 0
-            },
             {
               "period": "2026-01",
               "count": 91
@@ -19214,34 +17562,6 @@
         "Illegal Dumping": {
           "monthly": [
             {
-              "period": "2025-06",
-              "count": 0
-            },
-            {
-              "period": "2025-07",
-              "count": 0
-            },
-            {
-              "period": "2025-08",
-              "count": 0
-            },
-            {
-              "period": "2025-09",
-              "count": 0
-            },
-            {
-              "period": "2025-10",
-              "count": 0
-            },
-            {
-              "period": "2025-11",
-              "count": 0
-            },
-            {
-              "period": "2025-12",
-              "count": 0
-            },
-            {
               "period": "2026-01",
               "count": 134
             },
@@ -19299,34 +17619,6 @@
         },
         "Vehicle Concerns": {
           "monthly": [
-            {
-              "period": "2025-06",
-              "count": 0
-            },
-            {
-              "period": "2025-07",
-              "count": 0
-            },
-            {
-              "period": "2025-08",
-              "count": 0
-            },
-            {
-              "period": "2025-09",
-              "count": 0
-            },
-            {
-              "period": "2025-10",
-              "count": 0
-            },
-            {
-              "period": "2025-11",
-              "count": 0
-            },
-            {
-              "period": "2025-12",
-              "count": 0
-            },
             {
               "period": "2026-01",
               "count": 209
@@ -19386,34 +17678,6 @@
         "Container Issues": {
           "monthly": [
             {
-              "period": "2025-06",
-              "count": 0
-            },
-            {
-              "period": "2025-07",
-              "count": 0
-            },
-            {
-              "period": "2025-08",
-              "count": 0
-            },
-            {
-              "period": "2025-09",
-              "count": 0
-            },
-            {
-              "period": "2025-10",
-              "count": 0
-            },
-            {
-              "period": "2025-11",
-              "count": 0
-            },
-            {
-              "period": "2025-12",
-              "count": 0
-            },
-            {
               "period": "2026-01",
               "count": 172
             },
@@ -19472,34 +17736,6 @@
         "Encampment Concerns": {
           "monthly": [
             {
-              "period": "2025-06",
-              "count": 0
-            },
-            {
-              "period": "2025-07",
-              "count": 0
-            },
-            {
-              "period": "2025-08",
-              "count": 0
-            },
-            {
-              "period": "2025-09",
-              "count": 0
-            },
-            {
-              "period": "2025-10",
-              "count": 0
-            },
-            {
-              "period": "2025-11",
-              "count": 0
-            },
-            {
-              "period": "2025-12",
-              "count": 0
-            },
-            {
               "period": "2026-01",
               "count": 15
             },
@@ -19557,34 +17793,6 @@
         },
         "Pothole": {
           "monthly": [
-            {
-              "period": "2025-06",
-              "count": 0
-            },
-            {
-              "period": "2025-07",
-              "count": 0
-            },
-            {
-              "period": "2025-08",
-              "count": 0
-            },
-            {
-              "period": "2025-09",
-              "count": 0
-            },
-            {
-              "period": "2025-10",
-              "count": 0
-            },
-            {
-              "period": "2025-11",
-              "count": 0
-            },
-            {
-              "period": "2025-12",
-              "count": 0
-            },
             {
               "period": "2026-01",
               "count": 3
@@ -21732,7 +19940,7 @@
           },
           {
             "type": "Illegal Dumping",
-            "fixTimeHours": null,
+            "fixTimeHours": 25.1,
             "resolutionRate": 94,
             "volume": 31
           },
@@ -21788,7 +19996,7 @@
           },
           {
             "type": "Streetlight Outage",
-            "fixTimeHours": null,
+            "fixTimeHours": 463.2,
             "resolutionRate": 47,
             "volume": 97
           },
@@ -21836,34 +20044,6 @@
       "trendLines": {
         "Junk Pickup": {
           "monthly": [
-            {
-              "period": "2025-06",
-              "count": 0
-            },
-            {
-              "period": "2025-07",
-              "count": 0
-            },
-            {
-              "period": "2025-08",
-              "count": 0
-            },
-            {
-              "period": "2025-09",
-              "count": 0
-            },
-            {
-              "period": "2025-10",
-              "count": 0
-            },
-            {
-              "period": "2025-11",
-              "count": 0
-            },
-            {
-              "period": "2025-12",
-              "count": 0
-            },
             {
               "period": "2026-01",
               "count": 860
@@ -21923,34 +20103,6 @@
         "Graffiti": {
           "monthly": [
             {
-              "period": "2025-06",
-              "count": 0
-            },
-            {
-              "period": "2025-07",
-              "count": 0
-            },
-            {
-              "period": "2025-08",
-              "count": 0
-            },
-            {
-              "period": "2025-09",
-              "count": 0
-            },
-            {
-              "period": "2025-10",
-              "count": 0
-            },
-            {
-              "period": "2025-11",
-              "count": 0
-            },
-            {
-              "period": "2025-12",
-              "count": 0
-            },
-            {
               "period": "2026-01",
               "count": 236
             },
@@ -22008,34 +20160,6 @@
         },
         "Streetlight Outage": {
           "monthly": [
-            {
-              "period": "2025-06",
-              "count": 0
-            },
-            {
-              "period": "2025-07",
-              "count": 0
-            },
-            {
-              "period": "2025-08",
-              "count": 0
-            },
-            {
-              "period": "2025-09",
-              "count": 0
-            },
-            {
-              "period": "2025-10",
-              "count": 0
-            },
-            {
-              "period": "2025-11",
-              "count": 0
-            },
-            {
-              "period": "2025-12",
-              "count": 0
-            },
             {
               "period": "2026-01",
               "count": 31
@@ -22095,34 +20219,6 @@
         "Illegal Dumping": {
           "monthly": [
             {
-              "period": "2025-06",
-              "count": 0
-            },
-            {
-              "period": "2025-07",
-              "count": 0
-            },
-            {
-              "period": "2025-08",
-              "count": 0
-            },
-            {
-              "period": "2025-09",
-              "count": 0
-            },
-            {
-              "period": "2025-10",
-              "count": 0
-            },
-            {
-              "period": "2025-11",
-              "count": 0
-            },
-            {
-              "period": "2025-12",
-              "count": 0
-            },
-            {
               "period": "2026-01",
               "count": 131
             },
@@ -22180,34 +20276,6 @@
         },
         "Vehicle Concerns": {
           "monthly": [
-            {
-              "period": "2025-06",
-              "count": 0
-            },
-            {
-              "period": "2025-07",
-              "count": 0
-            },
-            {
-              "period": "2025-08",
-              "count": 0
-            },
-            {
-              "period": "2025-09",
-              "count": 0
-            },
-            {
-              "period": "2025-10",
-              "count": 0
-            },
-            {
-              "period": "2025-11",
-              "count": 0
-            },
-            {
-              "period": "2025-12",
-              "count": 0
-            },
             {
               "period": "2026-01",
               "count": 223
@@ -22267,34 +20335,6 @@
         "Container Issues": {
           "monthly": [
             {
-              "period": "2025-06",
-              "count": 0
-            },
-            {
-              "period": "2025-07",
-              "count": 0
-            },
-            {
-              "period": "2025-08",
-              "count": 0
-            },
-            {
-              "period": "2025-09",
-              "count": 0
-            },
-            {
-              "period": "2025-10",
-              "count": 0
-            },
-            {
-              "period": "2025-11",
-              "count": 0
-            },
-            {
-              "period": "2025-12",
-              "count": 0
-            },
-            {
               "period": "2026-01",
               "count": 167
             },
@@ -22353,34 +20393,6 @@
         "Encampment Concerns": {
           "monthly": [
             {
-              "period": "2025-06",
-              "count": 0
-            },
-            {
-              "period": "2025-07",
-              "count": 0
-            },
-            {
-              "period": "2025-08",
-              "count": 0
-            },
-            {
-              "period": "2025-09",
-              "count": 0
-            },
-            {
-              "period": "2025-10",
-              "count": 0
-            },
-            {
-              "period": "2025-11",
-              "count": 0
-            },
-            {
-              "period": "2025-12",
-              "count": 0
-            },
-            {
               "period": "2026-01",
               "count": 18
             },
@@ -22438,34 +20450,6 @@
         },
         "Pothole": {
           "monthly": [
-            {
-              "period": "2025-06",
-              "count": 0
-            },
-            {
-              "period": "2025-07",
-              "count": 0
-            },
-            {
-              "period": "2025-08",
-              "count": 0
-            },
-            {
-              "period": "2025-09",
-              "count": 0
-            },
-            {
-              "period": "2025-10",
-              "count": 0
-            },
-            {
-              "period": "2025-11",
-              "count": 0
-            },
-            {
-              "period": "2025-12",
-              "count": 0
-            },
             {
               "period": "2026-01",
               "count": 10
@@ -23413,13 +21397,13 @@
           },
           {
             "type": "Graffiti",
-            "fixTimeHours": null,
+            "fixTimeHours": 3.7,
             "resolutionRate": 75,
             "volume": 40
           },
           {
             "type": "Illegal Dumping",
-            "fixTimeHours": null,
+            "fixTimeHours": 44.6,
             "resolutionRate": 62,
             "volume": 37
           },
@@ -23524,34 +21508,6 @@
         "Junk Pickup": {
           "monthly": [
             {
-              "period": "2025-06",
-              "count": 0
-            },
-            {
-              "period": "2025-07",
-              "count": 0
-            },
-            {
-              "period": "2025-08",
-              "count": 0
-            },
-            {
-              "period": "2025-09",
-              "count": 0
-            },
-            {
-              "period": "2025-10",
-              "count": 0
-            },
-            {
-              "period": "2025-11",
-              "count": 0
-            },
-            {
-              "period": "2025-12",
-              "count": 0
-            },
-            {
               "period": "2026-01",
               "count": 856
             },
@@ -23609,34 +21565,6 @@
         },
         "Graffiti": {
           "monthly": [
-            {
-              "period": "2025-06",
-              "count": 0
-            },
-            {
-              "period": "2025-07",
-              "count": 0
-            },
-            {
-              "period": "2025-08",
-              "count": 0
-            },
-            {
-              "period": "2025-09",
-              "count": 0
-            },
-            {
-              "period": "2025-10",
-              "count": 0
-            },
-            {
-              "period": "2025-11",
-              "count": 0
-            },
-            {
-              "period": "2025-12",
-              "count": 0
-            },
             {
               "period": "2026-01",
               "count": 197
@@ -23696,34 +21624,6 @@
         "Streetlight Outage": {
           "monthly": [
             {
-              "period": "2025-06",
-              "count": 0
-            },
-            {
-              "period": "2025-07",
-              "count": 0
-            },
-            {
-              "period": "2025-08",
-              "count": 0
-            },
-            {
-              "period": "2025-09",
-              "count": 0
-            },
-            {
-              "period": "2025-10",
-              "count": 0
-            },
-            {
-              "period": "2025-11",
-              "count": 0
-            },
-            {
-              "period": "2025-12",
-              "count": 0
-            },
-            {
               "period": "2026-01",
               "count": 56
             },
@@ -23781,34 +21681,6 @@
         },
         "Illegal Dumping": {
           "monthly": [
-            {
-              "period": "2025-06",
-              "count": 0
-            },
-            {
-              "period": "2025-07",
-              "count": 0
-            },
-            {
-              "period": "2025-08",
-              "count": 0
-            },
-            {
-              "period": "2025-09",
-              "count": 0
-            },
-            {
-              "period": "2025-10",
-              "count": 0
-            },
-            {
-              "period": "2025-11",
-              "count": 0
-            },
-            {
-              "period": "2025-12",
-              "count": 0
-            },
             {
               "period": "2026-01",
               "count": 124
@@ -23868,34 +21740,6 @@
         "Vehicle Concerns": {
           "monthly": [
             {
-              "period": "2025-06",
-              "count": 0
-            },
-            {
-              "period": "2025-07",
-              "count": 0
-            },
-            {
-              "period": "2025-08",
-              "count": 0
-            },
-            {
-              "period": "2025-09",
-              "count": 0
-            },
-            {
-              "period": "2025-10",
-              "count": 0
-            },
-            {
-              "period": "2025-11",
-              "count": 0
-            },
-            {
-              "period": "2025-12",
-              "count": 0
-            },
-            {
               "period": "2026-01",
               "count": 145
             },
@@ -23953,34 +21797,6 @@
         },
         "Container Issues": {
           "monthly": [
-            {
-              "period": "2025-06",
-              "count": 0
-            },
-            {
-              "period": "2025-07",
-              "count": 0
-            },
-            {
-              "period": "2025-08",
-              "count": 0
-            },
-            {
-              "period": "2025-09",
-              "count": 0
-            },
-            {
-              "period": "2025-10",
-              "count": 0
-            },
-            {
-              "period": "2025-11",
-              "count": 0
-            },
-            {
-              "period": "2025-12",
-              "count": 0
-            },
             {
               "period": "2026-01",
               "count": 166
@@ -24040,34 +21856,6 @@
         "Encampment Concerns": {
           "monthly": [
             {
-              "period": "2025-06",
-              "count": 0
-            },
-            {
-              "period": "2025-07",
-              "count": 0
-            },
-            {
-              "period": "2025-08",
-              "count": 0
-            },
-            {
-              "period": "2025-09",
-              "count": 0
-            },
-            {
-              "period": "2025-10",
-              "count": 0
-            },
-            {
-              "period": "2025-11",
-              "count": 0
-            },
-            {
-              "period": "2025-12",
-              "count": 0
-            },
-            {
               "period": "2026-01",
               "count": 22
             },
@@ -24125,34 +21913,6 @@
         },
         "Pothole": {
           "monthly": [
-            {
-              "period": "2025-06",
-              "count": 0
-            },
-            {
-              "period": "2025-07",
-              "count": 0
-            },
-            {
-              "period": "2025-08",
-              "count": 0
-            },
-            {
-              "period": "2025-09",
-              "count": 0
-            },
-            {
-              "period": "2025-10",
-              "count": 0
-            },
-            {
-              "period": "2025-11",
-              "count": 0
-            },
-            {
-              "period": "2025-12",
-              "count": 0
-            },
             {
               "period": "2026-01",
               "count": 22
