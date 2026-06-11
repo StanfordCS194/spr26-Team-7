@@ -1,6 +1,7 @@
 import { Fragment, useEffect, useState } from 'react'
-import { Image, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native'
+import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
+import { MiniMapView } from '../components/MiniMapView'
 import { SampleIssueImage } from '../components/SampleIssueImage'
 
 import { dashboard311 } from '../data/dashboard311'
@@ -148,14 +149,16 @@ export const IssueStatusScreen = ({
   const [draftLocationSub, setDraftLocationSub] = useState(report.address)
   const displayImage = reportImage !== undefined ? reportImage : isSampleIssue ? report.image : null
   const showPhotoCount = report.photoCount > 0 && Boolean(displayImage)
-  const coordinatesText = isSampleIssue
-    ? `${report.latitude.toFixed(6)}, ${report.longitude.toFixed(6)}`
-    : null
-
-  const d3IssueTypes = dashboard311.districts['3']?.issueTypes ?? []
-  const issueMetrics = d3IssueTypes.find(t => t.name === report.category)
+  const mapLatitude = report.latitude
+  const mapLongitude = report.longitude
+  const coordinatesText =
+    mapLatitude != null && mapLongitude != null
+      ? `${mapLatitude.toFixed(6)}, ${mapLongitude.toFixed(6)}`
+      : null
 
   const districtKey = report.district.match(/\d+/)?.[0] ?? '3'
+  const districtIssueTypes = dashboard311.districts[districtKey]?.issueTypes ?? []
+  const issueMetrics = districtIssueTypes.find(t => t.name === report.category)
   const catItems = dashboardV2.districts[districtKey]?.categoryComparison.year ?? []
   const fixTimeHours = catItems.find(c => c.type === report.category)?.fixTimeHours ?? null
   const estResolutionText = fixTimeHours != null ? fmtFixTime(fixTimeHours) : 'Not available'
@@ -257,16 +260,10 @@ export const IssueStatusScreen = ({
         <View style={styles.card}>
           <Text style={styles.sectionTitle}>Location</Text>
           <View style={styles.mapArea}>
-            <Image source={require('../../assets/new-map.png')} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
-            <View
-              style={[
-                styles.mapPin,
-                {
-                  top: `${report.pin.top}%`,
-                  left: `${report.pin.left}%`,
-                  backgroundColor: report.pin.color,
-                },
-              ]}
+            <MiniMapView
+              style={StyleSheet.absoluteFillObject}
+              latitude={mapLatitude}
+              longitude={mapLongitude}
             />
           </View>
           {isEditingText ? (
@@ -362,7 +359,7 @@ export const IssueStatusScreen = ({
           <InsightRow
             label="Resolution rate"
             value={issueMetrics
-              ? `${issueMetrics.all.resolvedPct}% of District 3 cases resolved`
+              ? `${issueMetrics.all.resolvedPct}% of District ${districtKey} cases resolved`
               : `${report.reportCount} ${report.reportCount === 1 ? 'person' : 'people'} reported or confirmed this issue`}
           />
           <InsightRow label="Assigned team" value={report.assignedTo} />
@@ -506,14 +503,6 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     overflow: 'hidden',
     backgroundColor: '#2C2D32',
-  },
-  mapPin: {
-    position: 'absolute',
-    width: 14,
-    height: 14,
-    borderRadius: 7,
-    borderWidth: 2,
-    borderColor: '#fff',
   },
   value: { color: '#F2F3F5', fontWeight: '700', fontSize: 16, lineHeight: 22 },
   secondaryValue: { color: '#8D939E', fontWeight: '500', lineHeight: 21 },

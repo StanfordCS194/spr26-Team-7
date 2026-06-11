@@ -28,6 +28,7 @@ import { ProfileReport } from './src/lib/profileStats';
 import { createReport, fetchReportByExternalId, fetchReportsByIds, fetchUserReports, getSampleIssueIdFromRow, ReportRow, reportRowToMapReport, updateReportText } from './src/lib/reports';
 import { fetchFollowedReportIds, followReport, unfollowReport } from './src/lib/reportFollows';
 import { MlClassification } from './src/ml/types';
+import { formatDistrictLabel, lookupDistrictFromCoordinates } from './src/lib/districtLookup';
 
 const CATEGORY_LABEL: Record<MapReportCategoryId, IssueCategory> = {
   pothole:     'Pothole',
@@ -68,7 +69,7 @@ function mapReportToRecord(r: MapReport, isFollowing = false): ReportRecord {
     title:               r.title,
     category,
     tag:                 category,
-    district:            `San Jose District ${r.district}`,
+    district:            formatDistrictLabel(r.district),
     status:              STATUS_MAP[r.status] ?? 'Submitted',
     description:         r.description,
     address:             r.address,
@@ -78,6 +79,8 @@ function mapReportToRecord(r: MapReport, isFollowing = false): ReportRecord {
     isFollowing,
     isUserOwned:         true,
     photoCount:          0,
+    latitude:            r.lat,
+    longitude:           r.lon,
     pin:                 { top: 0, left: 0, color: '#5B9BF8' },
     timeline:            r.timeline.map((t, i) => ({
       label:    (STATUS_MAP[t.label] ?? t.label) as ReportStatus,
@@ -93,12 +96,17 @@ function makeSubmissionId(): string {
 }
 
 function classificationToRecord(c: Classification, id: string): ReportRecord {
+  const fallbackLat = 37.338
+  const fallbackLon = -121.886
+  const lat = c.latitude ?? fallbackLat
+  const lon = c.longitude ?? fallbackLon
+
   return {
     id,
     title:               c.tag,
     category:            c.category as IssueCategory,
     tag:                 c.tag,
-    district:            c.locationSub || 'San Jose',
+    district:            formatDistrictLabel(lookupDistrictFromCoordinates(lat, lon)),
     status:              'Submitted',
     description:         c.desc,
     address:             c.locationMain,
@@ -108,6 +116,8 @@ function classificationToRecord(c: Classification, id: string): ReportRecord {
     isFollowing:         false,
     isUserOwned:         true,
     photoCount:          0,
+    latitude:            c.latitude,
+    longitude:           c.longitude,
     pin:                 { top: 50, left: 50, color: '#5B9BF8' },
     timeline:            [{ label: 'Submitted', dateText: 'Just now', reached: true }],
   }
@@ -221,9 +231,10 @@ const createGuestMapReport = (
   classification: Classification,
   selectedSampleIssue: SampleIssueRecord | null,
 ): MapReport => {
-  const districtMatch = selectedSampleIssue?.district.match(/\d+/);
-  const district = districtMatch ? Number(districtMatch[0]) : 3;
   const fallbackCenter = { latitude: 37.338, longitude: -121.886 };
+  const lat = classification.latitude ?? selectedSampleIssue?.latitude ?? fallbackCenter.latitude;
+  const lon = classification.longitude ?? selectedSampleIssue?.longitude ?? fallbackCenter.longitude;
+  const district = lookupDistrictFromCoordinates(lat, lon);
 
   return {
     id: `guest-${Date.now()}`,
@@ -231,8 +242,8 @@ const createGuestMapReport = (
     title: classification.tag,
     address: `${classification.locationMain}, ${classification.locationSub}`,
     district,
-    lat: classification.latitude ?? selectedSampleIssue?.latitude ?? fallbackCenter.latitude,
-    lon: classification.longitude ?? selectedSampleIssue?.longitude ?? fallbackCenter.longitude,
+    lat,
+    lon,
     status: 'Submitted',
     createdAt: new Date(),
     description: classification.desc,
@@ -602,6 +613,9 @@ export default function App() {
         title: mapReport.title,
         locationName: mapReport.address,
         address: mapReport.address,
+        latitude: mapReport.lat,
+        longitude: mapReport.lon,
+        district: formatDistrictLabel(mapReport.district),
         description: mapReport.description,
         isFollowing: isFollowingReport(reportId),
         timeline: mapReport.timeline.map((entry, i) => ({
@@ -805,8 +819,8 @@ export default function App() {
       setPendingRecord(mapReportToRecord(mapReport));
       void postSubmission({
         id:          subId,
-        lat:         37.338,
-        lon:         -121.886,
+        lat:         mapReport.lat,
+        lon:         mapReport.lon,
         category:    c.category,
         submittedAt: new Date().toISOString(),
       }).catch(() => {});
