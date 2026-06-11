@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Animated, Easing, StyleSheet, Text, View } from "react-native";
+import { Animated, Easing, Pressable, StyleSheet, Text, View } from "react-native";
 import { useML, MlStage } from "../ml/MLProvider";
 import { assetToDataUrl, uriToDataUrl } from "../ml/imageToDataUrl";
 import { MlClassification } from "../ml/types";
@@ -9,6 +9,7 @@ type AnalyzingScreenProps = {
   image?: SampleIssueImage | null;
   imageUri?: string | null;
   onDone: (result: MlClassification | null) => void;
+  onCancel?: () => void;
 };
 
 const STAGE_LABEL: Record<MlStage, string> = {
@@ -21,7 +22,7 @@ const STAGE_LABEL: Record<MlStage, string> = {
 // by instantly, even when on-device inference finishes faster.
 const MIN_VISIBLE_MS = 2000;
 
-export const AnalyzingScreen = ({ image, imageUri, onDone }: AnalyzingScreenProps) => {
+export const AnalyzingScreen = ({ image, imageUri, onDone, onCancel }: AnalyzingScreenProps) => {
   const { status, loadPct, classify } = useML();
   const [phaseText, setPhaseText] = useState("Preparing photo…");
   const [progress, setProgress] = useState(0);
@@ -167,6 +168,12 @@ export const AnalyzingScreen = ({ image, imageUri, onDone }: AnalyzingScreenProp
         <View style={styles.progressTrack}>
           <View style={[styles.progressFill, { width: `${progress}%` }]} />
         </View>
+
+        {onCancel && (
+          <Pressable style={styles.cancelButton} onPress={onCancel} accessibilityRole="button" accessibilityLabel="Cancel analysis">
+            <Text style={styles.cancelText}>Cancel</Text>
+          </Pressable>
+        )}
       </View>
     </View>
   );
@@ -229,5 +236,18 @@ const styles = StyleSheet.create({
     height: "100%",
     backgroundColor: '#4F8EF7',
     borderRadius: 4,
+  },
+  cancelButton: {
+    marginTop: 12,
+    paddingVertical: 10,
+    paddingHorizontal: 28,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#35373D',
+  },
+  cancelText: {
+    color: '#8D939E',
+    fontSize: 14,
+    fontWeight: '600',
   },
 });

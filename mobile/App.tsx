@@ -930,6 +930,7 @@ export default function App() {
             setMlResult(result);
             setReportStep('classify');
           }}
+          onCancel={() => setReportStep(selectedSampleIssue ? 'picker' : 'camera')}
         />
       );
     }
