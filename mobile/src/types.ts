@@ -49,6 +49,8 @@ export type ReportRecord = {
   isFollowing: boolean
   isUserOwned: boolean
   photoCount: number
+  latitude?: number
+  longitude?: number
   pin: {
     top: number
     left: number

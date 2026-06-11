@@ -7,6 +7,7 @@ import {
   MapReportStatus,
 } from '../data/mockMapReports'
 import { supabase } from './supabase'
+import { formatDistrictLabel, lookupDistrictFromCoordinates } from './districtLookup'
 
 const CATEGORY_TO_ID: Record<string, MapReportCategoryId> = {
   Pothole: 'pothole',
@@ -194,11 +195,10 @@ export const createReport = async (
   classification: Classification,
   sampleIssue: SampleIssueRecord | null,
 ): Promise<ReportRow> => {
-  const district = sampleIssue?.district ?? 'San Jose District 3'
-  const districtNumber = parseDistrictNumber(district)
-  const center = DISTRICT_CENTERS[districtNumber] ?? DISTRICT_CENTERS[3]
+  const center = DISTRICT_CENTERS[3]
   const lat = classification.latitude ?? sampleIssue?.latitude ?? center.latitude
   const lon = classification.longitude ?? sampleIssue?.longitude ?? center.longitude
+  const district = formatDistrictLabel(lookupDistrictFromCoordinates(lat, lon))
 
   const { data, error } = await supabase
     .from('reports')
